@@ -23,7 +23,7 @@ public class Main extends ApplicationAdapter {
     private static final float WORLD_SIZE = 200f;
     private static final float WORLD_VIEWPORT_WIDTH = 30f;
 
-    private static final float MIN_ZOOM = 0.25f;
+    private static final float MIN_ZOOM = 0.15f;
     private static final float MAX_ZOOM = 4.0f;
 
     // MVC components
