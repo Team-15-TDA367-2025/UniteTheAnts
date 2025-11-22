@@ -50,8 +50,8 @@ public class CameraView {
    * @param screenY Screen Y coordinate (pixels)
    * @return World coordinates
    */
-  public Vector2 screenToWorld(float screenX, float screenY) {
-    Vector3 worldPos = camera.unproject(new Vector3(screenX, screenY, 0));
+  public Vector2 screenToWorld(Vector2 screenPos) {
+    Vector3 worldPos = camera.unproject(new Vector3(screenPos, 0));
     return new Vector2(worldPos.x, worldPos.y);
   }
 }
