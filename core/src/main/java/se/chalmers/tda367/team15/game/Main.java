@@ -2,11 +2,7 @@ package se.chalmers.tda367.team15.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -17,6 +13,8 @@ import se.chalmers.tda367.team15.game.model.camera.CameraConstraints;
 import se.chalmers.tda367.team15.game.model.camera.CameraModel;
 import se.chalmers.tda367.team15.game.model.entity.Ant;
 import se.chalmers.tda367.team15.game.view.CameraView;
+import se.chalmers.tda367.team15.game.view.GridView;
+import se.chalmers.tda367.team15.game.view.HUDView;
 import se.chalmers.tda367.team15.game.view.SceneView;
 import se.chalmers.tda367.team15.game.view.TextureRegistry;
 
@@ -35,12 +33,11 @@ public class Main extends ApplicationAdapter {
     private OrthographicCamera hudCamera;
     private CameraController cameraController;
     private ViewportListener viewportListener;
+    
+    // Views
     private SceneView sceneView;
-
-    // Rendering
-    private SpriteBatch hudBatch;
-    private BitmapFont font;
-    private ShapeRenderer shapeRenderer;
+    private GridView gridView;
+    private HUDView hudView;
     private TextureRegistry textureRegistry;
 
     @Override
@@ -85,19 +82,14 @@ public class Main extends ApplicationAdapter {
         viewportListener.addResizeHandler((width, height) -> {
             hudCamera.setToOrtho(false, width, height);
             hudCamera.update();
-            // Update HUD batch projection when camera changes
-            hudBatch.setProjectionMatrix(hudCamera.combined);
+            hudView.updateProjectionMatrix(hudCamera);
         });
 
         // Setup Rendering System
         textureRegistry = new TextureRegistry();
         sceneView = new SceneView(worldCameraView, textureRegistry);
-        
-        hudBatch = new SpriteBatch();
-        hudBatch.setProjectionMatrix(hudCamera.combined);
-        
-        font = new BitmapFont();
-        shapeRenderer = new ShapeRenderer();
+        gridView = new GridView(worldCameraView, 5f);
+        hudView = new HUDView(cameraModel, worldCameraView, hudCamera);
     }
 
     @Override
@@ -116,64 +108,10 @@ public class Main extends ApplicationAdapter {
         sceneView.render(gameWorld);
         
         // Debug Grid
-        shapeRenderer.setProjectionMatrix(worldCameraView.getCombinedMatrix());
-        drawGrid();
+        gridView.render();
 
         // HUD Render
-        hudBatch.begin();
-        drawHUD();
-        hudBatch.end();
-    }
-
-    // AI Generated for testing. Remove later.
-    private void drawGrid() {
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(Color.GRAY);
-
-        float gridSize = 5f; // Grid cell size in world units
-        Vector2 effectiveViewportSize = worldCameraView.getViewportSize().scl(worldCameraView.getCamera().zoom);
-        float startX = (float) Math
-                .floor((worldCameraView.getCamera().position.x - effectiveViewportSize.x / 2f) / gridSize) * gridSize;
-        float endX = (float) Math
-                .ceil((worldCameraView.getCamera().position.x + effectiveViewportSize.x / 2f) / gridSize) * gridSize;
-        float startY = (float) Math
-                .floor((worldCameraView.getCamera().position.y - effectiveViewportSize.y / 2f) / gridSize) * gridSize;
-        float endY = (float) Math
-                .ceil((worldCameraView.getCamera().position.y + effectiveViewportSize.y / 2f) / gridSize) * gridSize;
-
-        // Draw vertical lines
-        for (float x = startX; x <= endX; x += gridSize) {
-            shapeRenderer.line(x, startY, x, endY);
-        }
-
-        // Draw horizontal lines
-        for (float y = startY; y <= endY; y += gridSize) {
-            shapeRenderer.line(startX, y, endX, y);
-        }
-
-        shapeRenderer.end();
-    }
-
-    private void drawHUD() {
-        font.setColor(Color.WHITE);
-        float y = Gdx.graphics.getHeight();
-        float lineHeight = 25f;
-
-        // camera debug info
-        y -= 10f;
-        font.draw(hudBatch, String.format("FPS: %d", Gdx.graphics.getFramesPerSecond()), 10, y);
-        y -= lineHeight;
-        font.draw(hudBatch, String.format("Camera xy: (%.1f, %.1f)",
-                cameraModel.getPosition().x, cameraModel.getPosition().y), 10, y);
-        y -= lineHeight;
-
-        font.draw(hudBatch, String.format("Zoom: %.2f", cameraModel.getZoom()), 10, y);
-        y -= lineHeight;
-
-        font.draw(hudBatch, String.format("Viewport: %.1f x %.1f",
-                worldCameraView.getViewportSize().x, worldCameraView.getViewportSize().y), 10, y);
-        y -= lineHeight;
-        // end of debug info
+        hudView.render();
     }
 
     @Override
@@ -184,9 +122,8 @@ public class Main extends ApplicationAdapter {
     @Override
     public void dispose() {
         sceneView.dispose();
-        hudBatch.dispose();
-        font.dispose();
-        shapeRenderer.dispose();
+        gridView.dispose();
+        hudView.dispose();
         textureRegistry.dispose();
     }
 }

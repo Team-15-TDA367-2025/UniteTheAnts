@@ -42,7 +42,6 @@ public class CameraController extends InputAdapter {
         
         cameraModel.zoomAround(screenPos, amountY, zoomSpeed, screenSize, viewportSize);
         cameraModel.applyConstraints(viewportSize);
-        cameraView.updateCamera();
         
         return true;
     }
