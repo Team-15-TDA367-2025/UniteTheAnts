@@ -8,12 +8,12 @@ import se.chalmers.tda367.team15.game.model.CameraModel;
 import se.chalmers.tda367.team15.game.view.CameraView;
 
 public class CameraController extends InputAdapter {
-    private CameraModel model;
+    private CameraModel cameraModel;
     private CameraView cameraView;
     private float zoomSpeed = 0.1f;
 
     public CameraController(CameraModel model, CameraView cameraView) {
-        this.model = model;
+        this.cameraModel = model;
         this.cameraView = cameraView;
     }
 
@@ -27,9 +27,9 @@ public class CameraController extends InputAdapter {
             Vector2 screenSize = new Vector2(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             Vector2 viewportSize = cameraView.getViewportSize();
             
-            Vector2 worldDelta = model.screenDeltaToWorldDelta(mouseDelta, screenSize, viewportSize);
-            model.pan(worldDelta);
-            model.applyConstraints(viewportSize);
+            Vector2 worldDelta = cameraModel.screenDeltaToWorldDelta(mouseDelta, screenSize, viewportSize);
+            cameraModel.moveBy(worldDelta.scl(-1));
+            cameraModel.applyConstraints(viewportSize);
         }
     }
 
@@ -39,10 +39,8 @@ public class CameraController extends InputAdapter {
         Vector2 screenSize = new Vector2(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Vector2 viewportSize = cameraView.getViewportSize();
         
-        model.zoomAround(screenPos, amountY, zoomSpeed, screenSize, viewportSize);
-        model.applyConstraints(viewportSize);
-        
-        // Update camera view to reflect new zoom
+        cameraModel.zoomAround(screenPos, amountY, zoomSpeed, screenSize, viewportSize);
+        cameraModel.applyConstraints(viewportSize);
         cameraView.updateCamera();
         
         return true;

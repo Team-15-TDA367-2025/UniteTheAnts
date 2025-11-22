@@ -90,16 +90,6 @@ public class CameraModel {
     }
 
     /**
-     * Pans the camera by a world delta.
-     * 
-     * @param worldDelta World delta in world units (will be negated for natural
-     *                   panning)
-     */
-    public void pan(Vector2 worldDelta) {
-        moveBy(worldDelta.cpy().scl(-1));
-    }
-
-    /**
      * Zooms around a specific screen point, keeping that point fixed in world
      * space.
      * 
