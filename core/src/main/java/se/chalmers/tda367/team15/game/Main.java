@@ -20,7 +20,7 @@ import se.chalmers.tda367.team15.game.view.SceneView;
 
 public class Main extends ApplicationAdapter {
     // World bounds - adjust these to match your game world size
-    private static final float WORLD_SIZE = 100f;
+    private static final float WORLD_SIZE = 200f;
     private static final float WORLD_VIEWPORT_WIDTH = 30f;
 
     private static final float MIN_ZOOM = 0.25f;

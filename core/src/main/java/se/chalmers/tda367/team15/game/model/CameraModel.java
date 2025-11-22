@@ -27,21 +27,22 @@ public class CameraModel {
 
     public void moveTo(Vector2 newPosition) {
         position.set(newPosition);
-        applyConstraints();
     }
 
     public void moveBy(Vector2 delta) {
         position.add(delta);
-        applyConstraints();
     }
 
     public void zoomTo(float newZoom) {
         this.zoom = MathUtils.clamp(newZoom, constraints.getMinZoom(), constraints.getMaxZoom());
     }
 
-    private void applyConstraints() {
-        Rectangle bounds = constraints.getBounds();
-        position.x = MathUtils.clamp(position.x, bounds.x, bounds.x + bounds.width);
-        position.y = MathUtils.clamp(position.y, bounds.y, bounds.y + bounds.height);
+    /**
+     * Applies constraints to the camera position considering the viewport size.
+     * Ensures that the camera viewport corners stay within bounds when possible.
+     * @param viewportSize The viewport size in world units (before zoom)
+     */
+    public void applyConstraints(Vector2 viewportSize) {
+        position.set(constraints.constrainPosition(position, zoom, viewportSize));
     }
 }
