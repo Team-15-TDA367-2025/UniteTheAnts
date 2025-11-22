@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import se.chalmers.tda367.team15.game.controller.CameraController;
 import se.chalmers.tda367.team15.game.controller.ViewportListener;
@@ -117,16 +118,15 @@ public class Main extends ApplicationAdapter {
         shapeRenderer.setColor(Color.GRAY);
 
         float gridSize = 5f; // Grid cell size in world units
-        float effectiveViewportWidth = worldCameraView.getViewportWidth() * worldCameraView.getCamera().zoom;
-        float effectiveViewportHeight = worldCameraView.getViewportHeight() * worldCameraView.getCamera().zoom;
+        Vector2 effectiveViewportSize = worldCameraView.getViewportSize().scl(worldCameraView.getCamera().zoom);
         float startX = (float) Math
-                .floor((worldCameraView.getCamera().position.x - effectiveViewportWidth / 2f) / gridSize) * gridSize;
+                .floor((worldCameraView.getCamera().position.x - effectiveViewportSize.x / 2f) / gridSize) * gridSize;
         float endX = (float) Math
-                .ceil((worldCameraView.getCamera().position.x + effectiveViewportWidth / 2f) / gridSize) * gridSize;
+                .ceil((worldCameraView.getCamera().position.x + effectiveViewportSize.x / 2f) / gridSize) * gridSize;
         float startY = (float) Math
-                .floor((worldCameraView.getCamera().position.y - effectiveViewportHeight / 2f) / gridSize) * gridSize;
+                .floor((worldCameraView.getCamera().position.y - effectiveViewportSize.y / 2f) / gridSize) * gridSize;
         float endY = (float) Math
-                .ceil((worldCameraView.getCamera().position.y + effectiveViewportHeight / 2f) / gridSize) * gridSize;
+                .ceil((worldCameraView.getCamera().position.y + effectiveViewportSize.y / 2f) / gridSize) * gridSize;
 
         // Draw vertical lines
         for (float x = startX; x <= endX; x += gridSize) {
@@ -156,7 +156,7 @@ public class Main extends ApplicationAdapter {
         y -= lineHeight;
 
         font.draw(hudBatch, String.format("Viewport: %.1f x %.1f",
-                worldCameraView.getViewportWidth(), worldCameraView.getViewportHeight()), 10, y);
+                worldCameraView.getViewportSize().x, worldCameraView.getViewportSize().y), 10, y);
         y -= lineHeight;
         // end of debug info
     }

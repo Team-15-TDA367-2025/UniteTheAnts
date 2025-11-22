@@ -2,6 +2,7 @@ package se.chalmers.tda367.team15.game.view;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 import se.chalmers.tda367.team15.game.model.CameraModel;
@@ -14,12 +15,10 @@ public class CameraView {
 
   public CameraView(CameraModel model, float viewportWidth, float viewportHeight) {
     this.model = model;
-    this.viewportWidth = viewportWidth;
-    this.viewportHeight = viewportHeight;
 
     // Create camera with aspect ratio consideration
-    float aspectRatio = viewportHeight / viewportWidth;
-    this.camera = new OrthographicCamera(viewportWidth, viewportWidth * aspectRatio);
+    this.camera = new OrthographicCamera(0, 0);
+    this.setViewport(viewportWidth, viewportHeight);
     updateCamera();
   }
 
@@ -47,11 +46,8 @@ public class CameraView {
     return camera;
   }
 
-  public float getViewportWidth() {
-    return viewportWidth;
-  }
-
-  public float getViewportHeight() {
-    return viewportHeight;
+  public Vector2 getViewportSize() {
+    // We copy the vector to avoid modifying it
+    return new Vector2(viewportWidth, viewportHeight).cpy();
   }
 }

@@ -29,12 +29,11 @@ public class CameraController extends InputAdapter {
             // Convert screen pixel movement to world coordinates
             float screenWidth = Gdx.graphics.getWidth();
             float screenHeight = Gdx.graphics.getHeight();
-            float effectiveViewportWidth = cameraView.getViewportWidth() / model.getZoom();
-            float effectiveViewportHeight = cameraView.getViewportHeight() / model.getZoom();
+            Vector2 effectiveViewportSize = cameraView.getViewportSize().scl(1 / model.getZoom());
 
             // Convert pixel delta to world delta
-            Vector2 worldDelta = new Vector2((delta.x / screenWidth) * effectiveViewportWidth,
-                    (delta.y / screenHeight) * effectiveViewportHeight);
+            Vector2 worldDelta = new Vector2((delta.x / screenWidth) * effectiveViewportSize.x,
+                    (delta.y / screenHeight) * effectiveViewportSize.y);
 
             // Move camera in opposite direction of mouse drag
             model.moveBy(worldDelta.scl(-1));
