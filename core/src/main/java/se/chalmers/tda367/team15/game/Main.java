@@ -17,7 +17,10 @@ import se.chalmers.tda367.team15.game.model.CameraModel;
 import se.chalmers.tda367.team15.game.view.CameraView;
 import se.chalmers.tda367.team15.game.view.SceneView;
 
-/** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
+/**
+ * {@link com.badlogic.gdx.ApplicationListener} implementation shared by all
+ * platforms.
+ */
 public class Main extends ApplicationAdapter {
     // World bounds - adjust these to match your game world size
     private static final float WORLD_SIZE = 100f;
@@ -56,14 +59,14 @@ public class Main extends ApplicationAdapter {
 
         // World camera
         worldCameraView = new CameraView(cameraModel, WORLD_VIEWPORT_WIDTH, WORLD_VIEWPORT_WIDTH * aspectRatio);
-        
+
         cameraController = new CameraController(cameraModel, worldCameraView);
         Gdx.input.setInputProcessor(cameraController);
-        
+
         // HUD camera
         hudCamera = new OrthographicCamera(screenWidth, screenHeight);
         hudCamera.setToOrtho(false, screenWidth, screenHeight);
-        
+
         // Setup viewport listener with resize handlers
         viewportListener = new ViewportListener();
         // World camera: maintain aspect ratio with fixed viewport width
@@ -97,7 +100,7 @@ public class Main extends ApplicationAdapter {
         // Update shape renderer projection (world camera may have changed)
         shapeRenderer.setProjectionMatrix(worldCameraView.getCombinedMatrix());
         drawGrid();
-        
+
         sceneView.render(() -> {
             // Render world entities here
             sceneView.getBatch().draw(image, 0, 0, 12f, 2f);
@@ -112,25 +115,29 @@ public class Main extends ApplicationAdapter {
     private void drawGrid() {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(Color.GRAY);
-        
+
         float gridSize = 5f; // Grid cell size in world units
         float effectiveViewportWidth = worldCameraView.getViewportWidth() * worldCameraView.getCamera().zoom;
         float effectiveViewportHeight = worldCameraView.getViewportHeight() * worldCameraView.getCamera().zoom;
-        float startX = (float) Math.floor((worldCameraView.getCamera().position.x - effectiveViewportWidth / 2f) / gridSize) * gridSize;
-        float endX = (float) Math.ceil((worldCameraView.getCamera().position.x + effectiveViewportWidth / 2f) / gridSize) * gridSize;
-        float startY = (float) Math.floor((worldCameraView.getCamera().position.y - effectiveViewportHeight / 2f) / gridSize) * gridSize;
-        float endY = (float) Math.ceil((worldCameraView.getCamera().position.y + effectiveViewportHeight / 2f) / gridSize) * gridSize;
-        
+        float startX = (float) Math
+                .floor((worldCameraView.getCamera().position.x - effectiveViewportWidth / 2f) / gridSize) * gridSize;
+        float endX = (float) Math
+                .ceil((worldCameraView.getCamera().position.x + effectiveViewportWidth / 2f) / gridSize) * gridSize;
+        float startY = (float) Math
+                .floor((worldCameraView.getCamera().position.y - effectiveViewportHeight / 2f) / gridSize) * gridSize;
+        float endY = (float) Math
+                .ceil((worldCameraView.getCamera().position.y + effectiveViewportHeight / 2f) / gridSize) * gridSize;
+
         // Draw vertical lines
         for (float x = startX; x <= endX; x += gridSize) {
             shapeRenderer.line(x, startY, x, endY);
         }
-        
+
         // Draw horizontal lines
         for (float y = startY; y <= endY; y += gridSize) {
             shapeRenderer.line(startX, y, endX, y);
         }
-        
+
         shapeRenderer.end();
     }
 
@@ -138,18 +145,18 @@ public class Main extends ApplicationAdapter {
         font.setColor(Color.WHITE);
         float y = Gdx.graphics.getHeight();
         float lineHeight = 25f;
-        
+
         // camera debug info
         y -= 10f;
-        font.draw(hudBatch, String.format("Camera xy: (%.1f, %.1f)", 
-            cameraModel.getPosition().x, cameraModel.getPosition().y), 10, y);
+        font.draw(hudBatch, String.format("Camera xy: (%.1f, %.1f)",
+                cameraModel.getPosition().x, cameraModel.getPosition().y), 10, y);
         y -= lineHeight;
-        
+
         font.draw(hudBatch, String.format("Zoom: %.2f", cameraModel.getZoom()), 10, y);
         y -= lineHeight;
-        
-        font.draw(hudBatch, String.format("Viewport: %.1f x %.1f", 
-            worldCameraView.getViewportWidth(), worldCameraView.getViewportHeight()), 10, y);
+
+        font.draw(hudBatch, String.format("Viewport: %.1f x %.1f",
+                worldCameraView.getViewportWidth(), worldCameraView.getViewportHeight()), 10, y);
         y -= lineHeight;
         // end of debug info
     }
@@ -161,20 +168,10 @@ public class Main extends ApplicationAdapter {
 
     @Override
     public void dispose() {
-        if (sceneView != null) {
-            sceneView.dispose();
-        }
-        if (hudBatch != null) {
-            hudBatch.dispose();
-        }
-        if (image != null) {
-            image.dispose();
-        }
-        if (font != null) {
-            font.dispose();
-        }
-        if (shapeRenderer != null) {
-            shapeRenderer.dispose();
-        }
+        sceneView.dispose();
+        hudBatch.dispose();
+        image.dispose();
+        font.dispose();
+        shapeRenderer.dispose();
     }
 }

@@ -16,7 +16,7 @@ public class CameraView {
     this.model = model;
     this.viewportWidth = viewportWidth;
     this.viewportHeight = viewportHeight;
-    
+
     // Create camera with aspect ratio consideration
     float aspectRatio = viewportHeight / viewportWidth;
     this.camera = new OrthographicCamera(viewportWidth, viewportWidth * aspectRatio);
@@ -32,7 +32,7 @@ public class CameraView {
   public void setViewport(float width, float height) {
     this.viewportWidth = width;
     this.viewportHeight = height;
-    
+
     float aspectRatio = height / width;
     camera.viewportWidth = width;
     camera.viewportHeight = width * aspectRatio;
