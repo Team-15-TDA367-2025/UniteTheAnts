@@ -7,11 +7,11 @@ import se.chalmers.tda367.team15.game.model.IDrawable;
 public abstract class Entity implements IDrawable {
     protected Vector2 position;
     protected float rotation;
-    private String atlasName;
+    private String textureName;
 
-    public Entity(Vector2 position, String atlasName) {
+    public Entity(Vector2 position, String textureName) {
         this.position = position;
-        this.atlasName = atlasName;
+        this.textureName = textureName;
         this.rotation = 0f;
     }
 
@@ -31,6 +31,6 @@ public abstract class Entity implements IDrawable {
 
     @Override
     public String getTextureName() {
-        return atlasName;
+        return textureName;
     }
 }
