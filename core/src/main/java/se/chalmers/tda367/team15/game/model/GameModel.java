@@ -2,13 +2,18 @@ package se.chalmers.tda367.team15.game.model;
 
 import com.badlogic.gdx.math.Vector2;
 
-import se.chalmers.tda367.team15.game.model.entity.Ant;
+import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
+import se.chalmers.tda367.team15.game.model.structure.Colony;
 
 public class GameModel {
     private final GameWorld world;
+    private final PheromoneSystem pheromoneSystem;
 
     public GameModel() {
         this.world = new GameWorld();
+        Vec2i colonyPosition = new Vec2i(0, 0);
+        this.world.addStructure(new Colony(colonyPosition));
+        this.pheromoneSystem = new PheromoneSystem(colonyPosition);
     }
 
     // --- FACADE METHODS (Actions) ---
@@ -19,13 +24,18 @@ public class GameModel {
     }
 
     public void update(float deltaTime) {
-        world.update(deltaTime);
+        // Update entities with access to pheromone system
+        world.update(deltaTime, pheromoneSystem);
     }
 
     // --- GETTERS (For View) ---
 
     public Iterable<Drawable> getDrawables() {
         return world.getDrawables();
+    }
+
+    public PheromoneSystem getPheromoneSystem() {
+        return pheromoneSystem;
     }
 }
 
