@@ -2,6 +2,8 @@ package se.chalmers.tda367.team15.game.model;
 
 import java.util.List;
 
+import se.chalmers.tda367.team15.game.model.objects.Pheromone;
+
 public class Tile {
     private int x;
     private int y;

@@ -16,6 +16,6 @@ public class GameWorld {
         this.quantity = 0;
         this.entities = new ArrayList<>();
         this.map = map;
-        this.timeCycle = new TimeCycle();
+        this.timeCycle = timeCycle;
     }
 }

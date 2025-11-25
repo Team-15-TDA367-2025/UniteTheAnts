@@ -1,43 +1,42 @@
 package se.chalmers.tda367.team15.game.model;
 
 public class TimeCycle {
-    private int time;
-    private String dayNight;
+    private int ticks;
+    private int ticksPerMinute;
+    private boolean isDay;
 
-    public TimeCycle() {
-        this.time = 0;
-        this.dayNight = "Day";
+    public TimeCycle(int ticksPerMinute) {
+        this.ticksPerMinute = ticksPerMinute;
+        this.ticks = 0;
+        this.isDay = true;
     }
 
-    public int getTime() {
-        return time;
+    public void tick() {
+        ticks++;
     }
 
-    public void setTime(int time) {
-        this.time = time;
-        if (time % 24 < 12) {
-            dayNight = "Day";
-        } else {
-            dayNight = "Night";
-        }
+    public int getTotalMinutes() {
+        return ticks / ticksPerMinute;
     }
 
-    public String getDayNight() {
-        return dayNight;
+    public int getHour() {
+        return (getTotalMinutes() / 60) % 24;
     }
 
-    public void setDayNight(String dayNight) {
-        this.dayNight = dayNight;
+    public int getMinute() {
+        return getTotalMinutes() % 60;
     }
 
-    // Plussar på tiden med 1 timme
-    public void incrementTime() {
-        this.time = (this.time + 1) % 24;
-        if (time < 12) {
-            dayNight = "Day";
-        } else {
-            dayNight = "Night";
-        }
+    public void setTicksPerMinute(int ticksPerMinute) {
+        this.ticksPerMinute = ticksPerMinute;
+    }
+
+    public boolean getIsDay() {
+        return isDay;
+    }
+
+    public void setisDay(boolean isDay) {
+        this.isDay = isDay;
     }
 
 }

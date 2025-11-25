@@ -1,10 +1,10 @@
 package se.chalmers.tda367.team15.game.model.objects;
 
-public class Object {
+public class WorldObject {
     protected int x;
     protected int y;
 
-    public Object(int x, int y) {
+    public WorldObject(int x, int y) {
         this.x = x;
         this.x = y;
     }
