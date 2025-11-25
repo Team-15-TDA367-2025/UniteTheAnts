@@ -20,8 +20,6 @@ public class PheromoneSystem {
      * Adds a pheromone at the specified position if it's valid.
      * A position is valid if it's adjacent or diagonal to the colony or an existing
      * pheromone.
-     * The distance is set based on the lowest distance pheromone in a 3x3 area
-     * (excluding center).
      * 
      * @param pos  The position to add the pheromone
      * @param type The type of pheromone
@@ -46,7 +44,6 @@ public class PheromoneSystem {
     /**
      * Finds the lowest distance in adjacent cells (up, down, left, right) around
      * the position.
-     * Checks both existing pheromones and the colony position.
      * 
      * @param pos The center position
      * @return The lowest distance found, or -1 if no valid parent exists
