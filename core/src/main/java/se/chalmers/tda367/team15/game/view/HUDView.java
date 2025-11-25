@@ -121,7 +121,7 @@ public class HUDView implements ViewportObserver {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if (pheromoneController != null) {
-                    pheromoneController.setDeleteMode(true);
+                    pheromoneController.setCurrentType(null);
                 }
             }
         });

@@ -28,19 +28,16 @@ public class PheromoneSystem {
      * @return true if the pheromone was added, false if the position was invalid
      */
     public boolean addPheromone(GridPoint2 pos, PheromoneType type) {
-        // Check if position already has a pheromone
         if (pheromoneGrid.hasPheromoneAt(pos)) {
             return false;
         }
 
-        // Find the lowest distance in a 3x3 area around the position (excluding center)
         int minDistance = findLowestNeighbor(pos);
         if (minDistance == -1) {
             // No valid parent found (not adjacent to colony or any pheromone)
             return false;
         }
 
-        // Create new pheromone with distance = minDistance + 1
         Pheromone pheromone = new Pheromone(pos, type, minDistance + 1);
         pheromoneGrid.addPheromone(pheromone);
         return true;
@@ -58,17 +55,15 @@ public class PheromoneSystem {
         int minDistance = Integer.MAX_VALUE;
         boolean foundValidParent = false;
 
-        // Check only strictly adjacent cells (cross shape)
         for (int[] offset : NEIGHBOR_OFFSETS) {
             GridPoint2 neighborPos = new GridPoint2(pos.x + offset[0], pos.y + offset[1]);
 
-            // Check if this is the colony position
             if (neighborPos.equals(colonyPosition)) {
-                minDistance = 0; // Colony has distance 0
+                minDistance = 0;
                 foundValidParent = true;
             } else {
-                // Check if there's a pheromone at this position
                 Pheromone pheromone = pheromoneGrid.getPheromoneAt(neighborPos);
+
                 if (pheromone != null && pheromone.getDistance() < minDistance) {
                     minDistance = pheromone.getDistance();
                     foundValidParent = true;
