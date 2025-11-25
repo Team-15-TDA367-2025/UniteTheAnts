@@ -19,7 +19,6 @@ import se.chalmers.tda367.team15.game.view.TextureRegistry;
 import se.chalmers.tda367.team15.game.view.ViewportListener;
 
 public class GameScreen extends ScreenAdapter {
-    private static final float WORLD_SIZE = 200f;
     private static final float WORLD_VIEWPORT_WIDTH = 30f;
     private static final int MAP_WIDTH = 200;
     private static final int MAP_HEIGHT = 200;
@@ -45,7 +44,7 @@ public class GameScreen extends ScreenAdapter {
 
     public GameScreen() {
         // Initialize world bounds and constraints
-        Rectangle worldBounds = new Rectangle(-WORLD_SIZE / 2f, -WORLD_SIZE / 2f, WORLD_SIZE, WORLD_SIZE);
+        Rectangle worldBounds = new Rectangle(-MAP_WIDTH /2f, -MAP_HEIGHT / 2f, MAP_WIDTH, MAP_HEIGHT);
         CameraConstraints constraints = new CameraConstraints(worldBounds, MIN_ZOOM, MAX_ZOOM);
 
         cameraModel = new CameraModel(constraints);
@@ -88,7 +87,7 @@ public class GameScreen extends ScreenAdapter {
         worldCameraView.updateCamera();
         gameModel.update(delta);
 
-        ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
+        ScreenUtils.clear(0.227f, 0.643f, 0.239f,1f);
 
         sceneView.render(gameModel.getDrawables(), gameModel.getFog());
         gridView.render();

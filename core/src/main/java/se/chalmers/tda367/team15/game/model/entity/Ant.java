@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Ant extends Entity implements VisionProvider {
     private final Vector2 velocity;
-    private final int visionRadius = 3;
+    private final int visionRadius = 4;
 
     public Ant(Vector2 position) {
         super(position, "Ant");

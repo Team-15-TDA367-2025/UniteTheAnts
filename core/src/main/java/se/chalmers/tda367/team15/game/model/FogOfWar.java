@@ -34,7 +34,8 @@ public class FogOfWar {
             for (int dy = -radius; dy <= radius; dy++) {
                 int x = cx + dx;
                 int y = cy + dy;
-                if (x >= 0 && y >= 0 && x < width && y < height) {
+                boolean insideCircle = dx * dx + dy * dy <= radius * radius;
+                if (x >= 0 && y >= 0 && x < width && y < height && insideCircle) {
                     discovered[x][y] = true;    
                 }
             }
