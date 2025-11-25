@@ -3,7 +3,7 @@ package se.chalmers.tda367.team15.game.model.entity.ant.behavior;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.PriorityQueue;
+import java.util.stream.Collectors;
 
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
@@ -42,27 +42,28 @@ public class FollowTrailBehavior implements AntBehavior {
                 // We've reached the target, update lastPheromone and clear current target
                 lastPheromone = currentTarget;
                 currentTarget = null;
-
-                boolean canProgress = neighbors.stream()
-                        .filter(p -> !p.getPosition().equals(gridPos)
-                                && !p.getPosition().equals(lastPheromone.getPosition()))
-                        .anyMatch(p -> getComparator().compare(p, lastPheromone) < 0);
-
-                if (!canProgress) {
-                    returningToColony = !returningToColony;
-                }
-
             }
         }
 
         // If we don't have a current target, find a new one
         if (currentTarget == null) {
-            Pheromone nextPheromone = findNextPheromone(neighbors, gridPos);
-            if (nextPheromone == null) {
+            // Try to find next pheromone in current direction
+            Pheromone next = findNextPheromone(neighbors, returningToColony);
+            
+            // If blocked/end of trail, try flipping direction
+            if (next == null) {
+                boolean flippedState = !returningToColony;
+                next = findNextPheromone(neighbors, flippedState);
+                if (next != null) {
+                    returningToColony = flippedState;
+                }
+            }
+            
+            if (next == null) {
                 ant.setBehavior(new WanderBehavior());
                 return;
             }
-            currentTarget = nextPheromone;
+            currentTarget = next;
         }
 
         // Move towards the current target
@@ -82,31 +83,33 @@ public class FollowTrailBehavior implements AntBehavior {
         }
     }
 
-    private Comparator<Pheromone> getComparator() {
-        if (!returningToColony) {
-            return Comparator.comparingInt(Pheromone::getDistance).reversed();
-        }
-        return Comparator.comparingInt(Pheromone::getDistance);
-    }
+    private Pheromone findNextPheromone(List<Pheromone> neighbors, boolean returning) {
+        int currentDist = lastPheromone.getDistance();
 
-    private Pheromone findNextPheromone(List<Pheromone> neighbors, GridPoint2 currentGridPos) {
-        Comparator<Pheromone> comparator = getComparator();
-        PriorityQueue<Pheromone> priorityQueue = new PriorityQueue<>(comparator);
+        // Filter candidates:
+        // 1. Not the node we are currently at (lastPheromone)
+        // 2. Strictly in the correct direction (increasing if leaving, decreasing if returning)
+        List<Pheromone> candidates = neighbors.stream()
+                .filter(p -> !p.getPosition().equals(lastPheromone.getPosition()))
+                .filter(p -> returning ? p.getDistance() < currentDist : p.getDistance() > currentDist)
+                .collect(Collectors.toList());
 
-        Collections.shuffle(neighbors);
-        priorityQueue.addAll(neighbors);
-
-        // Get the best pheromone (closest/farthest depending on direction)
-        Pheromone best = priorityQueue.poll();
-
-        if (best == null) {
+        if (candidates.isEmpty()) {
             return null;
         }
 
-        while (best.getDistance() == lastPheromone.getDistance() && !priorityQueue.isEmpty()) {
-            best = priorityQueue.poll();
-        }
+        // Shuffle first to handle ties randomly
+        Collections.shuffle(candidates);
 
-        return best;
+        // Sort to find the best step
+        // If returning: prefer highest distance < current (closest step down)
+        // If leaving: prefer lowest distance > current (closest step up)
+        candidates.sort((p1, p2) -> {
+            int d1 = p1.getDistance();
+            int d2 = p2.getDistance();
+            return returning ? Integer.compare(d2, d1) : Integer.compare(d1, d2);
+        });
+
+        return candidates.get(0);
     }
 }
