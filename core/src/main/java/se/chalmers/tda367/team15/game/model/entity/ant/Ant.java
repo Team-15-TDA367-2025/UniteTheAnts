@@ -17,7 +17,7 @@ public class Ant extends Entity {
 
     public Ant(Vector2 position, PheromoneSystem system) {
         super(position, "libgdx");
-        this.behavior = new WanderBehavior();
+        this.behavior = new WanderBehavior(this);
         this.system = system;
         pickRandomDirection();
     }
@@ -29,7 +29,7 @@ public class Ant extends Entity {
 
     @Override
     public void update(float deltaTime) {
-        behavior.update(this, system, deltaTime);
+        behavior.update(system, deltaTime);
         super.update(deltaTime);
         updateRotation();
     }

@@ -12,104 +12,111 @@ import se.chalmers.tda367.team15.game.model.Pheromone;
 import se.chalmers.tda367.team15.game.model.PheromoneSystem;
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 
-public class FollowTrailBehavior implements AntBehavior {
+public class FollowTrailBehavior extends AntBehavior {
+    private static final float SPEED_BOOST_ON_TRAIL = 2f;
+    private static final float REACHED_THRESHOLD_SQ = 0.3f * 0.3f;
+
     private boolean returningToColony = false;
     private Pheromone lastPheromone = null;
     private Pheromone currentTarget = null;
-    private static final float SPEED_BOOST_ON_TRAIL = 2f;
-    private static final float REACHED_THRESHOLD = 0.3f;
+
+    public FollowTrailBehavior(Ant ant) {
+        super(ant);
+    }
 
     @Override
-    public void update(Ant ant, PheromoneSystem system, float deltaTime) {
+    public void update(PheromoneSystem system, float deltaTime) {
         GridPoint2 gridPos = ant.getGridPosition();
         List<Pheromone> neighbors = system.getPheromonesIn3x3(gridPos);
+
+        // Initialize if needed
         if (lastPheromone == null) {
-            lastPheromone = neighbors.stream().min(Comparator.comparingInt(Pheromone::getDistance)).orElse(null);
+            lastPheromone = neighbors.stream()
+                    .min(Comparator.comparingInt(Pheromone::getDistance))
+                    .orElse(null);
         }
 
-        if (lastPheromone == null || neighbors.isEmpty()) {
-            ant.setBehavior(new WanderBehavior());
+        if (lastPheromone == null) {
+            ant.setBehavior(new WanderBehavior(ant));
             return;
         }
 
-        // Check if we've reached our current target
-        if (currentTarget != null) {
-            Vector2 currentPos = ant.getPosition();
-            Vector2 targetPos = new Vector2(currentTarget.getPosition().x + 0.5f, currentTarget.getPosition().y + 0.5f);
-            float distSq = currentPos.dst2(targetPos);
+        if (hasReachedTarget()) {
+            lastPheromone = currentTarget;
+            currentTarget = null;
+        }
 
-            if (distSq < REACHED_THRESHOLD * REACHED_THRESHOLD) {
-                // We've reached the target, update lastPheromone and clear current target
-                lastPheromone = currentTarget;
-                currentTarget = null;
+        if (currentTarget == null && !selectNextTarget(neighbors)) {
+            return;
+        }
+
+        moveTowardsTarget();
+    }
+
+    private boolean hasReachedTarget() {
+        if (currentTarget == null)
+            return false;
+
+        Vector2 targetPos = getCenterPos(currentTarget);
+        return ant.getPosition().dst2(targetPos) < REACHED_THRESHOLD_SQ;
+    }
+
+    private boolean selectNextTarget(List<Pheromone> neighbors) {
+        // Try current direction
+        Pheromone next = findNextPheromone(neighbors, returningToColony);
+
+        // If blocked, try flipping
+        if (next == null) {
+            boolean flipped = !returningToColony;
+            next = findNextPheromone(neighbors, flipped);
+            if (next != null) {
+                returningToColony = flipped;
             }
         }
 
-        // If we don't have a current target, find a new one
-        if (currentTarget == null) {
-            // Try to find next pheromone in current direction
-            Pheromone next = findNextPheromone(neighbors, returningToColony);
-            
-            // If blocked/end of trail, try flipping direction
-            if (next == null) {
-                boolean flippedState = !returningToColony;
-                next = findNextPheromone(neighbors, flippedState);
-                if (next != null) {
-                    returningToColony = flippedState;
-                }
-            }
-            
-            if (next == null) {
-                ant.setBehavior(new WanderBehavior());
-                return;
-            }
-            currentTarget = next;
+        if (next == null) {
+            ant.setBehavior(new WanderBehavior(ant));
+            return false;
         }
 
-        // Move towards the current target
-        Vector2 targetPos = new Vector2(currentTarget.getPosition().x + 0.5f, currentTarget.getPosition().y + 0.5f);
-        Vector2 currentPos = ant.getPosition();
-        Vector2 direction = targetPos.cpy().sub(currentPos);
+        currentTarget = next;
+        return true;
+    }
 
-        // Set velocity towards target
+    private void moveTowardsTarget() {
+        Vector2 targetPos = getCenterPos(currentTarget);
+        Vector2 direction = targetPos.cpy().sub(ant.getPosition());
+
         if (direction.len2() > 0.01f) {
             direction.nor();
             float speed = ant.getSpeed() * SPEED_BOOST_ON_TRAIL;
             ant.setVelocity(direction.scl(speed));
-        } else {
-            // Very close, just update and find next
-            lastPheromone = currentTarget;
-            currentTarget = null;
         }
     }
 
     private Pheromone findNextPheromone(List<Pheromone> neighbors, boolean returning) {
         int currentDist = lastPheromone.getDistance();
 
-        // Filter candidates:
-        // 1. Not the node we are currently at (lastPheromone)
-        // 2. Strictly in the correct direction (increasing if leaving, decreasing if returning)
+        // Filter for valid next steps in the given direction
         List<Pheromone> candidates = neighbors.stream()
                 .filter(p -> !p.getPosition().equals(lastPheromone.getPosition()))
                 .filter(p -> returning ? p.getDistance() < currentDist : p.getDistance() > currentDist)
                 .collect(Collectors.toList());
 
-        if (candidates.isEmpty()) {
+        if (candidates.isEmpty())
             return null;
-        }
 
-        // Shuffle first to handle ties randomly
         Collections.shuffle(candidates);
 
-        // Sort to find the best step
-        // If returning: prefer highest distance < current (closest step down)
-        // If leaving: prefer lowest distance > current (closest step up)
-        candidates.sort((p1, p2) -> {
-            int d1 = p1.getDistance();
-            int d2 = p2.getDistance();
-            return returning ? Integer.compare(d2, d1) : Integer.compare(d1, d2);
-        });
+        // Sort to find best step (closest step in desired direction)
+        candidates.sort((p1, p2) -> returning
+                ? Integer.compare(p2.getDistance(), p1.getDistance()) // Returning: Descending (highest < current)
+                : Integer.compare(p1.getDistance(), p2.getDistance())); // Leaving: Ascending (lowest > current)
 
         return candidates.get(0);
+    }
+
+    private Vector2 getCenterPos(Pheromone p) {
+        return new Vector2(p.getPosition().x + 0.5f, p.getPosition().y + 0.5f);
     }
 }

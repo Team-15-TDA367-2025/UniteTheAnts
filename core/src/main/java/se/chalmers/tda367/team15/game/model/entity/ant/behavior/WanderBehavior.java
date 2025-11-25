@@ -8,15 +8,19 @@ import se.chalmers.tda367.team15.game.model.Pheromone;
 import se.chalmers.tda367.team15.game.model.PheromoneSystem;
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 
-public class WanderBehavior implements AntBehavior {
+public class WanderBehavior extends AntBehavior {
+
+    public WanderBehavior(Ant ant) {
+        super(ant);
+    }
 
     @Override
-    public void update(Ant ant, PheromoneSystem system, float deltaTime) {
+    public void update(PheromoneSystem system, float deltaTime) {
         GridPoint2 gridPos = ant.getGridPosition();
         List<Pheromone> neighbors = system.getPheromonesIn3x3(gridPos);
 
         if (!neighbors.isEmpty()) {
-            ant.setBehavior(new FollowTrailBehavior());
+            ant.setBehavior(new FollowTrailBehavior(ant));
         }
     }
 }
