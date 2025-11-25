@@ -12,7 +12,7 @@ import se.chalmers.tda367.team15.game.model.PheromoneSystem;
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 
 public class FollowTrailBehavior extends AntBehavior {
-    private static final float SPEED_BOOST_ON_TRAIL = 20f;
+    private static final float SPEED_BOOST_ON_TRAIL = 5f;
     private static final float REACHED_THRESHOLD_SQ = 0.3f * 0.3f;
 
     private boolean returningToColony = false;
