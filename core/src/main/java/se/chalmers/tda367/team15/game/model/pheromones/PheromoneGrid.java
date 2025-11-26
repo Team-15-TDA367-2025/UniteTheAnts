@@ -1,4 +1,4 @@
-package se.chalmers.tda367.team15.game.model;
+package se.chalmers.tda367.team15.game.model.pheromones;
 
 import java.util.ArrayList;
 import java.util.Collection;

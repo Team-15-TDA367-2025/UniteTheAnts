@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 
 import com.badlogic.gdx.math.Vector2;
 
-import se.chalmers.tda367.team15.game.model.Pheromone;
-import se.chalmers.tda367.team15.game.model.PheromoneSystem;
+import se.chalmers.tda367.team15.game.model.pheromones.Pheromone;
+import se.chalmers.tda367.team15.game.model.pheromones.PheromoneSystem;
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 
 public class FollowTrailBehavior extends AntBehavior {

@@ -6,9 +6,9 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 
-import se.chalmers.tda367.team15.game.model.Pheromone;
-import se.chalmers.tda367.team15.game.model.PheromoneSystem;
-import se.chalmers.tda367.team15.game.model.PheromoneType;
+import se.chalmers.tda367.team15.game.model.pheromones.Pheromone;
+import se.chalmers.tda367.team15.game.model.pheromones.PheromoneSystem;
+import se.chalmers.tda367.team15.game.model.pheromones.PheromoneType;
 
 // AI Generated for testing, should not look like this later!
 public class PheromoneView {

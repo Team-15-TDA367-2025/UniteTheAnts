@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.interfaces.Drawable;
 import se.chalmers.tda367.team15.game.model.structure.Colony;
+import se.chalmers.tda367.team15.game.model.pheromones.PheromoneSystem;
 
 public class GameModel {
     private final GameWorld world;
