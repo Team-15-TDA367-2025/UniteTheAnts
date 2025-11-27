@@ -55,6 +55,7 @@ public class GameScreen extends ScreenAdapter {
         gameModel = new GameModel(MAP_WIDTH, MAP_HEIGHT, TILE_SIZE);
 
         // TODO: Should be a factory or something, this is just for testing!
+
         gameModel.spawnAnt(new Vector2(0, 0));
         gameModel.spawnAnt(new Vector2(0, 0));
         gameModel.spawnAnt(new Vector2(0, 0));
@@ -62,7 +63,7 @@ public class GameScreen extends ScreenAdapter {
         gameModel.spawnAnt(new Vector2(0, 0));
 
 
-        gameModel.spawnTermite(new Vector2(0,0));
+        gameModel.spawnTermite(new Vector2(50,50));
 
         float screenWidth = Gdx.graphics.getWidth();
         float screenHeight = Gdx.graphics.getHeight();

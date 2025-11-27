@@ -15,8 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Termite extends Entity {
-    Faction faction = Faction.TERMITE_PROTECTORATE;
+    private final Faction faction = Faction.TERMITE_PROTECTORATE;
     private static final float SPEED = 5f;
+    private final int visionRadius = 4;
     //HealthComponent healthComponent;
     //TermiteBehaviour termiteBehaviour;
     //AttackComponent attackComponent;
@@ -44,7 +45,15 @@ public class Termite extends Entity {
             }
             targetV = closestEntity.getPosition().sub(position);
         }
-
+        else{
+            List<Structure> structures = getGameWorld().getStructures();
+            for(Structure s: structures) {
+                // TODO, TOO BAD!!!
+                if(s.getClass().isInstance(new Colony(new GridPoint2(0,0)))) {
+                    targetV = s.getPosition().sub(position);
+                }
+            }
+        }
 
 
         // move to target
@@ -65,13 +74,11 @@ public class Termite extends Entity {
         }
         return targetEntities;
     }
+    @Override
+    public Faction getFaction(){
+        return faction;
+    }
 
 }
 
- /*List<Structure> structures = getGameWorld().getStructures();
-            for(Structure s: structures) {
-                // TODO, TOO BAD!!!
-                if(s.getClass().isInstance(new Colony(new GridPoint2(0,0)))) {
-                    targetV = s.getPosition().sub(position);
-                }
-            }*/
+

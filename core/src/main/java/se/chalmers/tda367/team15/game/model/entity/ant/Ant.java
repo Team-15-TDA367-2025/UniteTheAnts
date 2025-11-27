@@ -14,7 +14,7 @@ import se.chalmers.tda367.team15.game.model.faction.Faction;
 public class Ant extends Entity implements VisionProvider {
     private static final float SPEED = 5f;
     private final int visionRadius = 4;
-    Faction faction = Faction.DEMOCRATIC_REPUBLIC_OF_ANTS;
+    Faction faction;
     private AntBehavior behavior;
     private PheromoneSystem system;
 
@@ -23,6 +23,7 @@ public class Ant extends Entity implements VisionProvider {
         this.behavior = new WanderBehavior(this);
         this.system = system;
         pickRandomDirection();
+        this.faction=Faction.DEMOCRATIC_REPUBLIC_OF_ANTS;
 
     }
 
@@ -64,6 +65,11 @@ public class Ant extends Entity implements VisionProvider {
     @Override
     public int getVisionRadius() {
         return visionRadius;
+    }
+
+    @Override
+    public Faction getFaction(){
+        return faction;
     }
 
 }
