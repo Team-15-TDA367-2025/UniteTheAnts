@@ -14,63 +14,28 @@ import java.util.List;
 
 public class Termite extends Entity {
     private final Faction faction = Faction.TERMITE_PROTECTORATE;
-    private static final float SPEED = 5f;
+    private final float SPEED = 4.5f;
     private final int visionRadius = 4;
-    //TermiteBehaviour termiteBehaviour;
+    TermiteBehaviour termiteBehaviour;
     //AttackComponent attackComponent;
 
     public Termite(Vector2 position,GameWorld gameWorld) {
+
         super(position, "Termite", gameWorld);
+        this.termiteBehaviour = new TermiteBehaviour(this);
     }
 
     @Override
     public void update(float deltaTime){
-        Vector2 targetV = new Vector2(50,50);
-
         List<Entity> entities = getGameWorld().getEntities();
-
-        // check for hostile entities.there might be ants we can eat! *licks lips with devious smile* >:)
-        List<Entity> targetEntities = hostileEntities(entities);
-        if(!targetEntities.isEmpty()) {
-            Entity closestEntity= targetEntities.getFirst();
-
-            for(Entity e : targetEntities) {
-                float dst = e.getPosition().dst(position);
-                if(dst < closestEntity.getPosition().dst(position) ) {
-                    closestEntity = e;
-                }
-            }
-            targetV = closestEntity.getPosition().sub(position);
-        }
-        else{
-            List<Structure> structures = getGameWorld().getStructures();
-            for(Structure s: structures) {
-                // TODO, TOO BAD!!!
-                if(s.getClass().isInstance(new Colony(new GridPoint2(0,0)))) {
-                    targetV = s.getPosition().sub(position);
-                }
-            }
-        }
-
-
-        // move to target
-        // TODO might overshoot, TOO BAD!
-        if(targetV.len() > 0.01f) {
-            velocity.set(targetV.nor().scl(SPEED));
-        }
+        termiteBehaviour.update(entities);
         super.update(deltaTime);
     }
 
-
-    List<Entity> hostileEntities(List<Entity> entities) {
-        List<Entity> targetEntities = new ArrayList<>();
-        for (Entity e : entities) {
-            if (e.getFaction() != this.faction) {
-                targetEntities.add(e);
-            }
-        }
-        return targetEntities;
+    public float getSpeed() {
+        return SPEED;
     }
+
     @Override
     public Faction getFaction(){
         return faction;
