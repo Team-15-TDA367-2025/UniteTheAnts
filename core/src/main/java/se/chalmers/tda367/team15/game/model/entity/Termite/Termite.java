@@ -4,8 +4,6 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import se.chalmers.tda367.team15.game.model.GameWorld;
 import se.chalmers.tda367.team15.game.model.faction.Faction;
-import se.chalmers.tda367.team15.game.model.interfaces.Drawable;
-import se.chalmers.tda367.team15.game.model.interfaces.Updatable;
 import se.chalmers.tda367.team15.game.model.structure.Structure;
 import se.chalmers.tda367.team15.game.model.structure.Colony;
 import se.chalmers.tda367.team15.game.model.entity.Entity;
@@ -18,7 +16,6 @@ public class Termite extends Entity {
     private final Faction faction = Faction.TERMITE_PROTECTORATE;
     private static final float SPEED = 5f;
     private final int visionRadius = 4;
-    //HealthComponent healthComponent;
     //TermiteBehaviour termiteBehaviour;
     //AttackComponent attackComponent;
 

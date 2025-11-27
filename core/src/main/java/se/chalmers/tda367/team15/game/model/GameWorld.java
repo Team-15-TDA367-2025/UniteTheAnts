@@ -4,25 +4,24 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.badlogic.gdx.math.Vector2;
 import se.chalmers.tda367.team15.game.model.entity.Entity;
-import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.interfaces.Drawable;
 import se.chalmers.tda367.team15.game.model.structure.Structure;
 
 
-public class GameWorld {
+public class GameWorld implements EntityDeathObserver{
     private List<Entity> entities; // Floating positions and can move around.
     private List<Structure> structures; // Integer positions and fixed in place.
     private final FogSystem fogSystem;
     private final FogOfWar fogOfWar;
-
+    private DestructionListener destructionListener;
 
     public GameWorld(int mapWidth, int mapHeight, float tileSize) {
         fogOfWar = new FogOfWar(mapWidth, mapHeight, tileSize);
         fogSystem = new FogSystem(fogOfWar);
         this.entities = new ArrayList<>();
         this.structures = new ArrayList<>();
+        destructionListener=DestructionListener.getInstance();
 
     }
 
@@ -63,8 +62,11 @@ public class GameWorld {
     public void addEntity(Entity entity) {
         entities.add(entity);
     }
-
+    public void removeEntity(Entity e){entities.remove(e);}
+    @Override
+    public void onEntityDeath(Entity e) {removeEntity(e);}
     public void addStructure(Structure structure) {
         structures.add(structure);
     }
+
 }

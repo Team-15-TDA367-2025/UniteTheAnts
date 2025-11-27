@@ -4,19 +4,24 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
+import se.chalmers.tda367.team15.game.model.DestructionListener;
 import se.chalmers.tda367.team15.game.model.GameWorld;
+import se.chalmers.tda367.team15.game.model.entity.HasHealth;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneSystem;
 import se.chalmers.tda367.team15.game.model.entity.Entity;
 import se.chalmers.tda367.team15.game.model.entity.VisionProvider;
 import se.chalmers.tda367.team15.game.model.entity.ant.behavior.AntBehavior;
 import se.chalmers.tda367.team15.game.model.entity.ant.behavior.WanderBehavior;
 import se.chalmers.tda367.team15.game.model.faction.Faction;
-public class Ant extends Entity implements VisionProvider {
+public class Ant extends Entity implements VisionProvider, HasHealth {
     private static final float SPEED = 5f;
+    private final float MAX_HEALTH = 6;
     private final int visionRadius = 4;
     Faction faction;
     private AntBehavior behavior;
     private PheromoneSystem system;
+
+    private float health;
 
     public Ant(Vector2 position, PheromoneSystem system, GameWorld gameWorld) {
         super(position, "Ant",gameWorld);
@@ -24,7 +29,7 @@ public class Ant extends Entity implements VisionProvider {
         this.system = system;
         pickRandomDirection();
         this.faction=Faction.DEMOCRATIC_REPUBLIC_OF_ANTS;
-
+        this.health= MAX_HEALTH;
     }
 
     private void pickRandomDirection() {
@@ -72,4 +77,15 @@ public class Ant extends Entity implements VisionProvider {
         return faction;
     }
 
+    @Override
+    public void takeDamage(float amount) {
+        health = Math.max(0f,health-amount);
+        if(health == 0) {
+            die();
+        }
+    }
+    @Override
+    public void die() {
+        DestructionListener.getInstance().notifyEntityDeathObservers(this);
+    }
 }
