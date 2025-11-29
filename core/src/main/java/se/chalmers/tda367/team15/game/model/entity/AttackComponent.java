@@ -17,7 +17,7 @@ public class AttackComponent {
 
     public void attack(HasHealth target) {
         long now = System.currentTimeMillis();
-        if(now - lastAttackTimeMS < ATTACK_COOLDOWN_MS) {
+        if(now - lastAttackTimeMS > ATTACK_COOLDOWN_MS) {
             if(target.getPosition().dst(host.getPosition()) <= ATTACK_RANGE) {
                 lastAttackTimeMS = System.currentTimeMillis();
                 target.takeDamage(ATTACK_DMG);

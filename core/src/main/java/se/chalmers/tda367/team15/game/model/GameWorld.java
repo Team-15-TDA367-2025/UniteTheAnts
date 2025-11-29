@@ -21,7 +21,7 @@ public class GameWorld implements EntityDeathObserver{
         fogSystem = new FogSystem(fogOfWar);
         this.entities = new ArrayList<>();
         this.structures = new ArrayList<>();
-        destructionListener =DestructionListener.getInstance();
+        destructionListener = DestructionListener.getInstance();
         destructionListener.addEntityDeathObserver(this);
 
     }
@@ -58,7 +58,6 @@ public class GameWorld implements EntityDeathObserver{
             if(getEntities().contains(spotlightedEntity)) {
                 spotlightedEntity.update(deltaTime);
             }
-
         }
 
         ArrayList<Structure> updateTheseStructures = new ArrayList<>(getStructures());

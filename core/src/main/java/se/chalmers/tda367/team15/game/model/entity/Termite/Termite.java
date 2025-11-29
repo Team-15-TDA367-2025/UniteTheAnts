@@ -16,10 +16,10 @@ import java.util.List;
 
 public class Termite extends Entity {
     private final Faction faction = Faction.TERMITE_PROTECTORATE;
-    private final float SPEED = 5.3f;
+    private final float SPEED = 6f;
     private final int visionRadius = 4;
     private TermiteBehaviour termiteBehaviour;
-    private AttackComponent attackComponent = new AttackComponent(2,1000,5,this);
+    private AttackComponent attackComponent = new AttackComponent(2,500,1,this);
 
     public Termite(Vector2 position,GameWorld gameWorld) {
         super(position, "Termite", gameWorld);
