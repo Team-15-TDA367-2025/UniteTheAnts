@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.badlogic.gdx.math.GridPoint2;
+
 import se.chalmers.tda367.team15.game.model.entity.Entity;
 import se.chalmers.tda367.team15.game.model.interfaces.Drawable;
+import se.chalmers.tda367.team15.game.model.structure.Colony;
 import se.chalmers.tda367.team15.game.model.structure.Structure;
 
 
@@ -15,12 +18,14 @@ public class GameWorld implements EntityDeathObserver{
     private final FogSystem fogSystem;
     private final FogOfWar fogOfWar;
     private DestructionListener destructionListener;
+    private TimeCycle timeCycle;
 
-    public GameWorld(int mapWidth, int mapHeight, float tileSize) {
+    public GameWorld(TimeCycle timeCycle, int mapWidth, int mapHeight, float tileSize) {
         fogOfWar = new FogOfWar(mapWidth, mapHeight, tileSize);
         fogSystem = new FogSystem(fogOfWar);
         this.entities = new ArrayList<>();
         this.structures = new ArrayList<>();
+        this.timeCycle = timeCycle;
         destructionListener = DestructionListener.getInstance();
         destructionListener.addEntityDeathObserver(this);
 
@@ -69,7 +74,6 @@ public class GameWorld implements EntityDeathObserver{
                 spotlightedStructure.update(deltaTime);
             }
         }
-
         // Update fog after movement
         fogSystem.updateFog(entities);
     }
@@ -83,5 +87,4 @@ public class GameWorld implements EntityDeathObserver{
     public void addStructure(Structure structure) {
         structures.add(structure);
     }
-
 }
