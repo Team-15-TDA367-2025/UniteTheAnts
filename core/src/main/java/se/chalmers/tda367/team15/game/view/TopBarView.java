@@ -56,20 +56,19 @@ public class TopBarView {
 
         barTable = new Table();
         barTable.setBackground(new TextureRegionDrawable(new TextureRegion(bgTex)));
-        // Add bar in top center with fixed size
+
         root.top();
         root.add(barTable).center().width(BAR_WIDTH).height(BAR_HEIGHT);
 
-        // Fonts and styles
+
         BitmapFont font = new BitmapFont();
         font.getData().setScale(2f);
         Label.LabelStyle ls = new Label.LabelStyle(font, Color.BLACK);
 
-        // day and time labels
         dayLabel = new Label("Day 1", ls);
         timeLabel = new Label("07:59", ls);
 
-        // radio buttons group
+        // radio buttons
         ImageButton pauseBtn = new ImageButton(new TextureRegionDrawable(new TextureRegion(pauseTex)));
         ImageButton playBtn  = new ImageButton(new TextureRegionDrawable(new TextureRegion(playTex)));
         ImageButton fastBtn  = new ImageButton(new TextureRegionDrawable(new TextureRegion(fastTex)));
@@ -86,7 +85,6 @@ public class TopBarView {
         speedTable.add(playBtn).size(40).padRight(6);
         speedTable.add(fastBtn).size(40);
 
-        // stacked resource bars
         resource1Value = new Label("1337", ls);
         resource2Value = new Label("420",  ls);
 
@@ -105,7 +103,7 @@ public class TopBarView {
         rightButtons.add(statsBtn).size(46).padRight(8);
         rightButtons.add(settingsBtn).size(46);
 
-        // assemble the bar row
+        // assemble the row
         barTable.left();
         barTable.add(dayLabel).left().padLeft(10).padRight(18).minWidth(115f);;
         barTable.add(timeLabel).left().padRight(18).minWidth(95f);;

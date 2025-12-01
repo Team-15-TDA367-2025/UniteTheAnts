@@ -2,8 +2,6 @@ package se.chalmers.tda367.team15.game.view;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class HudView {
     private final TopBarView topBar;

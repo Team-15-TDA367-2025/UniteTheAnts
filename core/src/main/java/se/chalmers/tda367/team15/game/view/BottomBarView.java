@@ -22,7 +22,6 @@ public class BottomBarView {
     private final Stage stage;
     private final Viewport viewport;
 
-    // UI pieces
     private final Table root;      // fills screen
     private final Table barTable;  // the visible bottom bar, fixed size
     private Table expandButtonTable;
@@ -38,7 +37,6 @@ public class BottomBarView {
         viewport = new ScreenViewport();           // use screen pixels
         stage = new Stage(viewport, batch);
 
-        // load dummy textures (replace with real assets later)
         minimizeTex = new Texture(Gdx.files.internal("BottomBar/minimize.png"));
         expandTex   = new Texture(Gdx.files.internal("BottomBar/expand.png"));
         barBgTex    = new Texture(Gdx.files.internal("BottomBar/bottombar_bg.png"));
@@ -50,7 +48,6 @@ public class BottomBarView {
 
         barTable = new Table();
         barTable.setBackground(new TextureRegionDrawable(new TextureRegion(barBgTex)));
-        // IMPORTANT: do NOT call setFillParent(true) on barTable
 
         // Add the bar to the root at bottom-center with fixed size
         root.bottom();
@@ -62,7 +59,7 @@ public class BottomBarView {
         expandButtonTable = createExpandButton();
         expandButtonTable.setVisible(false);
         stage.addActor(expandButtonTable); // floating at stage level
-        // position will be updated on resize
+
     }
 
     private void buildBarContents() {
@@ -95,7 +92,7 @@ public class BottomBarView {
         barTable.left();
         barTable.add(group1).left().padLeft(12);
         barTable.add(group2).left().padLeft(40);
-        barTable.add().expandX(); // take middle empty space
+        barTable.add().expandX();
         barTable.add(minimizeBtn).right().padRight(10).size(40, 40);
     }
 
@@ -141,7 +138,7 @@ public class BottomBarView {
         t.add(expandBtn).size(40, 40);
         t.row();
         t.add(lbl).padTop(4f);
-        // initial position 0, will be updated in resize() to align with minimize spot
+
         t.setVisible(false);
         return t;
     }
@@ -155,19 +152,16 @@ public class BottomBarView {
     }
 
     // update expand button position so it appears where the minimize button was
-    // call this from resize() and after stage viewport changes
     private void updateExpandPosition() {
-        // compute screen center x
         float worldWidth = stage.getViewport().getWorldWidth();
         float worldHeight = stage.getViewport().getWorldHeight();
 
         float centerX = worldWidth / 2f;
-        // right edge of barTable (in stage coords)
+
         float rightEdge = centerX + (BAR_WIDTH / 2f);
 
-        // place expand button slightly above bottom, aligned where minimize was:
-        float x = rightEdge - 50f; // tune offset so it matches minimize location
-        float y = 10f; // some padding above bottom
+        float x = rightEdge - 50f;
+        float y = 10f;
         expandButtonTable.setPosition(x, y, Align.bottomLeft);
     }
 
@@ -178,7 +172,6 @@ public class BottomBarView {
 
     public void resize(int w, int h) {
         viewport.update(w, h, true);
-        // reposition floating expand button after viewport update
         updateExpandPosition();
     }
 
