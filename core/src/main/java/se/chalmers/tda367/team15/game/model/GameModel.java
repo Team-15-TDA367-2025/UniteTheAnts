@@ -32,6 +32,7 @@ public class GameModel {
 
     public void spawnAnt(Vector2 position) {
         Ant ant = new Ant(position, pheromoneSystem, 5);
+        colony.addAnt(ant);
         world.addEntity(ant);
     }
 

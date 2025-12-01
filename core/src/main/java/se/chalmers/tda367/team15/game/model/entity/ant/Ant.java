@@ -15,6 +15,7 @@ public class Ant extends Entity implements VisionProvider {
     private static final float SPEED = 5f;
     private final int visionRadius = 4;
     private final int capacity;
+    private final int hunger;
 
     private AntBehavior behavior;
     private PheromoneSystem system;
@@ -25,6 +26,7 @@ public class Ant extends Entity implements VisionProvider {
         this.behavior = new WanderBehavior(this);
         this.system = system;
         this.capacity = capacity;
+        this.hunger = 2; // test value
         this.inventory = new Inventory(capacity);
         pickRandomDirection();
     }
@@ -70,6 +72,10 @@ public class Ant extends Entity implements VisionProvider {
 
     public Inventory getInventory() {
         return inventory;
+    }
+
+    public int getHunger() {
+        return hunger;
     }
 
     public boolean leaveResources(Colony colony) {

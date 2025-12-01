@@ -16,12 +16,16 @@ import se.chalmers.tda367.team15.game.model.structure.resource.ResourceType;
 
 public class Colony extends Structure {
     private List<Ant> ants;
-    private Map<ResourceType, Integer> storage;
+    private int consumption;
+    private int capacity;
+
+    private Inventory inventory;
 
     public Colony(GridPoint2 position) {
         super(position, "AntColony", 5);
         this.ants = new ArrayList<>();
-        this.storage = new HashMap<>();
+        this.capacity = 1000; // test value for now, expandable
+        this.inventory = new Inventory(capacity);
     }
 
     public void addAnt(Ant ant) {
@@ -32,24 +36,46 @@ public class Colony extends Structure {
         ants.remove(ant);
     }
 
-    public boolean depositResources(Inventory inventory) {
+    public boolean depositResources(Inventory amount) {
         boolean deposited = false;
 
         for (ResourceType type : ResourceType.values()) {
-            int amount = inventory.getAmount(type);
-            if (amount > 0) {
-                storage.put(type, storage.getOrDefault(type, 0) + amount);
+            int total = amount.getAmount(type);
+            if (total > 0) {
+                inventory.addResource(type, total);
                 deposited = true;
             }
         }
         return deposited;
     }
 
+    public int calculateConsumption() {
+        int total = 0;
+
+        for (Ant ant : ants) {
+            total += ant.getHunger();
+        }
+        return total;
+    }
+
+    public void applyConsumption(int amount) {
+        inventory.addResource(ResourceType.FOOD, -amount);
+
+    }
+
+    public int getTotalResources(ResourceType type) {
+        return inventory.getAmount(type);
+    }
+
     @Override
     public void update(float deltaTime) {
         for (Ant ant : ants) {
             ant.update(deltaTime);
+            
         }
+        consumption = calculateConsumption();
+        applyConsumption(consumption);
+        System.err.println(getTotalResources(ResourceType.FOOD));
     }
 
     @Override
