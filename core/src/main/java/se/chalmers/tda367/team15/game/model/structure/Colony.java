@@ -75,7 +75,6 @@ public class Colony extends Structure {
         }
         consumption = calculateConsumption();
         applyConsumption(consumption);
-        System.err.println(getTotalResources(ResourceType.FOOD));
     }
 
     @Override
