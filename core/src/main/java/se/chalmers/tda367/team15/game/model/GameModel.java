@@ -16,9 +16,9 @@ public class GameModel {
     private final PheromoneSystem pheromoneSystem;
     private final PheromoneGridConverter pheromoneGridConverter;
 
-    public GameModel(TimeCycle timeCycle, int mapWidth, int mapHeight, float tileSize, int pheromonesPerTile, TerrainGenerator generator) {
-        this.world = new GameWorld(timeCycle, mapWidth, mapHeight, tileSize, generator);
-        this.pheromoneGridConverter = new PheromoneGridConverter(tileSize, pheromonesPerTile);
+    public GameModel(TimeCycle timeCycle, int mapWidth, int mapHeight, int pheromonesPerTile, TerrainGenerator generator) {
+        this.world = new GameWorld(timeCycle, mapWidth, mapHeight, generator);
+        this.pheromoneGridConverter = new PheromoneGridConverter(pheromonesPerTile);
         GridPoint2 colonyPosition = new GridPoint2(0, 0);
         this.world.addStructure(new Colony(colonyPosition));
         this.pheromoneSystem = new PheromoneSystem(colonyPosition, pheromoneGridConverter);

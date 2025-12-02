@@ -24,8 +24,6 @@ import se.chalmers.tda367.team15.game.view.TextureRegistry;
 import se.chalmers.tda367.team15.game.view.ViewportListener;
 
 public class GameScreen extends ScreenAdapter {
-    // With TILE_SIZE = 1, world units ARE tile units (1 unit = 1 tile)
-    private static final float TILE_SIZE = 1f;
     private static final float WORLD_VIEWPORT_WIDTH = 15f; // Show ~15 tiles across
     private static final int MAP_WIDTH = 200;  // 200 tiles wide
     private static final int MAP_HEIGHT = 200; // 200 tiles tall
@@ -61,7 +59,7 @@ public class GameScreen extends ScreenAdapter {
             List.of("grass1", "grass2", "grass3"),
             System.currentTimeMillis() // Random seed
         );
-        gameModel = new GameModel(timeCycle, MAP_WIDTH, MAP_HEIGHT, TILE_SIZE, PHEROMONES_PER_TILE, terrainGenerator);
+        gameModel = new GameModel(timeCycle, MAP_WIDTH, MAP_HEIGHT, PHEROMONES_PER_TILE, terrainGenerator);
 
         // TODO: Should be a factory or something, this is just for testing!
         gameModel.spawnAnt(new Vector2(0, 0));

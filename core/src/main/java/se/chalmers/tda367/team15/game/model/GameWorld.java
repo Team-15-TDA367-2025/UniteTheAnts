@@ -22,8 +22,8 @@ public class GameWorld {
     private float tickAccumulator = 0f;
     private float secondsPerTick;
 
-    public GameWorld(TimeCycle timeCycle, int mapWidth, int mapHeight, float tileSize, TerrainGenerator generator) {
-        this.worldMap = new WorldMap(mapWidth, mapHeight, tileSize, generator);
+    public GameWorld(TimeCycle timeCycle, int mapWidth, int mapHeight, TerrainGenerator generator) {
+        this.worldMap = new WorldMap(mapWidth, mapHeight, generator);
         this.fogOfWar = new FogOfWar(worldMap);
         this.fogSystem = new FogSystem(fogOfWar, worldMap);
         this.entities = new ArrayList<>();

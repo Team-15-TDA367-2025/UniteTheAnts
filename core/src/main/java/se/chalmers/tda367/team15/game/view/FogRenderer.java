@@ -16,23 +16,21 @@ public class FogRenderer {
 
     public void render(SpriteBatch batch, FogOfWar fogOfWar) {
         GridPoint2 size = fogOfWar.getSize();
-        float tileSize = fogOfWar.getTileSize();
 
         batch.setColor(0.09f, 0.188f, 0.11f, 0.7f);
-        float offsetX = -size.x / 2f * fogOfWar.getTileSize(); // AI debugging for coordinates
-        float offsetY = -size.y / 2f * fogOfWar.getTileSize();
+        float offsetX = -size.x / 2f;
+        float offsetY = -size.y / 2f;
 
         for (int x = 0; x < size.x; x++) {
             for (int y = 0; y < size.y; y++) {
                 if (!fogOfWar.isDiscovered(x, y)) {
-                    float worldX = x * tileSize + offsetX;
-                    float worldY = y * tileSize + offsetY;
-                    batch.draw(pixelTexture, worldX, worldY, tileSize, tileSize);
+                    float worldX = x + offsetX;
+                    float worldY = y + offsetY;
+                    batch.draw(pixelTexture, worldX, worldY, 1, 1);
                 }
             }
         }
 
         batch.setColor(1, 1, 1, 1);
-
     }
 }

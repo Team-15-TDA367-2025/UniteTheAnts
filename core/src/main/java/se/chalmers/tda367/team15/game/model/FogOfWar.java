@@ -17,10 +17,6 @@ public class FogOfWar {
         return worldMap.getSize();
     }
 
-    public float getTileSize() {
-        return worldMap.getTileSize();
-    }
-
     public boolean isDiscovered(int x, int y) {
         if (!worldMap.isInBounds(x, y)) {
             return false;

@@ -18,16 +18,16 @@ public class TerrainRenderer {
     }
 
     public void render(SpriteBatch batch, WorldMap worldMap, CameraView cameraView) {
-        final float tileSize = worldMap.getTileSize();
         final GridPoint2 size = worldMap.getSize();
-        final Vector2 offset = new Vector2(-size.x / 2f * tileSize, -size.y / 2f * tileSize);
+        final float offsetX = -size.x / 2f;
+        final float offsetY = -size.y / 2f;
 
         Vector2 cameraPos = cameraView.getPosition();
         Vector2 viewportSize = cameraView.getEffectiveViewportSize();
         
         Vector2 halfViewport = new Vector2(viewportSize).scl(0.5f);
-        Vector2 leftBottom = new Vector2(cameraPos).sub(halfViewport).sub(tileSize, tileSize);
-        Vector2 rightTop = new Vector2(cameraPos).add(halfViewport).add(tileSize, tileSize);
+        Vector2 leftBottom = new Vector2(cameraPos).sub(halfViewport).sub(1, 1);
+        Vector2 rightTop = new Vector2(cameraPos).add(halfViewport).add(1, 1);
 
         GridPoint2 startTile = worldMap.worldToTile(leftBottom);
         GridPoint2 endTile = worldMap.worldToTile(rightTop);
@@ -43,25 +43,24 @@ public class TerrainRenderer {
 
         // Batch by texture to minimize texture switches
         // Render all grass1 tiles, then grass2, then grass3
-        renderTilesOfTexture(batch, worldMap, startX, endX, startY, endY, offset, tileSize, "grass1", grass1);
-        renderTilesOfTexture(batch, worldMap, startX, endX, startY, endY, offset, tileSize, "grass2", grass2);
-        renderTilesOfTexture(batch, worldMap, startX, endX, startY, endY, offset, tileSize, "grass3", grass3);
+        renderTilesOfTexture(batch, worldMap, startX, endX, startY, endY, offsetX, offsetY, "grass1", grass1);
+        renderTilesOfTexture(batch, worldMap, startX, endX, startY, endY, offsetX, offsetY, "grass2", grass2);
+        renderTilesOfTexture(batch, worldMap, startX, endX, startY, endY, offsetX, offsetY, "grass3", grass3);
     }
     
     private void renderTilesOfTexture(SpriteBatch batch, WorldMap worldMap, int startX, int endX, int startY, int endY,
-                                     Vector2 offset, float tileSize, String textureName, TextureRegion texture) {
+                                     float offsetX, float offsetY, String textureName, TextureRegion texture) {
         GridPoint2 tilePos = new GridPoint2();
-        Vector2 worldPos = new Vector2();
         
         for (int y = startY; y < endY; y++) {
             tilePos.y = y;
-            worldPos.y = y * tileSize + offset.y;
+            float worldY = y + offsetY;
             for (int x = startX; x < endX; x++) {
                 tilePos.x = x;
                 Tile tile = worldMap.getTileUnchecked(tilePos);
                 if (tile != null && textureName.equals(tile.getTextureName())) {
-                    worldPos.x = x * tileSize + offset.x;
-                    batch.draw(texture, worldPos.x, worldPos.y, tileSize, tileSize);
+                    float worldX = x + offsetX;
+                    batch.draw(texture, worldX, worldY, 1, 1);
                 }
             }
         }

@@ -11,9 +11,9 @@ public class PheromoneGridConverter {
     private final int pheromonesPerTile;
     private final float pheromoneCellSize;
 
-    public PheromoneGridConverter(float tileSize, int pheromonesPerTile) {
+    public PheromoneGridConverter(int pheromonesPerTile) {
         this.pheromonesPerTile = pheromonesPerTile;
-        this.pheromoneCellSize = tileSize / pheromonesPerTile;
+        this.pheromoneCellSize = 1f / pheromonesPerTile;
     }
 
     /**

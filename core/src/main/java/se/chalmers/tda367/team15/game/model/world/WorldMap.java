@@ -6,13 +6,11 @@ import com.badlogic.gdx.math.Vector2;
 public class WorldMap {
     private final int width;
     private final int height;
-    private final float tileSize;
     private final Tile[][] tiles;
 
-    public WorldMap(int width, int height, float tileSize, TerrainGenerator generator) {
+    public WorldMap(int width, int height, TerrainGenerator generator) {
         this.width = width;
         this.height = height;
-        this.tileSize = tileSize;
         this.tiles = generator.generate(width, height);
     }
 
@@ -37,24 +35,20 @@ public class WorldMap {
 
     public GridPoint2 worldToTile(Vector2 worldPos) {
         return new GridPoint2(
-            (int) Math.floor(worldPos.x / tileSize) + width / 2,
-            (int) Math.floor(worldPos.y / tileSize) + height / 2
+            (int) Math.floor(worldPos.x) + width / 2,
+            (int) Math.floor(worldPos.y) + height / 2
         );
     }
 
     public Vector2 tileToWorld(GridPoint2 tilePos) {
         return new Vector2(
-            (tilePos.x - width / 2f) * tileSize + tileSize / 2f,
-            (tilePos.y - height / 2f) * tileSize + tileSize / 2f
+            tilePos.x - width / 2f + 0.5f,
+            tilePos.y - height / 2f + 0.5f
         );
     }
 
     public GridPoint2 getSize() {
         return new GridPoint2(width, height);
-    }
-
-    public float getTileSize() {
-        return tileSize;
     }
 
     /**
