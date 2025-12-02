@@ -23,7 +23,7 @@ public class FogRenderer {
 
         for (int x = 0; x < size.x; x++) {
             for (int y = 0; y < size.y; y++) {
-                if (!fogOfWar.isDiscovered(x, y)) {
+                if (!fogOfWar.isDiscovered(new GridPoint2(x, y))) {
                     float worldX = x + offsetX;
                     float worldY = y + offsetY;
                     batch.draw(pixelTexture, worldX, worldY, 1, 1);

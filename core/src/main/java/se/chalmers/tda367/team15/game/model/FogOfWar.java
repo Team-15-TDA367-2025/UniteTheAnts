@@ -17,25 +17,20 @@ public class FogOfWar {
         return worldMap.getSize();
     }
 
-    public boolean isDiscovered(int x, int y) {
-        if (!worldMap.isInBounds(x, y)) {
+    public boolean isDiscovered(GridPoint2 pos) {
+        if (!worldMap.isInBounds(pos)) {
             return false;
         }
-        return discovered[x][y];
-    }
-
-    public boolean isDiscovered(GridPoint2 tilePos) {
-        return isDiscovered(tilePos.x, tilePos.y);
+        return discovered[pos.x][pos.y];
     }
 
     void reveal(GridPoint2 center, int radius) {
         for (int dx = -radius; dx <= radius; dx++) {
             for (int dy = -radius; dy <= radius; dy++) {
-                int x = center.x + dx;
-                int y = center.y + dy;
+                GridPoint2 pos = new GridPoint2(center.x + dx, center.y + dy);
                 boolean insideCircle = dx * dx + dy * dy <= radius * radius;
-                if (worldMap.isInBounds(x, y) && insideCircle) {
-                    discovered[x][y] = true;    
+                if (worldMap.isInBounds(pos) && insideCircle) {
+                    discovered[pos.x][pos.y] = true;    
                 }
             }
         }

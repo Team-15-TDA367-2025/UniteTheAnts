@@ -14,24 +14,17 @@ public class WorldMap {
         this.tiles = generator.generate(width, height);
     }
 
-    public Tile getTile(int x, int y) {
-        if (!isInBounds(x, y)) {
+    public Tile getTile(GridPoint2 pos) {
+        if (!isInBounds(pos)) {
             return null;
         }
-        return tiles[x][y];
+        return tiles[pos.x][pos.y];
     }
 
-    public Tile getTile(GridPoint2 tilePos) {
-        return getTile(tilePos.x, tilePos.y);
+    public boolean isInBounds(GridPoint2 pos) {
+        return pos.x >= 0 && pos.x < width && pos.y >= 0 && pos.y < height;
     }
 
-    public boolean isInBounds(int x, int y) {
-        return x >= 0 && x < width && y >= 0 && y < height;
-    }
-
-    public boolean isInBounds(GridPoint2 tilePos) {
-        return isInBounds(tilePos.x, tilePos.y);
-    }
 
     public GridPoint2 worldToTile(Vector2 worldPos) {
         return new GridPoint2(
@@ -49,21 +42,5 @@ public class WorldMap {
 
     public GridPoint2 getSize() {
         return new GridPoint2(width, height);
-    }
-
-    /**
-     * Get tiles in a rectangular region for efficient rendering.
-     * Returns null for out-of-bounds tiles.
-     * This method avoids repeated bounds checking in tight loops.
-     */
-    public Tile getTileUnchecked(int x, int y) {
-        if (x < 0 || x >= width || y < 0 || y >= height) {
-            return null;
-        }
-        return tiles[x][y];
-    }
-
-    public Tile getTileUnchecked(GridPoint2 tilePos) {
-        return getTileUnchecked(tilePos.x, tilePos.y);
     }
 }
