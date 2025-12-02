@@ -12,10 +12,11 @@ public class AttackComponent {
 
     /**
      * Pass arguments to define the attack capabilities.
-     * @param attackDmg  the amount of damage dealt with each attack
+     *
+     * @param attackDmg        the amount of damage dealt with each attack
      * @param attackCooldownMs the minimum time between attacks
-     * @param attackRange the max distance the target can be. cannot attack beyond this distance.
-     * @param host the Object that this component handles the attack logic for.
+     * @param attackRange      the max distance the target can be. cannot attack beyond this distance.
+     * @param host             the Object that this component handles the attack logic for.
      */
     public AttackComponent(float attackDmg, int attackCooldownMs, float attackRange, Entity host) {
         ATTACK_DMG = attackDmg;
@@ -25,12 +26,12 @@ public class AttackComponent {
         this.lastAttackTimeMS = System.currentTimeMillis();
     }
 
-    public void attack(HasHealth target) {
+    public void attack(AttackTarget target) {
         long now = System.currentTimeMillis();
-        if(now - lastAttackTimeMS > ATTACK_COOLDOWN_MS) {
-            if(target.getPosition().dst(host.getPosition()) <= ATTACK_RANGE) {
+        if (now - lastAttackTimeMS > ATTACK_COOLDOWN_MS) {
+            if (target.hasPosition.getPosition().dst(host.getPosition()) <= ATTACK_RANGE) {
                 lastAttackTimeMS = System.currentTimeMillis();
-                target.takeDamage(ATTACK_DMG);
+                target.canBeAttacked.takeDamage(ATTACK_DMG);
             }
         }
     }

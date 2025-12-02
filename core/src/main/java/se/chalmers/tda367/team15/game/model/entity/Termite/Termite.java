@@ -1,10 +1,12 @@
 package se.chalmers.tda367.team15.game.model.entity.Termite;
 
 import com.badlogic.gdx.math.Vector2;
+import se.chalmers.tda367.team15.game.model.AttackCategory;
 import se.chalmers.tda367.team15.game.model.DestructionListener;
 import se.chalmers.tda367.team15.game.model.GameWorld;
 import se.chalmers.tda367.team15.game.model.entity.AttackComponent;
-import se.chalmers.tda367.team15.game.model.entity.HasHealth;
+import se.chalmers.tda367.team15.game.model.entity.AttackTarget;
+import se.chalmers.tda367.team15.game.model.CanBeAttacked;
 import se.chalmers.tda367.team15.game.model.faction.Faction;
 import se.chalmers.tda367.team15.game.model.structure.Structure;
 import se.chalmers.tda367.team15.game.model.entity.Entity;
@@ -16,12 +18,12 @@ import java.util.List;
  * Termites are hostile to anything not in their {@link Faction}, termites {@link Faction} is "TERMITE_PROTECTORATE". Termites will pursue enemy entities
  *  then structures, then stand still. Perfect vision of map.
  */
-public class Termite extends Entity implements HasHealth{
+public class Termite extends Entity implements CanBeAttacked {
     private final Faction faction = Faction.TERMITE_PROTECTORATE;
-    private final float SPEED = 6f;
+    private final float SPEED = 10f;
     private final int visionRadius = 4;
     private TermiteBehaviour termiteBehaviour;
-    private AttackComponent attackComponent = new AttackComponent(2,1000,1,this);
+    private AttackComponent attackComponent = new AttackComponent(6,1000,1,this);
     private final float MAX_HEALTH = 6;
     private float health;
     public Termite(Vector2 position,GameWorld gameWorld) {
@@ -38,7 +40,7 @@ public class Termite extends Entity implements HasHealth{
     public void update(float deltaTime){
         List<Entity> entities = getGameWorld().getEntities();
         List<Structure> structures = getGameWorld().getStructures();
-        HasHealth target = termiteBehaviour.update(entities,structures);
+        AttackTarget target = termiteBehaviour.update(entities,structures);
         super.update(deltaTime);
         if(target != null) {
             attackComponent.attack(target);
@@ -77,6 +79,11 @@ public class Termite extends Entity implements HasHealth{
     public void die() {
         health = 0f;
         DestructionListener.getInstance().notifyEntityDeathObservers(this);
+    }
+
+    @Override
+    public AttackCategory getAttackCategory() {
+        return AttackCategory.TERMITE;
     }
 }
 
