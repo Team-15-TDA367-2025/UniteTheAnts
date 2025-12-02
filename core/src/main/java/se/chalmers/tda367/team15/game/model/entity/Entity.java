@@ -3,16 +3,16 @@ package se.chalmers.tda367.team15.game.model.entity;
 import com.badlogic.gdx.math.Vector2;
 
 import se.chalmers.tda367.team15.game.model.GameWorld;
+import se.chalmers.tda367.team15.game.model.HasPosition;
 import se.chalmers.tda367.team15.game.model.faction.Faction;
 import se.chalmers.tda367.team15.game.model.interfaces.Drawable;
 import se.chalmers.tda367.team15.game.model.interfaces.Updatable;
 
-public abstract class Entity implements Drawable, Updatable {
+public abstract class Entity implements Drawable, Updatable, HasPosition {
     protected Vector2 position;
     protected float rotation;
     private String textureName;
     protected Vector2 velocity;
-    protected Faction faction;
     private GameWorld gameWorld;
 
     // TODO reduce amount of parameters clients need to handle
@@ -63,9 +63,5 @@ public abstract class Entity implements Drawable, Updatable {
     // It is the responsibility of gameWorld to not expose internals.
     public GameWorld getGameWorld() {
         return gameWorld;
-    }
-
-    public Faction getFaction(){
-        return faction;
     }
 }

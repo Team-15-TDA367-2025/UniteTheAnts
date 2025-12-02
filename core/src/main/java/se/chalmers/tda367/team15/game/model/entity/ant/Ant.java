@@ -4,16 +4,17 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
+import se.chalmers.tda367.team15.game.model.AttackCategory;
 import se.chalmers.tda367.team15.game.model.DestructionListener;
 import se.chalmers.tda367.team15.game.model.GameWorld;
-import se.chalmers.tda367.team15.game.model.entity.HasHealth;
+import se.chalmers.tda367.team15.game.model.CanBeAttacked;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneSystem;
 import se.chalmers.tda367.team15.game.model.entity.Entity;
 import se.chalmers.tda367.team15.game.model.entity.VisionProvider;
 import se.chalmers.tda367.team15.game.model.entity.ant.behavior.AntBehavior;
 import se.chalmers.tda367.team15.game.model.entity.ant.behavior.WanderBehavior;
 import se.chalmers.tda367.team15.game.model.faction.Faction;
-public class Ant extends Entity implements VisionProvider, HasHealth {
+public class Ant extends Entity implements VisionProvider, CanBeAttacked {
     private static final float SPEED = 5f;
     private final float MAX_HEALTH = 6;
     private final int visionRadius = 4;
@@ -87,5 +88,10 @@ public class Ant extends Entity implements VisionProvider, HasHealth {
     @Override
     public void die() {
         DestructionListener.getInstance().notifyEntityDeathObservers(this);
+    }
+
+    @Override
+    public AttackCategory getAttackCategory() {
+        return AttackCategory.WORKER_ANT;
     }
 }
