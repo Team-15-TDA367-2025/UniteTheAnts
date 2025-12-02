@@ -38,7 +38,35 @@ public class PheromoneSystem {
 
         Pheromone pheromone = new Pheromone(pos, type, minDistance + 1);
         pheromoneGrid.addPheromone(pheromone);
+
+        // Update connected pheromones that now have a shorter path via this new pheromone
+        propagateShorterDistances(pos, pheromone.getDistance());
+
         return true;
+    }
+
+    /**
+     * Propagates shorter distances to neighboring pheromones.
+     * If a neighbor has a distance greater than sourceDistance + 1, it means
+     * there's now a shorter path through the source position, so we update it.
+     * 
+     * @param sourcePos      The position from which to propagate
+     * @param sourceDistance The distance at the source position
+     */
+    private void propagateShorterDistances(GridPoint2 sourcePos, int sourceDistance) {
+        for (int[] offset : NEIGHBOR_OFFSETS) {
+            GridPoint2 neighborPos = new GridPoint2(sourcePos.x + offset[0], sourcePos.y + offset[1]);
+            Pheromone neighbor = pheromoneGrid.getPheromoneAt(neighborPos);
+
+            if (neighbor != null && neighbor.getDistance() > sourceDistance + 1) {
+                // This neighbor has a longer path than necessary, update it
+                Pheromone updated = new Pheromone(neighborPos, neighbor.getType(), sourceDistance + 1);
+                pheromoneGrid.addPheromone(updated);
+
+                // Recursively propagate from the updated neighbor
+                propagateShorterDistances(neighborPos, updated.getDistance());
+            }
+        }
     }
 
     /**
