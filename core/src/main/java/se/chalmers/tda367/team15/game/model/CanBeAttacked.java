@@ -3,7 +3,7 @@ package se.chalmers.tda367.team15.game.model;
 import se.chalmers.tda367.team15.game.model.faction.Faction;
 
 /**
- * Represents the notion that the Object can be destroyed or die in the game world.
+ * Represents the notion that the Object can be destroyed or die in the game world by attackers.
  */
 public interface CanBeAttacked {
     /**
@@ -18,7 +18,15 @@ public interface CanBeAttacked {
      */
     void die();
 
+    /**
+     *
+     * @return the {@link AttackCategory} of the attackable object.
+     */
     AttackCategory getAttackCategory();
 
+    /**
+     *
+     * @return the  {@link Faction} of the attackable object.
+     */
     Faction getFaction();
 }
