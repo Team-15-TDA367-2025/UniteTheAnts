@@ -24,8 +24,8 @@ public class Ant extends Entity implements VisionProvider, CanBeAttacked {
 
     private float health;
 
-    public Ant(Vector2 position, PheromoneSystem system, GameWorld gameWorld) {
-        super(position, "Ant",gameWorld);
+    public Ant(Vector2 position, PheromoneSystem system) {
+        super(position, "Ant");
         this.behavior = new WanderBehavior(this);
         this.system = system;
         pickRandomDirection();

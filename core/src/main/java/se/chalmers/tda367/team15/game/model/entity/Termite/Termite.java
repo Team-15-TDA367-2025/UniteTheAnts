@@ -21,13 +21,12 @@ import java.util.List;
 public class Termite extends Entity implements CanBeAttacked {
     private final Faction faction = Faction.TERMITE_PROTECTORATE;
     private final float SPEED = 10f;
-    private final int visionRadius = 4;
-    private TermiteBehaviour termiteBehaviour;
+    private final TermiteBehaviour  termiteBehaviour;
     private AttackComponent attackComponent = new AttackComponent(100,1000,1,this);
     private final float MAX_HEALTH = 6;
     private float health;
-    public Termite(Vector2 position,GameWorld gameWorld) {
-        super(position, "Termite", gameWorld);
+    public Termite(Vector2 position) {
+        super(position, "Termite");
         this.termiteBehaviour = new TermiteBehaviour(this);
         health = MAX_HEALTH;
     }
@@ -38,8 +37,8 @@ public class Termite extends Entity implements CanBeAttacked {
      */
     @Override
     public void update(float deltaTime){
-        List<Entity> entities = getGameWorld().getEntities();
-        List<Structure> structures = getGameWorld().getStructures();
+        List<Entity> entities = GameWorld.getInstance().getEntities();
+        List<Structure> structures = GameWorld.getInstance().getStructures();
         AttackTarget target = termiteBehaviour.update(entities,structures);
         super.update(deltaTime);
         if(target != null) {

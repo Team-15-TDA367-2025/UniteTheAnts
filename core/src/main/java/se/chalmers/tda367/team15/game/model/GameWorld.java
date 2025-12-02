@@ -23,8 +23,9 @@ public class GameWorld implements EntityDeathObserver, StructureDeathObserver {
     private List<TimeObserver> timeObservers;
     private float tickAccumulator = 0f;
     private float secondsPerTick;
+    private static GameWorld gameWorld;
 
-    public GameWorld(TimeCycle timeCycle, int mapWidth, int mapHeight, float tileSize) {
+    private GameWorld(TimeCycle timeCycle, int mapWidth, int mapHeight, float tileSize) {
         fogOfWar = new FogOfWar(mapWidth, mapHeight, tileSize);
         fogSystem = new FogSystem(fogOfWar);
         this.entities = new ArrayList<>();
@@ -36,6 +37,18 @@ public class GameWorld implements EntityDeathObserver, StructureDeathObserver {
         destructionListener.addEntityDeathObserver(this);
         destructionListener.addStructureDeathObserver(this);
 
+    }
+
+    public static GameWorld createInstance(TimeCycle timeCycle, int mapWidth, int mapHeight, float tileSize) {
+        gameWorld=new GameWorld(timeCycle,mapWidth,mapHeight,tileSize);
+        return gameWorld;
+    }
+
+    public static GameWorld getInstance() {
+        if(gameWorld == null) {
+            throw new IllegalStateException("GameWorld must be created with createInstance() before used");
+        }
+        return gameWorld;
     }
 
     public List<Structure> getStructures() {

@@ -19,12 +19,11 @@ public abstract class Entity implements Drawable, Updatable, HasPosition {
     // Some kind of entity factory might help reduce the amount of parameters
     // GameWorld is useful because it gives entities awareness of the world around them- singleton???
 
-    public Entity(Vector2 position, String textureName, GameWorld gameWorld) {
+    public Entity(Vector2 position, String textureName) {
         this.position = position;
         this.textureName = textureName;
         this.rotation = 0f;
         this.velocity = new Vector2(0f, 0f);
-        this.gameWorld = gameWorld;
     }
 
     public void update(float deltaTime) {
@@ -59,9 +58,5 @@ public abstract class Entity implements Drawable, Updatable, HasPosition {
 
     public void moveTo(Vector2 pos) {
         position.set(pos);
-    }
-    // It is the responsibility of gameWorld to not expose internals.
-    public GameWorld getGameWorld() {
-        return gameWorld;
     }
 }
