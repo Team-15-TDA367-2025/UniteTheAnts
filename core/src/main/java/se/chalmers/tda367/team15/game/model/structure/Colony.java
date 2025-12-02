@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.GridPoint2;
 
 import se.chalmers.tda367.team15.game.model.AttackCategory;
 import se.chalmers.tda367.team15.game.model.CanBeAttacked;
+import se.chalmers.tda367.team15.game.model.DestructionListener;
 import se.chalmers.tda367.team15.game.model.entity.Entity;
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.faction.Faction;
@@ -58,7 +59,7 @@ public class Colony extends Structure implements CanBeAttacked {
 
     @Override
     public void die() {
-
+        DestructionListener.getInstance().notifyStructureDeathObservers(this);
     }
 
     @Override

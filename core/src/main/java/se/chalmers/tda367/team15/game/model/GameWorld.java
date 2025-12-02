@@ -13,7 +13,7 @@ import se.chalmers.tda367.team15.game.model.structure.Colony;
 import se.chalmers.tda367.team15.game.model.structure.Structure;
 
 
-public class GameWorld implements EntityDeathObserver, StructureDeathObserver{
+public class GameWorld implements EntityDeathObserver, StructureDeathObserver {
     private List<Entity> entities; // Floating positions and can move around.
     private List<Structure> structures; // Integer positions and fixed in place.
     private final FogSystem fogSystem;
@@ -34,11 +34,11 @@ public class GameWorld implements EntityDeathObserver, StructureDeathObserver{
         this.secondsPerTick = 60f / timeCycle.getTicksPerMinute();
         destructionListener = DestructionListener.getInstance();
         destructionListener.addEntityDeathObserver(this);
-
+        destructionListener.addStructureDeathObserver(this);
 
     }
 
-    public List<Structure> getStructures(){
+    public List<Structure> getStructures() {
         return Collections.unmodifiableList(structures);
 
 
@@ -90,13 +90,10 @@ public class GameWorld implements EntityDeathObserver, StructureDeathObserver{
             notifyTimeObservers();
             tickAccumulator -= secondsPerTick; // remove the processed time
         }
-        for (Entity e : entities) {
-            e.update(deltaTime);
-        }
 
         List<Updatable> updateTheseEntities = getUpdatables();
         Updatable spotlightedUpdateable;
-        while(!updateTheseEntities.isEmpty()) {
+        while (!updateTheseEntities.isEmpty()) {
             spotlightedUpdateable = updateTheseEntities.removeFirst();
             spotlightedUpdateable.update(deltaTime);
         }
@@ -107,12 +104,20 @@ public class GameWorld implements EntityDeathObserver, StructureDeathObserver{
     public void addEntity(Entity entity) {
         entities.add(entity);
     }
-    public void removeEntity(Entity e){entities.remove(e);}
+
+    public void removeEntity(Entity e) {
+        entities.remove(e);
+    }
+
     @Override
-    public void onEntityDeath(Entity e) {removeEntity(e);}
+    public void onEntityDeath(Entity e) {
+        removeEntity(e);
+    }
+
     public void addStructure(Structure structure) {
         structures.add(structure);
     }
+
     public void removeStructure(Structure s) {
         structures.remove(s);
     }
