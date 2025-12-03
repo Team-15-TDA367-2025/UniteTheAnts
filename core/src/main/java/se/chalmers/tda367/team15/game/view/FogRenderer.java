@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
@@ -94,18 +95,16 @@ public class FogRenderer {
         // Draw white where fog should be (unrevealed areas)
         maskBatch.setColor(1f, 1f, 1f, 1f);
         
-        int width = fogOfWar.getWidth();
-        int height = fogOfWar.getHeight();
-        float tileSize = fogOfWar.getTileSize();
-        float offsetX = -width / 2f * tileSize;
-        float offsetY = -height / 2f * tileSize;
+        GridPoint2 size = fogOfWar.getSize();
+        float offsetX = -size.x / 2f;
+        float offsetY = -size.y / 2f;
 
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                if (!fogOfWar.isDiscovered(x, y)) {
-                    float worldX = x * tileSize + offsetX;
-                    float worldY = y * tileSize + offsetY;
-                    maskBatch.draw(pixelTexture, worldX, worldY, tileSize, tileSize);
+        for (int x = 0; x < size.x; x++) {
+            for (int y = 0; y < size.y; y++) {
+                if (!fogOfWar.isDiscovered(new GridPoint2(x, y))) {
+                    float worldX = x + offsetX;
+                    float worldY = y + offsetY;
+                    maskBatch.draw(pixelTexture, worldX, worldY, 1, 1);
                 }
             }
         }
