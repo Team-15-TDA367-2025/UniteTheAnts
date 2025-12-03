@@ -46,27 +46,23 @@ public class ResourceSystem {
     }
 
     private void handleResourcePickup(List<Ant> ants) {
+        for (Ant ant : ants) {
+            if (!ant.getInventory().isFull()) {
+                tryPickupNearbyResource(ant);
+            }
+        }
+    }
+
+    private void tryPickupNearbyResource(Ant ant) {
+        GridPoint2 antGrid = ant.getGridPosition();
         GridPoint2 checkCell = new GridPoint2();
 
-        for (Ant ant : ants) {
-            if (ant.getInventory().isFull()) {
-                continue;
-            }
-
-            GridPoint2 antGrid = ant.getGridPosition();
-            boolean pickedUp = false;
-
-            for (int dx = -PICKUP_RADIUS; dx <= PICKUP_RADIUS && !pickedUp; dx++) {
-                for (int dy = -PICKUP_RADIUS; dy <= PICKUP_RADIUS && !pickedUp; dy++) {
-
-                    checkCell.set(antGrid.x + dx, antGrid.y + dy);
-                    Resource nearbyResource = resourceGrid.get(checkCell);
-
-                    if (nearbyResource != null) {
-                        if (tryPickupResource(ant, nearbyResource)) {
-                            pickedUp = true;
-                        }
-                    }
+        for (int dx = -PICKUP_RADIUS; dx <= PICKUP_RADIUS; dx++) {
+            for (int dy = -PICKUP_RADIUS; dy <= PICKUP_RADIUS; dy++) {
+                checkCell.set(antGrid.x + dx, antGrid.y + dy);
+                Resource resource = resourceGrid.get(checkCell);
+                if (resource != null && tryPickupResource(ant, resource)) {
+                    return;
                 }
             }
         }

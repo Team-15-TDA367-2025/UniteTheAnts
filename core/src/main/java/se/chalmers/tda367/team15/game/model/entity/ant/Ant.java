@@ -14,7 +14,6 @@ import se.chalmers.tda367.team15.game.model.entity.ant.behavior.WanderBehavior;
 public class Ant extends Entity implements VisionProvider {
     private static final float SPEED = 5f;
     private final int visionRadius = 4;
-    private final int capacity;
 
     private AntBehavior behavior;
     private PheromoneSystem system;
@@ -24,7 +23,6 @@ public class Ant extends Entity implements VisionProvider {
         super(position, "Ant");
         this.behavior = new WanderBehavior(this);
         this.system = system;
-        this.capacity = capacity;
         this.inventory = new Inventory(capacity);
         pickRandomDirection();
     }
