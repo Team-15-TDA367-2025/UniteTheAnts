@@ -28,7 +28,6 @@ public class GameScreen extends ScreenAdapter {
     private static final float WORLD_VIEWPORT_WIDTH = 15f; // Show ~15 tiles across
     private static final int MAP_WIDTH = 200;  // 200 tiles wide
     private static final int MAP_HEIGHT = 200; // 200 tiles tall
-    private static final int PHEROMONES_PER_TILE = 4; // 4 pheromones per tile = denser grid
 
     private static final float MIN_ZOOM = 0.15f;
     private static final float MAX_ZOOM = 4.0f;
@@ -60,7 +59,7 @@ public class GameScreen extends ScreenAdapter {
             List.of("grass1", "grass2", "grass3"),
             System.currentTimeMillis() // Random seed
         );
-        gameModel = new GameModel(timeCycle, MAP_WIDTH, MAP_HEIGHT, PHEROMONES_PER_TILE, terrainGenerator);
+        gameModel = new GameModel(timeCycle, MAP_WIDTH, MAP_HEIGHT, terrainGenerator);
 
         // TODO: Should be a factory or something, this is just for testing!
         gameModel.spawnAnt(new Vector2(0, 0));

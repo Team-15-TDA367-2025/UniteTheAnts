@@ -17,7 +17,7 @@ import se.chalmers.tda367.team15.game.model.world.WorldMap;
 public class GameModel {
     private final GameWorld world;
 
-    public GameModel(TimeCycle timeCycle, int mapWidth, int mapHeight, int pheromonesPerTile, TerrainGenerator generator) {
+    public GameModel(TimeCycle timeCycle, int mapWidth, int mapHeight, TerrainGenerator generator) {
         this.world = GameWorld.createInstance(timeCycle, mapWidth, mapHeight, generator);
 
         this.world.addResource(new Resource(new GridPoint2(-10, 10), "food", 1, ResourceType.FOOD, 5));
@@ -25,8 +25,6 @@ public class GameModel {
         this.world.addResource(new Resource(new GridPoint2(20, 25), "food", 1, ResourceType.FOOD, 5));
         this.world.addResource(new Resource(new GridPoint2(-20, 10), "food", 1, ResourceType.FOOD, 5));
         this.world.addResource(new Resource(new GridPoint2(10, -20), "food", 1, ResourceType.FOOD, 5));
-        GridPoint2 colonyPosition = new GridPoint2(0, 0);
-        this.world.addStructure(new Colony(colonyPosition));
     }
 
     public PheromoneGridConverter getPheromoneGridConverter() {
