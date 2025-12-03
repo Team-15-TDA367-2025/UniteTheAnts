@@ -23,7 +23,7 @@ import se.chalmers.tda367.team15.game.model.world.WorldMap;
 public class GameWorld implements EntityDeathObserver, StructureDeathObserver {
     private Colony colony = new Colony(new GridPoint2(0, 0));
     private final PheromoneSystem pheromoneSystem;
-    private List<Entity> entities; // Floating positions and can move around.
+    private List<Entity> worldEntities; // Floating positions and can move around.
     private List<Structure> structures; // Integer positions and fixed in place.
     private List<Resource> resources;
     private ResourceSystem resourceSystem;
@@ -41,7 +41,7 @@ public class GameWorld implements EntityDeathObserver, StructureDeathObserver {
         this.worldMap = new WorldMap(mapWidth, mapHeight, generator);
         this.fogOfWar = new FogOfWar(worldMap);
         this.fogSystem = new FogSystem(fogOfWar, worldMap);
-        this.entities = new ArrayList<>();
+        this.worldEntities = new ArrayList<>();
         this.structures = new ArrayList<>();
         structures.add(colony);
         this.resources = new ArrayList<>();
@@ -68,13 +68,18 @@ public class GameWorld implements EntityDeathObserver, StructureDeathObserver {
         return gameWorld;
     }
 
+    public Colony getColony() {
+        return colony;
+    }
+
     public List<Structure> getStructures() {
         return Collections.unmodifiableList(structures);
 
     }
 
     public List<Entity> getEntities() {
-        List<Entity> allEntities = new ArrayList<>(entities);
+        List<Entity> allEntities = new ArrayList<>();
+        allEntities.addAll(worldEntities);
         for (Structure structure : structures) {
             allEntities.addAll(structure.getSubEntities());
         }
@@ -116,12 +121,13 @@ public class GameWorld implements EntityDeathObserver, StructureDeathObserver {
 
     private List<Updatable> getUpdatables() {
         List<Updatable> updatables = new ArrayList<>();
-        updatables.addAll(entities);
+        updatables.addAll(getEntities());
         updatables.addAll(structures);
         return updatables;
     }
 
     public void update(float deltaTime) {
+        List<Entity> entities = getEntities();
         tickAccumulator += deltaTime; // add real seconds
         while (tickAccumulator >= secondsPerTick) {
             timeCycle.tick();
@@ -140,11 +146,11 @@ public class GameWorld implements EntityDeathObserver, StructureDeathObserver {
     }
 
     public void addEntity(Entity entity) {
-        entities.add(entity);
+        worldEntities.add(entity);
     }
 
     public void removeEntity(Entity e) {
-        entities.remove(e);
+        worldEntities.remove(e);
     }
 
     @Override

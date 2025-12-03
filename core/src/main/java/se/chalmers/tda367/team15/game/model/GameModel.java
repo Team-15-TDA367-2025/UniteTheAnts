@@ -37,7 +37,7 @@ public class GameModel {
 
     public void spawnAnt(Vector2 position) {
         Ant ant = new Ant(position, GameWorld.getInstance().getPheromoneSystem(), 5);
-        world.addEntity(ant);
+        world.getColony().addAnt(ant);
     }
 
     public void spawnTermite(Vector2 position) {
