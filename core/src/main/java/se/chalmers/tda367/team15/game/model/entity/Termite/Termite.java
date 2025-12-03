@@ -22,7 +22,7 @@ public class Termite extends Entity implements CanBeAttacked {
     private final Faction faction = Faction.TERMITE_PROTECTORATE;
     private final float SPEED = 12f;
     private final TermiteBehaviour  termiteBehaviour;
-    private AttackComponent attackComponent = new AttackComponent(3, 500, 1.5f, this);
+    private AttackComponent attackComponent = new AttackComponent(3, 500, 2.0f, this);
     private final float MAX_HEALTH = 6;
     private float health;
     public Termite(Vector2 position) {
