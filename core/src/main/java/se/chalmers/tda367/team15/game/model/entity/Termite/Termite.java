@@ -26,7 +26,7 @@ public class Termite extends Entity implements CanBeAttacked {
     private final float MAX_HEALTH = 6;
     private float health;
     public Termite(Vector2 position) {
-        super(position, "Termite");
+        super(position, "termite");
         this.termiteBehaviour = new TermiteBehaviour(this);
         health = MAX_HEALTH;
     }
@@ -83,6 +83,11 @@ public class Termite extends Entity implements CanBeAttacked {
     @Override
     public AttackCategory getAttackCategory() {
         return AttackCategory.TERMITE;
+    }
+
+    @Override
+    public Vector2 getSize() {
+        return new Vector2(1f, 1.5f);
     }
 }
 
