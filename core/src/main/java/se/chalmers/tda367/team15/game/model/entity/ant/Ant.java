@@ -20,7 +20,9 @@ public class Ant extends Entity implements VisionProvider, CanBeAttacked {
     private static final float SPEED = 5f;
     private final float MAX_HEALTH = 6;
     private final int visionRadius = 4;
-    Faction faction;
+    protected Faction faction;
+    private final int hunger;
+
     private AntBehavior behavior;
     private PheromoneSystem system;
 
@@ -31,6 +33,7 @@ public class Ant extends Entity implements VisionProvider, CanBeAttacked {
         super(position, "Ant");
         this.behavior = new WanderBehavior(this);
         this.system = system;
+        this.hunger = 2; // test value
         this.inventory = new Inventory(capacity);
         pickRandomDirection();
         this.faction = Faction.DEMOCRATIC_REPUBLIC_OF_ANTS;
@@ -78,6 +81,10 @@ public class Ant extends Entity implements VisionProvider, CanBeAttacked {
 
     public Inventory getInventory() {
         return inventory;
+    }
+
+    public int getHunger() {
+        return hunger;
     }
 
     public boolean leaveResources(Colony colony) {

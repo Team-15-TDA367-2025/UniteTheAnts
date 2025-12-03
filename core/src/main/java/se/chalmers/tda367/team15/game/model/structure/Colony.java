@@ -20,7 +20,7 @@ import se.chalmers.tda367.team15.game.model.structure.resource.ResourceType;
 
 public class Colony extends Structure implements CanBeAttacked {
     private List<Ant> ants;
-    private Map<ResourceType, Integer> storage;
+    private Inventory inventory;
 
     private float health;
     private float MAX_HEALTH = 60;
@@ -29,7 +29,7 @@ public class Colony extends Structure implements CanBeAttacked {
         super(position, "AntColony", 5);
         this.ants = new ArrayList<>();
         faction = Faction.DEMOCRATIC_REPUBLIC_OF_ANTS;
-        this.storage = new HashMap<>();
+        this.inventory = new Inventory(1000); // test value for now
     }
 
     public void addAnt(Ant ant) {
@@ -40,24 +40,44 @@ public class Colony extends Structure implements CanBeAttacked {
         ants.remove(ant);
     }
 
-    public boolean depositResources(Inventory inventory) {
+    public boolean depositResources(Inventory otherInventory) {
         boolean deposited = false;
 
         for (ResourceType type : ResourceType.values()) {
-            int amount = inventory.getAmount(type);
-            if (amount > 0) {
-                storage.put(type, storage.getOrDefault(type, 0) + amount);
+            int total = otherInventory.getAmount(type);
+            if (total > 0) {
+                inventory.addResource(type, total);
                 deposited = true;
             }
         }
         return deposited;
     }
 
+    public int calculateConsumption() {
+        int total = 0;
+
+        for (Ant ant : ants) {
+            total += ant.getHunger();
+        }
+        return total;
+    }
+
+    public void applyConsumption(int amount) {
+        inventory.addResource(ResourceType.FOOD, -amount);
+
+    }
+
+    public int getTotalResources(ResourceType type) {
+        return inventory.getAmount(type);
+    }
+
     @Override
     public void update(float deltaTime) {
         for (Ant ant : ants) {
             ant.update(deltaTime);
+
         }
+        applyConsumption(calculateConsumption());
     }
 
     @Override
