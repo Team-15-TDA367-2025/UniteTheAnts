@@ -84,12 +84,8 @@ public class GameScreen extends ScreenAdapter {
         gridView = new GridView(worldCameraView, TILE_SIZE);
 
         hudView = new HudView(hudBatch);
-        hudController = new HudController(hudView);
-
         pheromoneController = new PheromoneController(gameModel, worldCameraView);
-
-        // Connect HUD pheromone buttons to the pheromone controller
-        hudView.setPheromoneSelectionListener(type -> pheromoneController.setCurrentType(type));
+        hudController = new HudController(hudView, gameModel, pheromoneController);
 
         // Add Stage first so it can handle button clicks before other processors
         inputManager.addProcessor(hudView.getTopStage());
@@ -110,7 +106,7 @@ public class GameScreen extends ScreenAdapter {
         cameraController.update(delta);
         worldCameraView.updateCamera();
         gameModel.update(delta);
-        hudView.updateData(gameModel.getGameTime());
+        hudController.update(delta);
 
         ScreenUtils.clear(0.227f, 0.643f, 0.239f, 1f);
 
