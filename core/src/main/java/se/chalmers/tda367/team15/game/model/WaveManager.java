@@ -7,6 +7,9 @@ import se.chalmers.tda367.team15.game.model.interfaces.TimeObserver;
 
 import java.util.Random;
 
+/**
+ * When combat phase (night) starts as dictated by {@link TimeCycle} spawns a new wave of enemies.
+ */
 public class WaveManager implements TimeObserver {
     private int nightNumber = 0;
     private int termiteDifficultyCost = 1;
@@ -19,7 +22,10 @@ public class WaveManager implements TimeObserver {
         return nightNumber;
     }
 
-    void spawnWave() {
+    /**
+     * spawns a wave of termites according to a scaling difficulty, the termites will have scattered positions from a random direction.
+     */
+    private void spawnWave() {
         //determine budget
         int nightBudget = nightNumber * 3;
 
@@ -27,15 +33,21 @@ public class WaveManager implements TimeObserver {
         int nEnemies = nightBudget / termiteDifficultyCost;
 
         // spawn location
-        Vector2 spawnLocation = scatter(new Vector2(0,0),0);
+        Vector2 spawnLocation = scatter(new Vector2(0,0),75);
         // spawn enemies
         for(int i = 0 ; i < nEnemies; i++) {
-            Termite termite = new Termite(scatter(spawnLocation,20));
+            Termite termite = new Termite(scatter(spawnLocation,30));
             GameWorld.getInstance().addEntity(termite);
         }
 
     }
 
+    /**
+     * Calculates a new vector that is a specified distance away from some origin in a random direction.
+     * @param origin the origin point
+     * @param distance the distance
+     * @return a randomly scattered vector.
+     */
     Vector2 scatter(Vector2 origin,float distance) {
         Random r = new Random();
         float direction = r.nextFloat()*((float) Math.PI * 2);

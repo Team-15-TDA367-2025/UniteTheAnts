@@ -7,11 +7,19 @@ public class TimeCycle {
 
     private long timeUntilNextPhaseMs = 0;
 
+    /**
+     * Responsible for keeping track whether or not the world is in combat phase or standard phase.
+     * use {@code getTimeUntilNextPhaseMs()} and {@code isCombatPhaseCurrent()} to get info on world phase.
+     */
     public TimeCycle() {
             combatPhaseCurrent = false;
             timeUntilNextPhaseMs = standardPhaseMs ;
     }
 
+    /**
+     * Counts down the timer to next phase.
+     * @param deltaTime the realtime difference in seconds from the last frame.
+     */
     public void update(float deltaTime) {
         long msDeltaTime = Math.round(deltaTime * 1000f);
 
@@ -24,11 +32,18 @@ public class TimeCycle {
 
     }
 
-
-    public long getTimeUntilNextPhaseMS() {
+    /**
+     *
+     * @return {@code long}  time until next phase in milliseconds
+     */
+    public long getTimeUntilNextPhaseMs() {
         return timeUntilNextPhaseMs;
     }
 
+    /**
+     *
+     * @return {@code boolean} combatPhaseCurrent
+     */
     public boolean isCombatPhaseCurrent(){
         return combatPhaseCurrent;
     }
