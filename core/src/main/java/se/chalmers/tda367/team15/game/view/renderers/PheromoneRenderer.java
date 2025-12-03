@@ -1,4 +1,4 @@
-package se.chalmers.tda367.team15.game.view;
+package se.chalmers.tda367.team15.game.view.renderers;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -10,15 +10,16 @@ import se.chalmers.tda367.team15.game.model.pheromones.Pheromone;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneSystem;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneType;
+import se.chalmers.tda367.team15.game.view.camera.CameraView;
 
 // AI Generated for testing, should not look like this later!
-public class PheromoneView {
+public class PheromoneRenderer {
     private final ShapeRenderer shapeRenderer;
     private final CameraView cameraView;
     private final PheromoneSystem pheromoneSystem;
     private final PheromoneGridConverter converter;
 
-    public PheromoneView(CameraView cameraView, PheromoneSystem pheromoneSystem) {
+    public PheromoneRenderer(CameraView cameraView, PheromoneSystem pheromoneSystem) {
         this.cameraView = cameraView;
         this.pheromoneSystem = pheromoneSystem;
         this.converter = pheromoneSystem.getConverter();
