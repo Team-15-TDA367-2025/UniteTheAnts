@@ -72,7 +72,8 @@ public class GameWorld implements EntityDeathObserver, StructureDeathObserver {
     }
 
     public List<Entity> getEntities() {
-        List<Entity> allEntities = new ArrayList<>(worldEntities);
+        List<Entity> allEntities = new ArrayList<>();
+        allEntities.addAll(worldEntities);
         for (Structure structure : structures) {
             allEntities.addAll(structure.getSubEntities());
         }
