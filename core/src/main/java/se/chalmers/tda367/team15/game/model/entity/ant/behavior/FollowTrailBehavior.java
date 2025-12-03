@@ -13,9 +13,9 @@ import se.chalmers.tda367.team15.game.model.pheromones.PheromoneSystem;
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 
 public class FollowTrailBehavior extends AntBehavior {
-    private static final float SPEED_BOOST_ON_TRAIL = 5f;
+    private static final float SPEED_BOOST_ON_TRAIL = 1.5f;
     // Threshold as fraction of pheromone cell size (must be < 1 to avoid reaching multiple cells)
-    private static final float REACHED_THRESHOLD_FRACTION = 0.5f;
+    private static final float REACHED_THRESHOLD_FRACTION = 0.3f;
 
     private boolean returningToColony = false;
     private Pheromone lastPheromone = null;
@@ -68,9 +68,20 @@ public class FollowTrailBehavior extends AntBehavior {
         }
 
         // 3. Movement
-        Vector2 diff = getCenterPos(currentTarget).sub(ant.getPosition());
-        if (diff.len2() > 0.01f) {
-            ant.setVelocity(diff.nor().scl(ant.getSpeed() * SPEED_BOOST_ON_TRAIL));
+        Vector2 targetPos = getCenterPos(currentTarget);
+        Vector2 diff = new Vector2(targetPos).sub(ant.getPosition());
+        float distSq = diff.len2();
+        
+        if (distSq > 0.001f) {
+            // Scale speed based on distance to avoid overshooting
+            float maxSpeed = ant.getSpeed() * SPEED_BOOST_ON_TRAIL;
+            float cellSize = ant.getSystem().getConverter().getPheromoneCellSize();
+            // Slow down when close to target to prevent overshooting
+            float speed = Math.min(maxSpeed, Math.max(ant.getSpeed(), (float) Math.sqrt(distSq) / cellSize * maxSpeed));
+            ant.setVelocity(diff.nor().scl(speed));
+        } else {
+            // Very close to target - stop to prevent oscillation
+            ant.setVelocity(new Vector2(0, 0));
         }
     }
 
