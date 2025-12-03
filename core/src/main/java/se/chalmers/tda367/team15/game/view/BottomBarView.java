@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import se.chalmers.tda367.team15.game.model.pheromones.PheromoneType;
 
 public class BottomBarView {
     private static final float BAR_WIDTH = 600f;
@@ -32,6 +33,10 @@ public class BottomBarView {
     private final Texture minimizeTex;
     private final Texture expandTex;
     private final Texture barBgTex;
+
+    // Pheromone selection
+    private PheromoneSelectionListener pheromoneListener;
+    private ButtonGroup<ImageButton> pheromoneButtonGroup;
 
     public BottomBarView(SpriteBatch batch) {
         viewport = new ScreenViewport();           // use screen pixels
@@ -62,22 +67,22 @@ public class BottomBarView {
 
     }
 
+    /**
+     * Sets the listener for pheromone selection events.
+     * @param listener The listener to notify when a pheromone type is selected.
+     */
+    public void setPheromoneSelectionListener(PheromoneSelectionListener listener) {
+        this.pheromoneListener = listener;
+    }
+
     private void buildBarContents() {
-        // Two groups of 3 buttons each
-        HorizontalGroup group1 = new HorizontalGroup();
-        HorizontalGroup group2 = new HorizontalGroup();
+        // Pheromone buttons group - these select pheromone types
+        HorizontalGroup pheromoneGroup = createPheromoneButtonGroup();
 
-        BitmapFont font = new BitmapFont();
-        Label.LabelStyle ls = new Label.LabelStyle(font, Color.WHITE);
-
-        group1 = createButtonGroup(
-            new String[]{"BottomBar/btn1.png", "BottomBar/btn2.png", "BottomBar/btn3.png"},
-            new String[]{"Button 1", "Button 2", "Button 3"}
-        );
-
-        group2 = createButtonGroup(
-            new String[] { "BottomBar/btn4.png", "BottomBar/btn5.png", "BottomBar/btn6.png" },
-            new String[] { "Button 4", "Button 5", "Button 6" }
+        // Other buttons group
+        HorizontalGroup otherGroup = createButtonGroup(
+            new String[] { "BottomBar/btn5.png", "BottomBar/btn6.png" },
+            new String[] { "Button 5", "Button 6" }
         );
 
         // Minimize button on right
@@ -90,10 +95,75 @@ public class BottomBarView {
 
         // layout inside barTable
         barTable.left();
-        barTable.add(group1).left().padLeft(12);
-        barTable.add(group2).left().padLeft(40);
+        barTable.add(pheromoneGroup).left().padLeft(12);
+        barTable.add(otherGroup).left().padLeft(40);
         barTable.add().expandX();
         barTable.add(minimizeBtn).right().padRight(10).size(40, 40);
+    }
+
+    private HorizontalGroup createPheromoneButtonGroup() {
+        HorizontalGroup group = new HorizontalGroup();
+        group.space(10);
+
+        BitmapFont font = new BitmapFont();
+
+        // Pheromone types with their textures and labels
+        String[] textureNames = {
+            "BottomBar/btn1.png",  // Gather
+            "BottomBar/btn2.png",  // Attack
+            "BottomBar/btn3.png",  // Explore
+            "BottomBar/btn4.png"   // Delete/Erase
+        };
+        String[] labels = { "Gather", "Attack", "Explore", "Erase" };
+        // null at end represents delete mode
+        PheromoneType[] types = { PheromoneType.GATHER, PheromoneType.ATTACK, PheromoneType.EXPLORE, null };
+
+        pheromoneButtonGroup = new ButtonGroup<>();
+        pheromoneButtonGroup.setMinCheckCount(1);
+        pheromoneButtonGroup.setMaxCheckCount(1);
+        pheromoneButtonGroup.setUncheckLast(true);
+
+        for (int i = 0; i < textureNames.length; i++) {
+            final PheromoneType type = types[i];
+
+            Texture tex = new Texture(Gdx.files.internal(textureNames[i]));
+            TextureRegionDrawable drawable = new TextureRegionDrawable(new TextureRegion(tex));
+
+            // Create a style with checked state highlighting
+            ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
+            style.imageUp = drawable;
+            style.imageDown = drawable;
+            style.imageChecked = drawable; // same texture, but button will be "checked"
+
+            ImageButton btn = new ImageButton(style);
+
+            btn.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    if (pheromoneListener != null) {
+                        pheromoneListener.onPheromoneSelected(type);
+                    }
+                }
+            });
+
+            pheromoneButtonGroup.add(btn);
+
+            // label below the button
+            Label desc = new Label(labels[i], new Label.LabelStyle(font, Color.WHITE));
+            desc.setAlignment(Align.center);
+
+            VerticalGroup v = new VerticalGroup();
+            v.center();
+            v.addActor(btn);
+            v.addActor(desc);
+
+            group.addActor(v);
+        }
+
+        // Default to first button (Gather) checked
+        pheromoneButtonGroup.getButtons().first().setChecked(true);
+
+        return group;
     }
 
     private HorizontalGroup createButtonGroup(String[] textureNames, String[] descriptions) {
@@ -101,7 +171,7 @@ public class BottomBarView {
         group.space(10);
 
         for (int i = 0; i < textureNames.length; i++) {
-            Texture tex = new Texture(textureNames[i]);  // each button has unique texture
+            Texture tex = new Texture(Gdx.files.internal(textureNames[i]));
             TextureRegionDrawable drawable = new TextureRegionDrawable(new TextureRegion(tex));
 
             ImageButton btn = new ImageButton(drawable);

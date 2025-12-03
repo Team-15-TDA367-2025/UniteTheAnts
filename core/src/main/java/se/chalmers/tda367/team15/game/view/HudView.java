@@ -28,6 +28,14 @@ public class HudView {
         topBar.update(gameTime, 0, 0);
     }
 
+    /**
+     * Sets the listener for pheromone selection events from the bottom bar.
+     * @param listener The listener to notify when a pheromone type is selected.
+     */
+    public void setPheromoneSelectionListener(PheromoneSelectionListener listener) {
+        bottomBar.setPheromoneSelectionListener(listener);
+    }
+
     public Stage getTopStage() { return topBar.getStage(); }
     public Stage getBottomStage() { return bottomBar.getStage(); }
 

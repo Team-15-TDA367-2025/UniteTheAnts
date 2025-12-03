@@ -87,8 +87,9 @@ public class GameScreen extends ScreenAdapter {
         hudController = new HudController(hudView);
 
         pheromoneController = new PheromoneController(gameModel, worldCameraView);
-        // hudView.setPheromoneController(pheromoneController);
-        // hudView.setPheromoneSystem(gameModel.getPheromoneSystem());
+
+        // Connect HUD pheromone buttons to the pheromone controller
+        hudView.setPheromoneSelectionListener(type -> pheromoneController.setCurrentType(type));
 
         // Add Stage first so it can handle button clicks before other processors
         inputManager.addProcessor(pheromoneController);
