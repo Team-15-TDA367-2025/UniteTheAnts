@@ -32,13 +32,15 @@ public class GameModel {
     // --- FACADE METHODS (Actions) ---
 
     public void spawnAnt(Vector2 position) {
+        // Just temperory before we have EggSystem 
         AntFactory antFactory = new AntFactory(world.getPheromoneSystem(), world.getColony());
         Ant ant = antFactory.createAnt();
         world.getColony().addAnt(ant);
     }
 
     public void spawnTermite(Vector2 position) {
-        EnemyFactory enemyFactory = new EnemyFactory();
+        // Temperory before we have EnemyWaveSystem
+        EnemyFactory enemyFactory = new EnemyFactory(world);
         Termite termite = enemyFactory.createTermite(position);
         world.addEntity(termite);
     }
