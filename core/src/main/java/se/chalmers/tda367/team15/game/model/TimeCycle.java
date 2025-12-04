@@ -1,65 +1,45 @@
 package se.chalmers.tda367.team15.game.model;
 
 public class TimeCycle {
-    private long combatPhaseMs = 1000;
-    private long standardPhaseMs =1000 ;
-    private boolean combatPhaseCurrent;
+    private int ticks;
+    private int ticksPerMinute;
 
-    private long timeUntilNextPhaseMs = 0;
-
-    /**
-     * Responsible for keeping track whether the world is in combat phase or standard phase.
-     * use {@code getTimeUntilNextPhaseMs()} and {@code isCombatPhaseCurrent()} to get info on world phase.
-     */
-    public TimeCycle() {
-            combatPhaseCurrent = false;
-            timeUntilNextPhaseMs = standardPhaseMs ;
+    public record GameTime(int totalDays, int currentHour, int currentMinute, int ticks) {}
+    public TimeCycle(int ticksPerMinute) {
+        this.ticksPerMinute = ticksPerMinute;
+        this.ticks = 0;
     }
 
-    /**
-     * Counts down the timer to next phase.
-     * @param deltaTime the realtime difference in seconds from the last frame.
-     */
-    public void update(float deltaTime) {
-        long msDeltaTime = Math.round(deltaTime * 1000f);
-
-        if ((timeUntilNextPhaseMs - msDeltaTime) <= 0) {
-            nextPhase();
-        } else {
-            timeUntilNextPhaseMs -= msDeltaTime;
-        }
-       System.out.println(timeUntilNextPhaseMs / 1000);
-
+    public void tick() {
+        ticks++;
     }
 
-    /**
-     *
-     * @return {@code long}  time until next phase in milliseconds
-     */
-    public long getTimeUntilNextPhaseMs() {
-        return timeUntilNextPhaseMs;
+    public int getTotalMinutes() {
+        return ticks;
     }
 
-    /**
-     *
-     * @return {@code boolean} combatPhaseCurrent
-     */
-    public boolean isCombatPhaseCurrent(){
-        return combatPhaseCurrent;
+    public int getHour() {
+        return (getTotalMinutes() / 60) % 24;
     }
 
-
-    private void nextPhase() {
-        System.out.println("-----Next Phase!");
-        if (combatPhaseCurrent) {
-            timeUntilNextPhaseMs = standardPhaseMs;
-            combatPhaseCurrent = false;
-            GameWorld.getInstance().day();
-        } else {
-            timeUntilNextPhaseMs = combatPhaseMs;
-            combatPhaseCurrent = true;
-            GameWorld.getInstance().night();
-        }
+    public int getMinute() {
+        return getTotalMinutes() % 60;
     }
 
+    public void setTicksPerMinute(int ticksPerMinute) {
+        this.ticksPerMinute = ticksPerMinute;
+    }
+
+    public int getTicksPerMinute() {
+        return ticksPerMinute;
+    }
+
+    public GameTime getGameTime() {
+        return new GameTime((getTotalMinutes()/(24*60))+1, getHour(), getMinute(), ticks);
+    }
+
+    public boolean getIsDay() {
+        int h = getHour();
+        return h >= 6 && h < 22;
+    }
 }
