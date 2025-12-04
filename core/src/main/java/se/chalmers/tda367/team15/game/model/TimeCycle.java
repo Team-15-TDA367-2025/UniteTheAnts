@@ -17,6 +17,10 @@ public class TimeCycle {
         return ticks / ticksPerMinute;
     }
 
+    public int getTotalHours() {
+        return getTotalMinutes() / 60;
+    }
+
     public int getHour() {
         return (getTotalMinutes() / 60) % 24;
     }
@@ -36,5 +40,9 @@ public class TimeCycle {
     public boolean getIsDay() {
         int h = getHour();
         return h >= 6 && h < 22;
+    }
+
+    public int getTotalDays() {
+        return getTotalHours() / 24;
     }
 }

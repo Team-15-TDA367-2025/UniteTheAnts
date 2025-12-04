@@ -1,17 +1,17 @@
 package se.chalmers.tda367.team15.game.screens;
 
-import java.util.Map;
-
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import se.chalmers.tda367.team15.game.controller.CameraController;
 import se.chalmers.tda367.team15.game.controller.InputManager;
 import se.chalmers.tda367.team15.game.controller.PheromoneController;
+import se.chalmers.tda367.team15.game.model.GameEndReason;
 import se.chalmers.tda367.team15.game.model.GameModel;
+import se.chalmers.tda367.team15.game.model.GameStats;
 import se.chalmers.tda367.team15.game.model.TimeCycle;
 import se.chalmers.tda367.team15.game.model.camera.CameraConstraints;
 import se.chalmers.tda367.team15.game.model.camera.CameraModel;
@@ -48,7 +48,12 @@ public class GameScreen extends ScreenAdapter {
     private final HUDView hudView;
     private final TextureRegistry textureRegistry;
 
-    public GameScreen() {
+    private final Game game;
+    private GameStats gameStats;
+
+    public GameScreen(Game game) {
+        this.game = game;
+
         // Initialize world bounds and constraints
         Rectangle worldBounds = new Rectangle(-MAP_WIDTH / 2f, -MAP_HEIGHT / 2f, MAP_WIDTH, MAP_HEIGHT);
         CameraConstraints constraints = new CameraConstraints(worldBounds, MIN_ZOOM, MAX_ZOOM);
@@ -96,6 +101,17 @@ public class GameScreen extends ScreenAdapter {
         viewportListener.addObserver(hudView);
     }
 
+    // TODO: Implement GameHasEnded that returns true if the game has ended
+    private GameEndReason gameHasEnded() {
+        if (gameModel.getTotalAnts() == 0) {
+            return GameEndReason.ALL_ANTS_DEAD;
+        }
+        if (gameModel.getTotalResources() == 0) {
+            return GameEndReason.STARVATION;
+        }
+        return GameEndReason.STILL_PLAYING;
+    }
+
     @Override
     public void render(float delta) {
         // Update
@@ -103,8 +119,14 @@ public class GameScreen extends ScreenAdapter {
         worldCameraView.updateCamera();
         gameModel.update(delta);
 
-        ScreenUtils.clear(0.227f, 0.643f, 0.239f, 1f);
+        GameEndReason endReason = gameHasEnded();
+        if (endReason != GameEndReason.STILL_PLAYING) {
+            gameStats = new GameStats(gameModel.getTotalDays());
+            gameStats.saveIfNewHighScore();
+            game.setScreen(new EndScreen(game, endReason));
+        }
 
+        ScreenUtils.clear(0.227f, 0.643f, 0.239f, 1f);
         pheromoneView.render();
         sceneView.render(gameModel.getDrawables(), gameModel.getFog());
         gridView.render();

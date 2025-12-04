@@ -50,4 +50,16 @@ public class GameModel {
     public PheromoneSystem getPheromoneSystem() {
         return GameWorld.getInstance().getPheromoneSystem();
     }
+
+    public int getTotalDays() {
+        return world.getTimeCycle().getTotalDays();
+    }
+
+    public int getTotalAnts() {
+        return world.getAnts().size();
+    }
+
+    public int getTotalResources() {
+        return world.getResources().size();
+    }
 }

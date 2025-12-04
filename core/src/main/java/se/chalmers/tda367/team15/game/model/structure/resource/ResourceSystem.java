@@ -25,8 +25,7 @@ public class ResourceSystem {
         this.resourceGrid = new HashMap<>();
     }
 
-    public void update(Colony colony, List<Entity> entities, List<Resource> resources) {
-        List<Ant> ants = filterAnts(entities);
+    public void update(Colony colony, List<Ant> ants, List<Resource> resources) {
         handleResourcePickup(ants);
         handleResourceDeposit(ants, colony);
         resources.removeIf(resource -> resource.getAmount() <= 0);
@@ -103,15 +102,5 @@ public class ResourceSystem {
         }
 
         return false;
-    }
-
-    private List<Ant> filterAnts(List<Entity> entities) {
-        List<Ant> ants = new ArrayList<>();
-        for (Entity entity : entities) {
-            if (entity instanceof Ant) {
-                ants.add((Ant) entity);
-            }
-        }
-        return ants;
     }
 }

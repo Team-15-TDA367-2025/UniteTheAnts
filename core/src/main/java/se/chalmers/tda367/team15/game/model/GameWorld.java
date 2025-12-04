@@ -7,6 +7,7 @@ import java.util.List;
 import com.badlogic.gdx.math.GridPoint2;
 
 import se.chalmers.tda367.team15.game.model.entity.Entity;
+import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.interfaces.Drawable;
 import se.chalmers.tda367.team15.game.model.interfaces.Updatable;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneSystem;
@@ -75,6 +76,20 @@ public class GameWorld implements EntityDeathObserver, StructureDeathObserver {
         return Collections.unmodifiableList(allEntities);
     }
 
+    public List<Ant> getAnts() {
+        List<Ant> ants = new ArrayList<>();
+        for (Entity entity : entities) {
+            if (entity instanceof Ant) {
+                ants.add((Ant) entity);
+            }
+        }
+        return Collections.unmodifiableList(ants);
+    }
+
+    public List<Resource> getResources() {
+        return Collections.unmodifiableList(resources);
+    }
+
     public Iterable<Drawable> getDrawables() {
         List<Drawable> allDrawables = new ArrayList<>(structures);
         allDrawables.addAll(resources);
@@ -88,6 +103,10 @@ public class GameWorld implements EntityDeathObserver, StructureDeathObserver {
 
     public FogOfWar getFog() {
         return fogOfWar;
+    }
+
+    public TimeCycle getTimeCycle() {
+        return timeCycle;
     }
 
     public void addTimeObserver(TimeObserver observer) {
@@ -126,7 +145,7 @@ public class GameWorld implements EntityDeathObserver, StructureDeathObserver {
 
         // Update fog after movement
         fogSystem.updateFog(entities);
-        resourceSystem.update(colony, entities, resources);
+        resourceSystem.update(colony, getAnts(), resources);
     }
 
     public void addEntity(Entity entity) {
