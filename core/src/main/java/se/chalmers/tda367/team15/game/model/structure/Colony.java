@@ -34,6 +34,7 @@ public class Colony extends Structure implements CanBeAttacked, EntityDeathObser
 
     public Colony(GridPoint2 position, PheromoneSystem pheromoneSystem) {
         super(position, "colony", 2);
+        this.pheromoneSystem = pheromoneSystem;
         this.ants = new ArrayList<>();
         this.health = MAX_HEALTH;
         faction = Faction.DEMOCRATIC_REPUBLIC_OF_ANTS;

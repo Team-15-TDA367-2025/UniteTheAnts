@@ -122,7 +122,7 @@ public class GameFactory {
         for (int i = 0; i < 5; i++) {
             gameModel.spawnAnt(new Vector2(0, 0));
         }
-        gameModel.spawnTermite(new Vector2(10, 0));
+        // gameModel.spawnTermite(new Vector2(10, 0));
     }
 
     /**
