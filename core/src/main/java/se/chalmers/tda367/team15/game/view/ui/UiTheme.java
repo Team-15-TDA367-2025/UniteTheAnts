@@ -1,5 +1,7 @@
 package se.chalmers.tda367.team15.game.view.ui;
 
+import com.badlogic.gdx.graphics.Color;
+
 /**
  * Centralized UI constants for consistent styling across all views.
  */
@@ -9,7 +11,7 @@ public final class UiTheme {
     }
 
     public static final float UI_SCALE = 1.0f;
-    public static final float NINE_PATCH_SCALE = 6.0f;
+    public static final float NINE_PATCH_SCALE = 4.0f;
 
     public static final float TOP_BAR_WIDTH = 800f;
     public static final float TOP_BAR_HEIGHT = 140f;
@@ -29,8 +31,12 @@ public final class UiTheme {
     public static final float PADDING_LARGE = 16f;
     public static final float PADDING_XLARGE = 24f;
     public static final float PADDING_XXLARGE = 32f;
-    public static final float BUTTON_SPACING = 12f;
+    public static final float BUTTON_SPACING = 6f;
 
     public static final float FONT_SCALE_DEFAULT = 1f;
     public static final float FONT_SCALE_LARGE = 2f;
+
+    public static final Color BUTTON_HOVER_TINT = new Color(0.8f, 1f, 0.8f, 1);
+    public static final Color BUTTON_PRESSED_TINT = new Color(0.5f, 1f, 0.8f, 1);
+    public static final Color BUTTON_CHECKED_TINT = new Color(0.5f, 1f, 0.5f, 1);
 }

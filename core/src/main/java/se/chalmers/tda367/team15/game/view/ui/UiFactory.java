@@ -20,6 +20,9 @@ public class UiFactory {
     private final TextureRegistry textures;
     private final BitmapFont defaultFont;
     private NinePatchDrawable buttonBackground;
+    private NinePatchDrawable buttonBackgroundHover;
+    private NinePatchDrawable buttonBackgroundPressed;
+    private NinePatchDrawable buttonBackgroundChecked;
     private NinePatchDrawable panelBackground;
     private NinePatchDrawable areaBackground;
 
@@ -41,6 +44,8 @@ public class UiFactory {
         ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
         style.imageUp = drawable;
         style.up = getButtonBackground();
+        style.over = getButtonBackgroundHover();
+        style.down = getButtonBackgroundPressed();
         
         ImageButton button = new ImageButton(style);
 
@@ -73,6 +78,39 @@ public class UiFactory {
         return buttonBackground;
     }
 
+    public NinePatchDrawable getButtonBackgroundHover() {
+        if (buttonBackgroundHover == null) {
+            NinePatch patch = new NinePatch(textures.get("button"), 3, 3, 3, 6);
+            patch.scale(UiTheme.NINE_PATCH_SCALE, UiTheme.NINE_PATCH_SCALE);
+            NinePatchDrawable drawable = new NinePatchDrawable(patch);
+            drawable.getPatch().setColor(UiTheme.BUTTON_HOVER_TINT);
+            buttonBackgroundHover = drawable;
+        }
+        return buttonBackgroundHover;
+    }
+
+    public NinePatchDrawable getButtonBackgroundPressed() {
+        if (buttonBackgroundPressed == null) {
+            NinePatch patch = new NinePatch(textures.get("button"), 3, 3, 3, 6);
+            patch.scale(UiTheme.NINE_PATCH_SCALE, UiTheme.NINE_PATCH_SCALE);
+            NinePatchDrawable drawable = new NinePatchDrawable(patch);
+            drawable.getPatch().setColor(UiTheme.BUTTON_PRESSED_TINT);
+            buttonBackgroundPressed = drawable;
+        }
+        return buttonBackgroundPressed;
+    }
+
+    public NinePatchDrawable getButtonBackgroundChecked() {
+        if (buttonBackgroundChecked == null) {
+            NinePatch patch = new NinePatch(textures.get("button"), 3, 3, 3, 6);
+            patch.scale(UiTheme.NINE_PATCH_SCALE, UiTheme.NINE_PATCH_SCALE);
+            NinePatchDrawable drawable = new NinePatchDrawable(patch);
+            drawable.getPatch().setColor(UiTheme.BUTTON_CHECKED_TINT);
+            buttonBackgroundChecked = drawable;
+        }
+        return buttonBackgroundChecked;
+    }
+
     public NinePatchDrawable getAreaBackground() {
         if (areaBackground == null) {
             NinePatch patch = new NinePatch(textures.get("area"), 2, 2, 3, 3);
@@ -89,10 +127,9 @@ public class UiFactory {
         ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
         style.imageUp = drawable;
         style.up = getButtonBackground();
-        style.checked = getButtonBackground(); // Selected state background
-        // Maybe we want a different background for checked? 
-        // Since we don't have one, we use the same.
-        // Alternatively, we could tint it.
+        style.over = getButtonBackgroundHover();
+        style.down = getButtonBackgroundPressed();
+        style.checked = getButtonBackgroundChecked();
         
         return new ImageButton(style);
     }
@@ -104,7 +141,8 @@ public class UiFactory {
         TextButtonStyle style = new TextButtonStyle();
         style.font = font;
         style.up = getButtonBackground();
-        style.down = getButtonBackground();
+        style.over = getButtonBackgroundHover();
+        style.down = getButtonBackgroundPressed();
         style.checked = getButtonBackground();
         style.fontColor = Color.WHITE;
         
@@ -129,8 +167,9 @@ public class UiFactory {
         TextButtonStyle style = new TextButtonStyle();
         style.font = font;
         style.up = getButtonBackground();
-        style.down = getButtonBackground();
-        style.checked = getButtonBackground();
+        style.over = getButtonBackgroundHover();
+        style.down = getButtonBackgroundPressed();
+        style.checked = getButtonBackgroundChecked();
         style.fontColor = Color.WHITE;
         style.checkedFontColor = Color.WHITE;
         
