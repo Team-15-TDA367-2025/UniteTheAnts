@@ -7,7 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
@@ -20,13 +20,14 @@ public class BottomBarView {
     private final Table expandButtonTable;
 
     private PheromoneSelectionListener pheromoneListener;
-    private ButtonGroup<ImageButton> pheromoneButtonGroup;
+    private ButtonGroup<TextButton> pheromoneButtonGroup;
 
     public BottomBarView(UiFactory uiFactory) {
         this.uiFactory = uiFactory;
 
         barTable = new Table();
-        barTable.setBackground(uiFactory.createDrawable("BottomBar/bottombar_bg"));
+        barTable.setBackground(uiFactory.getPanelBackground());
+        // barTable.pad(UiTheme.PADDING_MEDIUM);
 
         buildBarContents();
 
@@ -38,7 +39,8 @@ public class BottomBarView {
         Table container = new Table();
         container.setFillParent(true);
         container.bottom();
-        container.add(barTable).center().width(UiTheme.BOTTOM_BAR_WIDTH).height(UiTheme.BOTTOM_BAR_HEIGHT);
+        container.add(barTable).center().width(UiTheme.BOTTOM_BAR_WIDTH).height(UiTheme.BOTTOM_BAR_HEIGHT)
+                .pad(UiTheme.PADDING_MEDIUM);
 
         stage.addActor(container);
         stage.addActor(expandButtonTable);
@@ -61,16 +63,13 @@ public class BottomBarView {
         ImageButton minimizeBtn = uiFactory.createImageButton("BottomBar/minimize", () -> setMinimizedBar(true));
 
         barTable.left();
-        barTable.add(pheromoneGroup).left().padLeft(UiTheme.PADDING_LARGE);
-        barTable.add(otherGroup).left().padLeft(UiTheme.PADDING_XXLARGE + UiTheme.PADDING_XLARGE);
+        barTable.add(pheromoneGroup).left();
+        barTable.add(otherGroup).left().padLeft(UiTheme.PADDING_XXLARGE);
         barTable.add().expandX();
-        barTable.add(minimizeBtn).right().padRight(UiTheme.PADDING_MEDIUM).size(UiTheme.ICON_SIZE_MEDIUM);
+        barTable.add(minimizeBtn).right().size(UiTheme.ICON_SIZE_MEDIUM);
     }
 
     private HorizontalGroup createPheromoneButtonGroup() {
-        String[] textureNames = {
-                "BottomBar/btn1", "BottomBar/btn2", "BottomBar/btn3", "BottomBar/btn4"
-        };
         String[] labels = { "Gather", "Attack", "Explore", "Erase" };
         PheromoneType[] types = { PheromoneType.GATHER, PheromoneType.ATTACK, PheromoneType.EXPLORE, null };
 
@@ -82,10 +81,10 @@ public class BottomBarView {
         pheromoneButtonGroup.setMaxCheckCount(1);
         pheromoneButtonGroup.setUncheckLast(true);
 
-        for (int i = 0; i < textureNames.length; i++) {
+        for (int i = 0; i < labels.length; i++) {
             final PheromoneType type = types[i];
 
-            ImageButton btn = uiFactory.createToggleButton(textureNames[i]);
+            TextButton btn = uiFactory.createToggleTextButton(labels[i]);
             btn.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
@@ -96,18 +95,7 @@ public class BottomBarView {
             });
 
             pheromoneButtonGroup.add(btn);
-
-            // Replaced uiFactory.createWhiteLabel() with direct label creation
-            Label desc = new Label(labels[i],
-                    uiFactory.createLabelStyle(UiTheme.FONT_SCALE_DEFAULT, com.badlogic.gdx.graphics.Color.WHITE));
-            desc.setAlignment(Align.center);
-
-            VerticalGroup v = new VerticalGroup();
-            v.center();
-            v.addActor(btn);
-            v.addActor(desc);
-
-            group.addActor(v);
+            group.addActor(btn);
         }
 
         pheromoneButtonGroup.getButtons().first().setChecked(true);
@@ -118,22 +106,11 @@ public class BottomBarView {
         HorizontalGroup group = new HorizontalGroup();
         group.space(UiTheme.BUTTON_SPACING);
 
-        String[] textureNames = { "BottomBar/btn5", "BottomBar/btn6" };
         String[] labels = { "Button 5", "Button 6" };
 
-        for (int i = 0; i < textureNames.length; i++) {
-            ImageButton btn = uiFactory.createImageButton(textureNames[i], null);
-            // Replaced uiFactory.createWhiteLabel() with direct label creation
-            Label desc = new Label(labels[i],
-                    uiFactory.createLabelStyle(UiTheme.FONT_SCALE_DEFAULT, com.badlogic.gdx.graphics.Color.WHITE));
-            desc.setAlignment(Align.center);
-
-            VerticalGroup v = new VerticalGroup();
-            v.center();
-            v.addActor(btn);
-            v.addActor(desc);
-
-            group.addActor(v);
+        for (int i = 0; i < labels.length; i++) {
+            TextButton btn = uiFactory.createTextButton(labels[i], null);
+            group.addActor(btn);
         }
 
         return group;
