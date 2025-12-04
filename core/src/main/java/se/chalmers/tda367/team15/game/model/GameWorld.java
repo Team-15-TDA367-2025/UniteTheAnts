@@ -35,7 +35,6 @@ public class GameWorld implements EntityDeathObserver, StructureDeathObserver {
     private List<TimeObserver> timeObservers;
     private float tickAccumulator = 0f;
     private float secondsPerTick;
-    private static GameWorld gameWorld;
 
     public GameWorld(TimeCycle timeCycle, int mapWidth, int mapHeight, TerrainGenerator generator) {
         this.worldMap = new WorldMap(mapWidth, mapHeight, generator);
@@ -53,19 +52,8 @@ public class GameWorld implements EntityDeathObserver, StructureDeathObserver {
         destructionListener.addEntityDeathObserver(this);
         destructionListener.addStructureDeathObserver(this);
         pheromoneSystem = new PheromoneSystem(new GridPoint2(0, 0), new PheromoneGridConverter(4));
+        addTimeObserver(colony);
 
-    }
-
-    public static GameWorld createInstance(TimeCycle timeCycle, int mapWidth, int mapHeight, TerrainGenerator terrainGenerator) {
-        gameWorld = new GameWorld(timeCycle, mapWidth, mapHeight,  terrainGenerator);
-        return gameWorld;
-    }
-
-    public static GameWorld getInstance() {
-        if (gameWorld == null) {
-            throw new IllegalStateException("GameWorld must be created with createInstance() before used");
-        }
-        return gameWorld;
     }
 
     public Colony getColony() {
