@@ -2,9 +2,10 @@ package se.chalmers.tda367.team15.game.controller;
 
 import se.chalmers.tda367.team15.game.model.GameModel;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneType;
+import se.chalmers.tda367.team15.game.model.structure.resource.ResourceType;
+import se.chalmers.tda367.team15.game.view.ui.EggPanelView;
 import se.chalmers.tda367.team15.game.view.ui.HudView;
 import se.chalmers.tda367.team15.game.view.ui.PheromoneSelectionListener;
-import se.chalmers.tda367.team15.game.view.ui.EggPanelView;
 import se.chalmers.tda367.team15.game.view.ui.UiFactory;
 
 public class HudController implements PheromoneSelectionListener {
@@ -37,6 +38,6 @@ public class HudController implements PheromoneSelectionListener {
     }
 
     public void update(float dt) {
-        view.updateData(model.getGameTime());
+        view.updateData(model.getGameTime(), model.getColony().getAntCount(), model.getColony().getTotalResources(ResourceType.FOOD));
     }
 }

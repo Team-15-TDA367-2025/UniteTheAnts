@@ -116,6 +116,10 @@ public class Colony extends Structure implements CanBeAttacked, EntityDeathObser
         return true;
     }
 
+    public int getAntCount() {
+        return ants.size();
+    }
+
     @Override
     public void onEggHatch(AntType type) {
         // Get spawn position (Colony location)
