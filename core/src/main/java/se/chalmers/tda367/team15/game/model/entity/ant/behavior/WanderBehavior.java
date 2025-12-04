@@ -30,9 +30,6 @@ public class WanderBehavior extends AntBehavior {
         if (!neighbors.isEmpty()) {
             ant.setBehavior(new FollowTrailBehavior(ant));
         }
-        else{
-            ant.setVelocity(new Vector2(0,0));
-        }
 
     }
 }
