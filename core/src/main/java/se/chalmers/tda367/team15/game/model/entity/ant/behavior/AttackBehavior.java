@@ -36,7 +36,7 @@ public class AttackBehavior extends AntBehavior{
         AttackTarget target = findTarget();
 
         if(target==null) {
-            ant.setBehavior(new ReturnBehaviour(ant,lastPosBeforeAttack));
+            ant.setBehavior(new FollowTrailBehavior(ant));
         }
         else {
             Vector2 targetV = target.hasPosition.getPosition().sub(ant.getPosition());
