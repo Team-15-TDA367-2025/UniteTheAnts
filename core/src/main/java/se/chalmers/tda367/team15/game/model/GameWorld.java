@@ -15,6 +15,7 @@ import se.chalmers.tda367.team15.game.model.pheromones.PheromoneSystem;
 import se.chalmers.tda367.team15.game.model.structure.Colony;
 import se.chalmers.tda367.team15.game.model.structure.Structure;
 import se.chalmers.tda367.team15.game.model.structure.resource.Resource;
+import se.chalmers.tda367.team15.game.model.structure.resource.ResourceNode;
 import se.chalmers.tda367.team15.game.model.structure.resource.ResourceSystem;
 import se.chalmers.tda367.team15.game.model.world.TerrainGenerator;
 import se.chalmers.tda367.team15.game.model.world.WorldMap;
@@ -24,7 +25,6 @@ public class GameWorld implements EntityDeathObserver, StructureDeathObserver {
     private final PheromoneSystem pheromoneSystem;
     private List<Entity> worldEntities; // Floating positions and can move around.
     private List<Structure> structures; // Integer positions and fixed in place.
-    private List<Resource> resources;
     private ResourceSystem resourceSystem;
     private final WorldMap worldMap;
     private final FogSystem fogSystem;
@@ -44,7 +44,6 @@ public class GameWorld implements EntityDeathObserver, StructureDeathObserver {
         this.worldEntities = new ArrayList<>();
         this.structures = new ArrayList<>();
         structures.add(colony);
-        this.resources = new ArrayList<>();
         this.resourceSystem = new ResourceSystem();
         this.timeObservers = new ArrayList<>();
         this.timeCycle = timeCycle;
@@ -78,7 +77,6 @@ public class GameWorld implements EntityDeathObserver, StructureDeathObserver {
 
     public Iterable<Drawable> getDrawables() {
         List<Drawable> allDrawables = new ArrayList<>(structures);
-        allDrawables.addAll(resources);
         allDrawables.addAll(getEntities());
         return Collections.unmodifiableList(allDrawables);
     }
@@ -144,7 +142,7 @@ public class GameWorld implements EntityDeathObserver, StructureDeathObserver {
 
         // Update fog after movement
         fogSystem.updateFog(entities);
-        resourceSystem.update(colony, entities, resources);
+        resourceSystem.update(colony, entities, structures);
     }
 
     public void addEntity(Entity entity) {
@@ -165,8 +163,14 @@ public class GameWorld implements EntityDeathObserver, StructureDeathObserver {
     }
 
     public void addResource(Resource resource) {
-        resources.add(resource);
+        structures.add(resource);
         resourceSystem.addResource(resource);
+    }
+
+    public void addResourceNode(ResourceNode resourceNode) {
+        structures.add(resourceNode);
+        resourceSystem.addResourceNode(resourceNode);
+        addTimeObserver(resourceNode);
     }
 
     public void removeStructure(Structure s) {
