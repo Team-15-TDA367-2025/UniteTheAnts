@@ -2,7 +2,6 @@ package se.chalmers.tda367.team15.game.model;
 
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
-
 import se.chalmers.tda367.team15.game.model.entity.Termite.Termite;
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.interfaces.Drawable;
@@ -26,7 +25,8 @@ public class GameModel {
     // --- FACADE METHODS (Actions) ---
 
     public void spawnAnt(Vector2 position) {
-        Ant ant = new Ant(position, GameWorld.getInstance().getPheromoneSystem(), 5);
+        AntFactory antFactory = new AntFactory(world.getPheromoneSystem(), world.getColony());
+        Ant ant = antFactory.createAnt();
         world.getColony().addAnt(ant);
     }
 
