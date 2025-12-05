@@ -54,7 +54,7 @@ public class WaveManager implements TimeObserver {
         float x = MathUtils.cos(direction);
         float y = MathUtils.sin(direction);
         Vector2 directionV = new Vector2(x, y);
-        return origin.add(directionV.scl(distance));
+        return origin.cpy().add(directionV.scl(distance));
     }
 
     @Override
