@@ -21,6 +21,7 @@ public class BottomBarView {
 
     private PheromoneSelectionListener pheromoneListener;
     private ButtonGroup<TextButton> pheromoneButtonGroup;
+    private EggPanelView eggPanelView;
 
     public BottomBarView(UiFactory uiFactory) {
         this.uiFactory = uiFactory;
@@ -65,8 +66,27 @@ public class BottomBarView {
         barTable.left();
         barTable.add(pheromoneGroup).left();
         barTable.add(otherGroup).left().padLeft(UiTheme.PADDING_XXLARGE);
+        
+        // Add egg panel if it exists
+        if (eggPanelView != null) {
+            barTable.add(eggPanelView.getTable()).left().padLeft(UiTheme.PADDING_LARGE);
+        }
+        
         barTable.add().expandX();
         barTable.add(minimizeBtn).right().size(UiTheme.ICON_SIZE_MEDIUM);
+    }
+    
+    public void setEggPanelView(EggPanelView eggPanelView) {
+        this.eggPanelView = eggPanelView;
+        // Rebuild bar contents to include egg panel
+        barTable.clear();
+        buildBarContents();
+    }
+    
+    public void update(float deltaTime) {
+        if (eggPanelView != null) {
+            eggPanelView.update();
+        }
     }
 
     private HorizontalGroup createPheromoneButtonGroup() {
