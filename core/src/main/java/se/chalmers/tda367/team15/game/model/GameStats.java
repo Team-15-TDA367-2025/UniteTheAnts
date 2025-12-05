@@ -20,7 +20,7 @@ public class GameStats {
     private int daysSurvived;
 
     public GameStats(int daysSurvived) {
-        this.daysSurvived = 5;
+        this.daysSurvived = daysSurvived;
     }
 
     public void saveIfNewHighScore() {
