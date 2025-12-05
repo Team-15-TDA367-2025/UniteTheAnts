@@ -2,7 +2,6 @@ package se.chalmers.tda367.team15.game.model.egg;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import se.chalmers.tda367.team15.game.model.TimeCycle;
