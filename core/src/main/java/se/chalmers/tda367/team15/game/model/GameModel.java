@@ -24,7 +24,7 @@ public class GameModel {
     public GameModel(TimeCycle timeCycle, int mapWidth, int mapHeight, TerrainGenerator generator) {
 
         this.world = new GameWorld(timeCycle, mapWidth, mapHeight, generator);
-        this.waveManager = new WaveManager(world,this);
+        this.waveManager = new WaveManager(world, this);
 
         this.world.addResource(new Resource(new GridPoint2(-10, 10), "food",
                 ResourceType.FOOD, 5));
@@ -50,7 +50,7 @@ public class GameModel {
     public void spawnAnt(Vector2 position) {
         AntType workerType = AntTypeRegistry.getInstance().get("worker");
         if (workerType != null) {
-            Ant ant = new Ant(position, world.getPheromoneSystem(), workerType,world);
+            Ant ant = new Ant(position, world.getPheromoneSystem(), workerType, world);
             world.getColony().addAnt(ant);
         }
     }
@@ -87,4 +87,13 @@ public class GameModel {
     public WorldMap getWorldMap() {
         return world.getWorldMap();
     }
+
+    public int getTotalDays() {
+        return world.getTimeCycle().getTotalDays();
+    }
+
+    public int getTotalAnts() {
+        return world.getAnts().size();
+    }
+
 }
