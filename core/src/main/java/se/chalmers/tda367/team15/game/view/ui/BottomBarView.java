@@ -40,8 +40,7 @@ public class BottomBarView {
         Table container = new Table();
         container.setFillParent(true);
         container.bottom();
-        container.add(barTable).center().width(UiTheme.BOTTOM_BAR_WIDTH).height(UiTheme.BOTTOM_BAR_HEIGHT)
-                .pad(UiTheme.PADDING_MEDIUM);
+        container.add(barTable).center().pad(UiTheme.PADDING_MEDIUM);
 
         stage.addActor(container);
         stage.addActor(expandButtonTable);
@@ -59,17 +58,15 @@ public class BottomBarView {
 
     private void buildBarContents() {
         HorizontalGroup pheromoneGroup = createPheromoneButtonGroup();
-        HorizontalGroup otherGroup = createOtherButtonGroup();
 
         ImageButton minimizeBtn = uiFactory.createImageButton("BottomBar/minimize", () -> setMinimizedBar(true));
 
         barTable.left();
         barTable.add(pheromoneGroup).left();
-        barTable.add(otherGroup).left().padLeft(UiTheme.PADDING_XXLARGE);
         
         // Add egg panel if it exists
         if (eggPanelView != null) {
-            barTable.add(eggPanelView.getTable()).left().padLeft(UiTheme.PADDING_LARGE);
+            barTable.add(eggPanelView.getTable()).left().padLeft(UiTheme.PADDING_XXLARGE);
         }
         
         barTable.add().expandX();
@@ -122,20 +119,6 @@ public class BottomBarView {
         return group;
     }
 
-    private HorizontalGroup createOtherButtonGroup() {
-        HorizontalGroup group = new HorizontalGroup();
-        group.space(UiTheme.BUTTON_SPACING);
-
-        String[] labels = { "Button 5", "Button 6" };
-
-        for (int i = 0; i < labels.length; i++) {
-            TextButton btn = uiFactory.createTextButton(labels[i], null);
-            group.addActor(btn);
-        }
-
-        return group;
-    }
-
     private Table createExpandButton() {
         ImageButton expandBtn = uiFactory.createImageButton("BottomBar/expand", () -> setMinimizedBar(false));
         Label lbl = new Label("expand",
@@ -159,11 +142,8 @@ public class BottomBarView {
     }
 
     private void updateExpandPosition(float worldWidth) {
-        float centerX = worldWidth / 2f;
-        float rightEdge = centerX + (UiTheme.BOTTOM_BAR_WIDTH / 2f);
-
-        float x = rightEdge - 50f;
+        float x = worldWidth / 2f;
         float y = UiTheme.PADDING_MEDIUM;
-        expandButtonTable.setPosition(x, y, Align.bottomLeft);
+        expandButtonTable.setPosition(x, y, Align.bottom);
     }
 }
