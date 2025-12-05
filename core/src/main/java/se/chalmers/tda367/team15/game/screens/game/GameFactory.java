@@ -2,6 +2,7 @@ package se.chalmers.tda367.team15.game.screens.game;
 
 import java.util.List;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
@@ -41,7 +42,7 @@ public class GameFactory {
     private GameFactory() {
     }
 
-    public static GameScreen createGameScreen() {
+    public static GameScreen createGameScreen(Game game) {
         // 0. Initialize ant types (must happen before models)
         initializeAntTypes();
 
@@ -78,6 +79,7 @@ public class GameFactory {
         viewportListener.addObserver(cameraView);
 
         return new GameScreen(
+                game,
                 gameModel,
                 cameraView,
                 sceneView,
@@ -127,7 +129,8 @@ public class GameFactory {
 
     /**
      * Initializes and registers all ant types in the registry.
-     * This must be called before creating GameModel to ensure ant types are available.
+     * This must be called before creating GameModel to ensure ant types are
+     * available.
      */
     private static void initializeAntTypes() {
         AntTypeRegistry registry = AntTypeRegistry.getInstance();
@@ -135,38 +138,38 @@ public class GameFactory {
 
         // Scout: High speed, low HP, 0 capacity, cheap/fast to hatch
         registry.register(new AntType(
-            "scout",
-            "Scout",
-            5,          // Food Cost
-            30,         // 30 ticks (0.5 min)
-            4f,         // Max Health
-            8f,         // Speed
-            0,          // Capacity
-            "scout"     // Texture
+                "scout",
+                "Scout",
+                5, // Food Cost
+                30, // 30 ticks (0.5 min)
+                4f, // Max Health
+                8f, // Speed
+                0, // Capacity
+                "scout" // Texture
         ));
 
         // Soldier: Low speed, high HP, 0 capacity, expensive
         registry.register(new AntType(
-            "soldier",
-            "Soldier",
-            40,         // Food Cost
-            300,        // 5 min
-            20f,        // Max Health
-            2f,         // Speed
-            0,          // Capacity
-            "ant"   // Texture
+                "soldier",
+                "Soldier",
+                40, // Food Cost
+                300, // 5 min
+                20f, // Max Health
+                2f, // Speed
+                0, // Capacity
+                "ant" // Texture
         ));
 
         // Worker: Medium speed, medium HP, some capacity
         registry.register(new AntType(
-            "worker",
-            "Worker",
-            10,         // Food Cost
-            60,         // 1 min
-            6f,         // Max Health
-            5f,         // Speed
-            10,         // Capacity
-            "ant"       // Texture
+                "worker",
+                "Worker",
+                10, // Food Cost
+                60, // 1 min
+                6f, // Max Health
+                5f, // Speed
+                10, // Capacity
+                "ant" // Texture
         ));
     }
 }
