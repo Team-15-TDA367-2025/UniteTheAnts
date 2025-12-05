@@ -25,17 +25,10 @@ public class GameModel {
         this.world = new GameWorld(timeCycle, mapWidth, mapHeight, generator);
         this.waveManager = new WaveManager(world, this);
 
-        this.world.addResource(new Resource(new GridPoint2(-10, 10), "food",
-                ResourceType.FOOD, 5));
-        this.world.addResource(new Resource(new GridPoint2(10, -10), "food",
-                ResourceType.FOOD, 5));
-        this.world.addResource(new Resource(new GridPoint2(20, 25), "food",
-                ResourceType.FOOD, 5));
-        this.world.addResource(new Resource(new GridPoint2(-20, 10), "food",
-                ResourceType.FOOD, 5));
-        this.world.addResource(new Resource(new GridPoint2(10, -20), "food",
-                ResourceType.FOOD, 5));
-
+        this.world.addResourceNode(new ResourceNode(world, new GridPoint2(-50, 30), "node", 1,
+                ResourceType.FOOD, 10, 20));
+        this.world.addResourceNode(new ResourceNode(world, new GridPoint2(50, -40), "node", 1,
+                ResourceType.FOOD, 10, 20));
         this.world.addResourceNode(new ResourceNode(world, new GridPoint2(10, 10), "node", 1,
                 ResourceType.FOOD, 10, 20));
     }
@@ -45,7 +38,6 @@ public class GameModel {
     }
 
     // --- FACADE METHODS (Actions) ---
-
 
     public void spawnTermite(Vector2 position) {
         // Temperory before we have EnemyWaveSystem
