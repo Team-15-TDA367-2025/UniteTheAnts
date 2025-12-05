@@ -77,7 +77,6 @@ public class ResourceSystem {
 
                 ResourceNode node = resourceNodeGrid.get(checkCell);
                 if (node != null && tryHarvestNode(ant, node)) {
-                    System.out.println("Ant try to harvest");
                     return;
                 }
 

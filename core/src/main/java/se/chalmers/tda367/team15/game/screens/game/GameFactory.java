@@ -50,7 +50,7 @@ public class GameFactory {
         CameraModel cameraModel = createCameraModel();
         GameModel gameModel = createGameModel();
 
-        spawnInitialEntities(gameModel);
+        gameModel.getColony().spawnInitialAnts();
 
         // 2. Create Resources
         TextureRegistry textureRegistry = new TextureRegistry();
@@ -118,13 +118,6 @@ public class GameFactory {
                 cameraModel,
                 WORLD_VIEWPORT_WIDTH,
                 WORLD_VIEWPORT_WIDTH * aspectRatio);
-    }
-
-    private static void spawnInitialEntities(GameModel gameModel) {
-        for (int i = 0; i < 5; i++) {
-            gameModel.spawnAnt(new Vector2(0, 0));
-        }
-        // gameModel.spawnTermite(new Vector2(10, 0));
     }
 
     /**

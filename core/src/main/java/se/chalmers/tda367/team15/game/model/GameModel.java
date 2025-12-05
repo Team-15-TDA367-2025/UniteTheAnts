@@ -2,7 +2,6 @@ package se.chalmers.tda367.team15.game.model;
 
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
-
 import se.chalmers.tda367.team15.game.model.entity.Termite.Termite;
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntType;
@@ -26,17 +25,10 @@ public class GameModel {
         this.world = new GameWorld(timeCycle, mapWidth, mapHeight, generator);
         this.waveManager = new WaveManager(world, this);
 
-        this.world.addResource(new Resource(new GridPoint2(-10, 10), "food",
-                ResourceType.FOOD, 5));
-        this.world.addResource(new Resource(new GridPoint2(10, -10), "food",
-                ResourceType.FOOD, 5));
-        this.world.addResource(new Resource(new GridPoint2(20, 25), "food",
-                ResourceType.FOOD, 5));
-        this.world.addResource(new Resource(new GridPoint2(-20, 10), "food",
-                ResourceType.FOOD, 5));
-        this.world.addResource(new Resource(new GridPoint2(10, -20), "food",
-                ResourceType.FOOD, 5));
-
+        this.world.addResourceNode(new ResourceNode(world, new GridPoint2(-50, 30), "node", 1,
+                ResourceType.FOOD, 10, 20));
+        this.world.addResourceNode(new ResourceNode(world, new GridPoint2(50, -40), "node", 1,
+                ResourceType.FOOD, 10, 20));
         this.world.addResourceNode(new ResourceNode(world, new GridPoint2(10, 10), "node", 1,
                 ResourceType.FOOD, 10, 20));
     }
@@ -47,16 +39,10 @@ public class GameModel {
 
     // --- FACADE METHODS (Actions) ---
 
-    public void spawnAnt(Vector2 position) {
-        AntType workerType = AntTypeRegistry.getInstance().get("worker");
-        if (workerType != null) {
-            Ant ant = new Ant(position, world.getPheromoneSystem(), workerType, world);
-            world.getColony().addAnt(ant);
-        }
-    }
-
     public void spawnTermite(Vector2 position) {
-        Termite termite = new Termite(position, world);
+        // Temperory before we have EnemyWaveSystem
+        EnemyFactory enemyFactory = new EnemyFactory(world);
+        Termite termite = enemyFactory.createTermite(position);
         world.addEntity(termite);
     }
 

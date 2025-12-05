@@ -30,7 +30,7 @@ public class Termite extends Entity implements CanBeAttacked {
 
     public Termite(Vector2 position, GameWorld world) {
         super(position, "termite");
-        this.world = world;
+        this.world = world; 
         this.termiteBehaviour = new TermiteBehaviour(this);
         health = MAX_HEALTH;
     }
