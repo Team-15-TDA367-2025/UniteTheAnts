@@ -49,7 +49,7 @@ public class GameFactory {
         CameraModel cameraModel = createCameraModel();
         GameModel gameModel = createGameModel();
 
-        spawnInitialEntities(gameModel);
+        gameModel.getColony().spawnInitialAnts();
 
         // 2. Create Resources
         TextureRegistry textureRegistry = new TextureRegistry();
@@ -118,16 +118,10 @@ public class GameFactory {
                 WORLD_VIEWPORT_WIDTH * aspectRatio);
     }
 
-    private static void spawnInitialEntities(GameModel gameModel) {
-        for (int i = 0; i < 5; i++) {
-            gameModel.spawnAnt(new Vector2(0, 0));
-        }
-        // gameModel.spawnTermite(new Vector2(10, 0));
-    }
-
     /**
      * Initializes and registers all ant types in the registry.
-     * This must be called before creating GameModel to ensure ant types are available.
+     * This must be called before creating GameModel to ensure ant types are
+     * available.
      */
     private static void initializeAntTypes() {
         AntTypeRegistry registry = AntTypeRegistry.getInstance();
@@ -135,38 +129,38 @@ public class GameFactory {
 
         // Scout: High speed, low HP, 0 capacity, cheap/fast to hatch
         registry.register(new AntType(
-            "scout",
-            "Scout",
-            5,          // Food Cost
-            30,         // 30 ticks (0.5 min)
-            4f,         // Max Health
-            8f,         // Speed
-            0,          // Capacity
-            "ant"     // Texture
+                "scout",
+                "Scout",
+                5, // Food Cost
+                30, // 30 ticks (0.5 min)
+                4f, // Max Health
+                8f, // Speed
+                0, // Capacity
+                "ant" // Texture
         ));
 
         // Soldier: Low speed, high HP, 0 capacity, expensive
         registry.register(new AntType(
-            "soldier",
-            "Soldier",
-            40,         // Food Cost
-            300,        // 5 min
-            20f,        // Max Health
-            2f,         // Speed
-            0,          // Capacity
-            "ant"   // Texture
+                "soldier",
+                "Soldier",
+                40, // Food Cost
+                300, // 5 min
+                20f, // Max Health
+                2f, // Speed
+                0, // Capacity
+                "ant" // Texture
         ));
 
         // Worker: Medium speed, medium HP, some capacity
         registry.register(new AntType(
-            "worker",
-            "Worker",
-            10,         // Food Cost
-            60,         // 1 min
-            6f,         // Max Health
-            5f,         // Speed
-            10,         // Capacity
-            "ant"       // Texture
+                "worker",
+                "Worker",
+                10, // Food Cost
+                60, // 1 min
+                6f, // Max Health
+                5f, // Speed
+                10, // Capacity
+                "ant" // Texture
         ));
     }
 }
