@@ -15,11 +15,11 @@ import se.chalmers.tda367.team15.game.model.interfaces.TimeObserver;
  */
 public class EggManager implements TimeObserver {
     private final List<Egg> eggs;
-    private final List<EggHatchObserver> listeners;
+    private final List<EggHatchObserver> observers;
 
     public EggManager() {
         this.eggs = new ArrayList<>();
-        this.listeners = new ArrayList<>();
+        this.observers = new ArrayList<>();
     }
 
     public void addEgg(AntType type) {
@@ -27,12 +27,12 @@ public class EggManager implements TimeObserver {
         eggs.add(egg);
     }
 
-    public void addObserver(EggHatchObserver listener) {
-        listeners.add(listener);
+    public void addObserver(EggHatchObserver observer) {
+        observers.add(observer);
     }
 
-    public void removeObserver(EggHatchObserver listener) {
-        listeners.remove(listener);
+    public void removeObserver(EggHatchObserver observer) {
+        observers.remove(observer);
     }
 
     @Override
@@ -46,8 +46,8 @@ public class EggManager implements TimeObserver {
                     continue;
                 }
 
-                for (EggHatchObserver listener : listeners) {
-                    listener.onEggHatch(type);
+                for (EggHatchObserver observer : observers) {
+                    observer.onEggHatch(type);
                 }
             }
         }
