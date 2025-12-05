@@ -19,9 +19,8 @@ import se.chalmers.tda367.team15.game.model.structure.resource.ResourceSystem;
 import se.chalmers.tda367.team15.game.model.world.TerrainGenerator;
 import se.chalmers.tda367.team15.game.model.world.WorldMap;
 
-
 public class GameWorld implements EntityDeathObserver, StructureDeathObserver {
-    private Colony colony = new Colony(new GridPoint2(0, 0));
+    private final Colony colony;
     private final PheromoneSystem pheromoneSystem;
     private List<Entity> worldEntities; // Floating positions and can move around.
     private List<Structure> structures; // Integer positions and fixed in place.
@@ -37,23 +36,24 @@ public class GameWorld implements EntityDeathObserver, StructureDeathObserver {
     private float secondsPerTick;
 
     public GameWorld(TimeCycle timeCycle, int mapWidth, int mapHeight, TerrainGenerator generator) {
+        this.timeObservers = new ArrayList<>();
+        this.worldEntities = new ArrayList<>();
+        this.resources = new ArrayList<>();
+        this.structures = new ArrayList<>();
+
         this.worldMap = new WorldMap(mapWidth, mapHeight, generator);
         this.fogOfWar = new FogOfWar(worldMap);
         this.fogSystem = new FogSystem(fogOfWar, worldMap);
-        this.worldEntities = new ArrayList<>();
-        this.structures = new ArrayList<>();
-        structures.add(colony);
-        this.resources = new ArrayList<>();
+        pheromoneSystem = new PheromoneSystem(new GridPoint2(0, 0), new PheromoneGridConverter(4));
+        this.colony = new Colony(new GridPoint2(0, 0), pheromoneSystem, this);
         this.resourceSystem = new ResourceSystem();
-        this.timeObservers = new ArrayList<>();
         this.timeCycle = timeCycle;
         this.secondsPerTick = 60f / timeCycle.getTicksPerMinute();
         destructionListener = DestructionListener.getInstance();
+
         destructionListener.addEntityDeathObserver(this);
         destructionListener.addStructureDeathObserver(this);
-        pheromoneSystem = new PheromoneSystem(new GridPoint2(0, 0), new PheromoneGridConverter(4));
-        addTimeObserver(colony);
-
+        structures.add(colony);
     }
 
     public Colony getColony() {
@@ -96,6 +96,7 @@ public class GameWorld implements EntityDeathObserver, StructureDeathObserver {
     public TimeCycle getTimeCycle() {
         return timeCycle;
     }
+
     public void addTimeObserver(TimeObserver observer) {
         timeObservers.add(observer);
     }
@@ -107,16 +108,14 @@ public class GameWorld implements EntityDeathObserver, StructureDeathObserver {
     private void notifyTimeObservers(boolean nightJustStarted, boolean dayJustStarted) {
         for (TimeObserver observer : timeObservers) {
             observer.onTimeUpdate(timeCycle);
-        
-        if (nightJustStarted) {
+
+            if (nightJustStarted) {
                 observer.onNightStart(timeCycle);
-            }
-        else if (dayJustStarted) {
+            } else if (dayJustStarted) {
                 observer.onDayStart(timeCycle);
-                }
             }
         }
-    
+    }
 
     private List<Updatable> getUpdatables() {
         List<Updatable> updatables = new ArrayList<>();
