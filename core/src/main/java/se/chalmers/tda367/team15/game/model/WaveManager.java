@@ -10,15 +10,13 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * When combat phase (night) starts as dictated by {@link TimeCycle} spawns a new wave of enemies.
+ * When night starts as dictated by {@link GameWorld} spawns a new wave of enemies.
  */
 public class WaveManager implements TimeObserver {
     private int nightNumber = 0;
-    private boolean dayIsNext = false;
-    private GameWorld gameWorld;
     private GameModel gameModel;
+
     WaveManager(GameWorld gameWorld, GameModel gameModel) {
-        this.gameWorld = gameWorld;
         this.gameModel = gameModel;
         gameWorld.addTimeObserver(this);
     }
@@ -32,32 +30,30 @@ public class WaveManager implements TimeObserver {
      */
     private void spawnWave() {
 
-        List<Entity> e = gameWorld.getEntities();
-        System.out.println(e.size());
-
-        int nEnemies = nightNumber*2;
+        int nEnemies = nightNumber * 2;
 
         // spawn location
-        Vector2 spawnLocation = scatter(new Vector2(0,0),45);
+        Vector2 spawnLocation = scatter(new Vector2(0, 0), 45);
         // spawn enemies
-        for(int i = 0 ; i < nEnemies; i++) {
-            gameModel.spawnTermite(scatter(spawnLocation,15));
+        for (int i = 0; i < nEnemies; i++) {
+            gameModel.spawnTermite(scatter(spawnLocation, 15));
         }
 
     }
 
     /**
      * Calculates a new vector that is a specified distance away from some origin in a random direction.
-     * @param origin the origin point
+     *
+     * @param origin   the origin point
      * @param distance the distance
      * @return a randomly scattered vector.
      */
-    Vector2 scatter(Vector2 origin,float distance) {
+    private Vector2 scatter(Vector2 origin, float distance) {
         Random r = new Random();
-        float direction = r.nextFloat()*((float) Math.PI * 2);
+        float direction = r.nextFloat() * ((float) Math.PI * 2);
         float x = MathUtils.cos(direction);
         float y = MathUtils.sin(direction);
-        Vector2 directionV = new Vector2(x,y);
+        Vector2 directionV = new Vector2(x, y);
         return origin.add(directionV.scl(distance));
     }
 

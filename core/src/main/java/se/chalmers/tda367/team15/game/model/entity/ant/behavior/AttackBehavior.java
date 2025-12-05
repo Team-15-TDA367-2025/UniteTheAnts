@@ -15,30 +15,25 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class AttackBehavior extends AntBehavior{
+public class AttackBehavior extends AntBehavior {
     HashMap<AttackCategory, Integer> targetPriority = new HashMap<>();
     Vector2 lastPosBeforeAttack;
     AttackComponent attackComponent;
+
     public AttackBehavior(Ant ant, Vector2 lastPosBeforeAttack) {
         super(ant);
         targetPriority.put(AttackCategory.TERMITE, 1);
-        this.lastPosBeforeAttack=lastPosBeforeAttack;
-        this.attackComponent = new AttackComponent(5,1000,2,ant);
+        this.lastPosBeforeAttack = lastPosBeforeAttack;
+        this.attackComponent = new AttackComponent(5, 1000, 2, ant);
     }
-
-    public Vector2 getLastPosBeforeAttack() {
-        return lastPosBeforeAttack.cpy();
-    }
-
 
     @Override
     public void update(PheromoneSystem system, float deltaTime) {
         AttackTarget target = findTarget();
 
-        if(target==null) {
+        if (target == null) {
             ant.setBehavior(new FollowTrailBehavior(ant));
-        }
-        else {
+        } else {
             Vector2 targetV = target.hasPosition.getPosition().sub(ant.getPosition());
             ant.setVelocity(targetV.nor().scl(ant.getSpeed()));
             attackComponent.attack(target);
@@ -52,14 +47,14 @@ public class AttackBehavior extends AntBehavior{
         List<AttackTarget> potentialTargets = potentialTargets(entities);
 
         //determine target
-        if(!potentialTargets.isEmpty()) {
+        if (!potentialTargets.isEmpty()) {
             target = potentialTargets.getFirst();
-            for(AttackTarget t: potentialTargets) {
+            for (AttackTarget t : potentialTargets) {
                 // Greater or equal target priority?
-                if(targetPriority.get(t.canBeAttacked.getAttackCategory()) >=  targetPriority.get(target.canBeAttacked.getAttackCategory())) {
+                if (targetPriority.get(t.canBeAttacked.getAttackCategory()) >= targetPriority.get(target.canBeAttacked.getAttackCategory())) {
                     // closest distance?
-                    if(t.hasPosition.getPosition().dst(ant.getPosition()) < target.hasPosition.getPosition().dst(ant.getPosition())) {
-                        target=t;
+                    if (t.hasPosition.getPosition().dst(ant.getPosition()) < target.hasPosition.getPosition().dst(ant.getPosition())) {
+                        target = t;
                     }
                 }
             }
@@ -68,16 +63,16 @@ public class AttackBehavior extends AntBehavior{
         return target;
     }
 
-   private List<AttackTarget> potentialTargets(List<Entity> entities) {
-       List<AttackTarget> targets = new ArrayList<>();
-       for(Entity e: entities) {
-           if(e instanceof CanBeAttacked) {
-               targets.add(new AttackTarget((CanBeAttacked) e,e));
-           }
-       }
-       targets.removeIf(t -> t.canBeAttacked.getFaction() == ant.getFaction());
-       targets.removeIf(t -> t.hasPosition.getPosition().dst(ant.getPosition()) > ant.getVisionRadius());
+    private List<AttackTarget> potentialTargets(List<Entity> entities) {
+        List<AttackTarget> targets = new ArrayList<>();
+        for (Entity e : entities) {
+            if (e instanceof CanBeAttacked) {
+                targets.add(new AttackTarget((CanBeAttacked) e, e));
+            }
+        }
+        targets.removeIf(t -> t.canBeAttacked.getFaction() == ant.getFaction());
+        targets.removeIf(t -> t.hasPosition.getPosition().dst(ant.getPosition()) > ant.getVisionRadius());
 
-       return targets;
-   }
+        return targets;
+    }
 }
