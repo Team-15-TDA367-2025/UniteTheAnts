@@ -145,7 +145,7 @@ public class GameFactory {
                 4f, // Max Health
                 8f, // Speed
                 0, // Capacity
-                "ant" // Texture
+                "scout" // Texture
         ));
 
         // Soldier: Low speed, high HP, 0 capacity, expensive
