@@ -19,6 +19,7 @@ public class TopBarView extends Table {
     private final Label timeLabel;
     private final Label resource1Value;
     private final Label resource2Value;
+    private final Label resource3Value;
 
     public TopBarView(UiFactory uiFactory) {
         this.uiFactory = uiFactory;
@@ -37,14 +38,19 @@ public class TopBarView extends Table {
 
         resource1Value = new Label("1337", labelStyle);
         resource2Value = new Label("420", labelStyle);
+        resource3Value = new Label("69", labelStyle);
 
         Stack resourceBar1 = createResourceBar("ant", resource1Value);
         Stack resourceBar2 = createResourceBar("resource", resource2Value);
+        Stack resourceBar3 = createResourceBar("consumption", resource3Value);
+    
 
         Table resourceStack = new Table();
         resourceStack.add(resourceBar1).width(120f).growY().padBottom(UiTheme.PADDING_SMALL);
         resourceStack.row();
         resourceStack.add(resourceBar2).width(120f).growY();
+        resourceStack.row();
+        resourceStack.add(resourceBar3).width(120f).growY();
 
         Table rightButtons = createRightButtons();
 
@@ -115,10 +121,11 @@ public class TopBarView extends Table {
         return rightButtons;
     }
 
-    public void update(TimeCycle.GameTime gameTime, int antCount, int resourceCount) {
+    public void update(TimeCycle.GameTime gameTime, int antCount, int resourceCount, int consumption) {
         dayLabel.setText("Day " + gameTime.totalDays());
         timeLabel.setText(String.format("%02d:%02d", gameTime.currentHour(), gameTime.currentMinute()));
         resource1Value.setText(String.valueOf(antCount));
         resource2Value.setText(String.valueOf(resourceCount));
+        resource3Value.setText(String.valueOf(consumption));
     }
 }
