@@ -4,6 +4,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
 import se.chalmers.tda367.team15.game.model.FogOfWar;
 import se.chalmers.tda367.team15.game.model.GameModel;
 import se.chalmers.tda367.team15.game.model.interfaces.Drawable;
@@ -32,8 +36,13 @@ public class WorldRenderer {
         batch.begin();
 
         terrainRenderer.render(batch, model.getWorldMap(), cameraView);
-        drawables.forEach(this::draw);
-        fogRenderer.render(batch, fog);
+
+
+        for (Drawable d : drawables) {
+            draw(d);
+        }
+        
+        fogRenderer.render(batch, fog, cameraView);
 
         batch.end();
 
