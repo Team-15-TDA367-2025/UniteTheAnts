@@ -15,7 +15,6 @@ import se.chalmers.tda367.team15.game.model.pheromones.PheromoneType;
 
 public class FollowTrailBehavior extends AntBehavior {
     private final PheromoneType allowedType;
-    private final boolean stickyTrail;
 
     private static final float SPEED_BOOST_ON_TRAIL = 1.5f;
     // Threshold as fraction of pheromone cell size (must be < 1 to avoid reaching
@@ -38,19 +37,15 @@ public class FollowTrailBehavior extends AntBehavior {
         switch (typeId) {
             case "scout" -> {
                 allowedType = PheromoneType.EXPLORE;
-                stickyTrail = false;
             }
             case "soldier" -> {
                 allowedType = PheromoneType.ATTACK;
-                stickyTrail = false;
             }
             case "worker" -> {
                 allowedType = PheromoneType.GATHER;
-                stickyTrail = true;
             }
             default -> {
                 allowedType = PheromoneType.EXPLORE;
-                stickyTrail = false;
             }
         }
     }
