@@ -42,7 +42,7 @@ public class EndScreen extends ScreenAdapter {
                 endMessage = "All your ants are dead!";
                 break;
             case STARVATION:
-                endMessage = "Your colony has starved!";
+                endMessage = "Your colony dies of starvation!";
                 break;
             default:
                 endMessage = "Unknown reason";

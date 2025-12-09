@@ -10,6 +10,7 @@ import se.chalmers.tda367.team15.game.controller.HudController;
 import se.chalmers.tda367.team15.game.model.GameEndReason;
 import se.chalmers.tda367.team15.game.model.GameModel;
 import se.chalmers.tda367.team15.game.model.GameStats;
+import se.chalmers.tda367.team15.game.model.structure.resource.ResourceType;
 import se.chalmers.tda367.team15.game.screens.EndScreen;
 import se.chalmers.tda367.team15.game.view.TextureRegistry;
 import se.chalmers.tda367.team15.game.view.camera.CameraView;
@@ -74,6 +75,9 @@ public class GameScreen extends ScreenAdapter {
     private GameEndReason gameHasEnded() {
         if (gameModel.getTotalAnts() == 0) {
             return GameEndReason.ALL_ANTS_DEAD;
+        }
+        if (gameModel.getColony().getTotalResources(ResourceType.FOOD) < 0) {
+            return GameEndReason.STARVATION;
         }
         return GameEndReason.STILL_PLAYING;
     }
