@@ -35,6 +35,7 @@ public class TerrainRenderer {
         for (int y = startTile.y; y < endTile.y; y++) {
             for (int x = startTile.x; x < endTile.x; x++) {
                 Tile tile = worldMap.getTile(new GridPoint2(x, y));
+
                 if (tile != null) {
                     TextureRegion texture = textureRegistry.get(tile.getTextureName());
                     batch.draw(texture, x + offsetX, y + offsetY, 1, 1);
