@@ -21,24 +21,20 @@ public class TextureRegistry {
     private TextureAtlas atlas;
 
     public TextureRegistry() {
-        // 2048x2048 should be sufficient for our assets.
-        // using 2 pixel padding to avoid bleeding
-        PixmapPacker packer = new PixmapPacker(256, 256, Pixmap.Format.RGBA8888, 2, true);
+        // 256x256 gives us about 64 tiles with 32x32 textures, which for now is enough.
+        PixmapPacker packer = new PixmapPacker(256, 256, Pixmap.Format.RGBA8888, 1, true);
 
         loadDirectory(packer, ".");
         loadDirectory(packer, "TopBar");
         loadDirectory(packer, "BottomBar");
         createPixelTexture(packer);
 
-        // Generate the atlas
         atlas = packer.generateTextureAtlas(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest, false);
         
-        // Cache regions for O(1) lookup
         for (TextureAtlas.AtlasRegion region : atlas.getRegions()) {
             textures.put(region.name, region);
         }
 
-        // We don't need the packer anymore
         packer.dispose();
     }
 

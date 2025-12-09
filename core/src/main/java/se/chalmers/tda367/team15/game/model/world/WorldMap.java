@@ -41,11 +41,7 @@ public class WorldMap {
     }
 
     public boolean isInBounds(GridPoint2 pos) {
-        return isInBounds(pos.x, pos.y);
-    }
-
-    public boolean isInBounds(int x, int y) {
-        return x >= 0 && x < width && y >= 0 && y < height;
+        return pos.x >= 0 && pos.x < width && pos.y >= 0 && pos.y < height;
     }
 
     public GridPoint2 worldToTile(Vector2 worldPos) {
