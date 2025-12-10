@@ -19,7 +19,6 @@ public class TopBarView extends Table {
     private final Label timeLabel;
     private final Label resource1Value;
     private final Label resource2Value;
-    private final Label resource3Value;
 
     public TopBarView(UiFactory uiFactory) {
         this.uiFactory = uiFactory;
@@ -38,19 +37,15 @@ public class TopBarView extends Table {
 
         resource1Value = new Label("1337", labelStyle);
         resource2Value = new Label("420", labelStyle);
-        resource3Value = new Label("69", labelStyle);
 
         Stack resourceBar1 = createResourceBar("ant", resource1Value);
         Stack resourceBar2 = createResourceBar("resource", resource2Value);
-        Stack resourceBar3 = createResourceBar("consumption", resource3Value);
-    
 
         Table resourceStack = new Table();
-        resourceStack.add(resourceBar1).width(120f).growY().padBottom(UiTheme.PADDING_SMALL);
+        resourceStack.add(resourceBar1).width(200f).growY().padBottom(UiTheme.PADDING_SMALL);
         resourceStack.row();
-        resourceStack.add(resourceBar2).width(120f).growY();
+        resourceStack.add(resourceBar2).width(200f).growY();
         resourceStack.row();
-        resourceStack.add(resourceBar3).width(120f).growY();
 
         Table rightButtons = createRightButtons();
 
@@ -88,8 +83,8 @@ public class TopBarView extends Table {
         Table bg = new Table();
         bg.setBackground(uiFactory.getAreaBackground());
         bg.pad(UiTheme.PADDING_SMALL);
-        bg.add().width(40f); // Spacer for the icon
-        bg.add(valueLabel).width(60f).right().padRight(UiTheme.PADDING_SMALL);
+        bg.add().width(20f); // Spacer for the icon
+        bg.add(valueLabel).right().padRight(UiTheme.PADDING_SMALL);
 
         // Icon
         Image icon = uiFactory.createImage(iconTextureName);
@@ -125,7 +120,7 @@ public class TopBarView extends Table {
         dayLabel.setText("Day " + gameTime.totalDays());
         timeLabel.setText(String.format("%02d:%02d", gameTime.currentHour(), gameTime.currentMinute()));
         resource1Value.setText(String.valueOf(antCount));
-        resource2Value.setText(String.valueOf(resourceCount));
-        resource3Value.setText(String.valueOf(consumption));
+        resource2Value.setText(String.format("%d (%d/d)", resourceCount, consumption));
+
     }
 }
