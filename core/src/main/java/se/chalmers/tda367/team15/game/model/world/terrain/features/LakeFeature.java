@@ -14,7 +14,6 @@ public class LakeFeature implements TerrainFeature {
         int lakeCount,
         int lakeMinSteps,
         int lakeMaxSteps,
-        int lakeSmoothingPasses,
         int centerExclusionRadius,
         int minBlobRadius,
         int maxBlobRadius
@@ -30,9 +29,8 @@ public class LakeFeature implements TerrainFeature {
     public void apply(TerrainGenerationContext context) {
         boolean[][] existingWater = context.getWaterMap();
         boolean[][] lakeMap = generateLakes(context, existingWater);
-        boolean[][] smoothedLakes = smoothLakes(lakeMap);
         
-        context.setWaterMap(smoothedLakes);
+        context.setWaterMap(lakeMap);
     }
 
     private boolean[][] generateLakes(TerrainGenerationContext context, boolean[][] existingWater) {
@@ -110,43 +108,6 @@ public class LakeFeature implements TerrainFeature {
                 }
             }
         }
-    }
-
-    private boolean[][] smoothLakes(boolean[][] lakeMap) {
-        int width = lakeMap.length;
-        int height = lakeMap[0].length;
-        boolean[][] current = copyBooleanMap(lakeMap);
-
-        for (int pass = 0; pass < config.lakeSmoothingPasses(); pass++) {
-            boolean[][] next = new boolean[width][height];
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    int waterNeighbors = countWaterNeighbors(current, x, y, width, height);
-                    if (current[x][y]) {
-                        next[x][y] = waterNeighbors >= 2;
-                    } else {
-                        next[x][y] = waterNeighbors >= 6;
-                    }
-                }
-            }
-            current = next;
-        }
-        return current;
-    }
-
-    private int countWaterNeighbors(boolean[][] map, int x, int y, int width, int height) {
-        int count = 0;
-        for (int dx = -1; dx <= 1; dx++) {
-            for (int dy = -1; dy <= 1; dy++) {
-                if (dx == 0 && dy == 0) continue;
-                int nx = x + dx;
-                int ny = y + dy;
-                if (nx >= 0 && nx < width && ny >= 0 && ny < height && map[nx][ny]) {
-                    count++;
-                }
-            }
-        }
-        return count;
     }
 
     private boolean[][] copyBooleanMap(boolean[][] source) {

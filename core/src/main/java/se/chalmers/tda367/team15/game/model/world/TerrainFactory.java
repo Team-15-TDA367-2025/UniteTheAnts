@@ -30,7 +30,7 @@ public class TerrainFactory {
         List<TerrainFeature> pipeline = Arrays.asList(
             new PerlinHeightMapFeature(new PerlinHeightMapFeature.Config(0.07, 4, 0.4, 2.0, 1.2)),
             new IslandMaskFeature(new IslandMaskFeature.Config(0.5, 0.01, 0.1, 0.3)),
-            new LakeFeature(new LakeFeature.Config(30, 80, 150, 10, 25, 1, 3)),
+            new LakeFeature(new LakeFeature.Config(30, 80, 150, 25, 1, 3)),
             new TextureApplicationFeature(new TextureApplicationFeature.Config(1)),
             new ResourcePlacementFeature(new ResourcePlacementFeature.Config(100, 2, 20, 10, 1))
         );
