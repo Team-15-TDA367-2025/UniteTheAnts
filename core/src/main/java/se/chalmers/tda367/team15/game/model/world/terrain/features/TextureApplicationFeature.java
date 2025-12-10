@@ -1,8 +1,5 @@
 package se.chalmers.tda367.team15.game.model.world.terrain.features;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import se.chalmers.tda367.team15.game.model.world.Tile;
 import se.chalmers.tda367.team15.game.model.world.TileType;
 import se.chalmers.tda367.team15.game.model.world.terrain.TerrainFeature;
@@ -47,7 +44,7 @@ public class TextureApplicationFeature implements TerrainFeature {
         }
 
         // 2. Apply Sand Borders
-        applySandBorders(textureMap, context.getWidth(), context.getHeight());
+        applySandBorders(textureMap, context.getWidth(), context.getHeight(), context);
 
         // 3. Convert to Tiles
         for (int x = 0; x < width; x++) {
@@ -64,51 +61,38 @@ public class TextureApplicationFeature implements TerrainFeature {
         return TEXTURE_GRASS[Math.min(index, TEXTURE_GRASS.length - 1)];
     }
 
-    private void applySandBorders(String[][] textureMap, int width, int height) {
-        Set<Long> waterTiles = new HashSet<>();
+    private void applySandBorders(String[][] textureMap, int width, int height, TerrainGenerationContext context) {
+        boolean[][] waterMap = context.getWaterMap();
+        if (waterMap == null) return;
+
+        int radius = config.sandBorderWidth();
+        
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                if (TEXTURE_WATER.equals(textureMap[x][y])) {
-                    waterTiles.add(packCoord(x, y));
+                // If it's already water, skip
+                if (waterMap[x][y]) continue;
+
+                // Check neighbors for water
+                if (hasWaterNeighbor(x, y, waterMap, radius, width, height)) {
+                    textureMap[x][y] = TEXTURE_SAND;
                 }
             }
-        }
-
-        Set<Long> sandTiles = new HashSet<>();
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                if (!TEXTURE_WATER.equals(textureMap[x][y])) {
-                    if (isNearWater(x, y, waterTiles, config.sandBorderWidth(), width, height)) {
-                        sandTiles.add(packCoord(x, y));
-                    }
-                }
-            }
-        }
-
-        for (Long packed : sandTiles) {
-            int x = (int) (packed >> 32);
-            int y = (int) (packed & 0xFFFFFFFFL);
-            textureMap[x][y] = TEXTURE_SAND;
         }
     }
 
-    private boolean isNearWater(int x, int y, Set<Long> waterTiles, int radius, int width, int height) {
+    private boolean hasWaterNeighbor(int x, int y, boolean[][] waterMap, int radius, int width, int height) {
         for (int dx = -radius; dx <= radius; dx++) {
             for (int dy = -radius; dy <= radius; dy++) {
                 int nx = x + dx;
                 int ny = y + dy;
                 if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-                    if (waterTiles.contains(packCoord(nx, ny))) {
+                    if (waterMap[nx][ny]) {
                         return true;
                     }
                 }
             }
         }
         return false;
-    }
-
-    private long packCoord(int x, int y) {
-        return ((long) x << 32) | (y & 0xFFFFFFFFL);
     }
 
     private TileType textureToTileType(String texture) {

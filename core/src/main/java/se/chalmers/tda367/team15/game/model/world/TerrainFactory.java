@@ -6,7 +6,7 @@ import java.util.List;
 import se.chalmers.tda367.team15.game.model.world.terrain.PipelineTerrainGenerator;
 import se.chalmers.tda367.team15.game.model.world.terrain.TerrainFeature;
 import se.chalmers.tda367.team15.game.model.world.terrain.features.IslandMaskFeature;
-import se.chalmers.tda367.team15.game.model.world.terrain.features.LakeFeature;
+import se.chalmers.tda367.team15.game.model.world.terrain.features.RiverFeature;
 import se.chalmers.tda367.team15.game.model.world.terrain.features.PerlinHeightMapFeature;
 import se.chalmers.tda367.team15.game.model.world.terrain.features.ResourcePlacementFeature;
 import se.chalmers.tda367.team15.game.model.world.terrain.features.TextureApplicationFeature;
@@ -30,7 +30,7 @@ public class TerrainFactory {
         List<TerrainFeature> pipeline = Arrays.asList(
             new PerlinHeightMapFeature(new PerlinHeightMapFeature.Config(0.07, 4, 0.4, 2.0, 1.2)),
             new IslandMaskFeature(new IslandMaskFeature.Config(0.5, 0.01, 0.1, 0.3)),
-            new LakeFeature(new LakeFeature.Config(30, 80, 150, 25, 1, 3)),
+            new RiverFeature(new RiverFeature.Config(100, 50, 150, 25, 2.0, 2)),
             new TextureApplicationFeature(new TextureApplicationFeature.Config(1)),
             new ResourcePlacementFeature(new ResourcePlacementFeature.Config(100, 2, 20, 10, 1))
         );
