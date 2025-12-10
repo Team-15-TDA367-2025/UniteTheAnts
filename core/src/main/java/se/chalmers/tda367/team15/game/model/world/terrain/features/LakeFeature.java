@@ -15,7 +15,9 @@ public class LakeFeature implements TerrainFeature {
         int lakeMinSteps,
         int lakeMaxSteps,
         int lakeSmoothingPasses,
-        int centerExclusionRadius
+        int centerExclusionRadius,
+        int minBlobRadius,
+        int maxBlobRadius
     ) {}
 
     private final Config config;
@@ -68,7 +70,7 @@ public class LakeFeature implements TerrainFeature {
             double angle = lakeRandom.nextDouble() * Math.PI * 2;
             
             for (int step = 0; step < steps; step++) {
-                int blobRadius = 1 + lakeRandom.nextInt(2);
+                int blobRadius = config.minBlobRadius() + lakeRandom.nextInt(config.maxBlobRadius() - config.minBlobRadius() + 1);
                 paintBlob(lakeMap, x, y, blobRadius, width, height);
 
                 angle += (lakeRandom.nextDouble() - 0.5) * 0.8;
