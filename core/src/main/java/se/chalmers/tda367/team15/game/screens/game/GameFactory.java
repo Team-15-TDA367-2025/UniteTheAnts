@@ -9,6 +9,8 @@ import com.badlogic.gdx.math.Rectangle;
 
 import se.chalmers.tda367.team15.game.controller.*;
 import se.chalmers.tda367.team15.game.model.GameModel;
+import se.chalmers.tda367.team15.game.model.GameWorld;
+import se.chalmers.tda367.team15.game.model.SimulationHandler;
 import se.chalmers.tda367.team15.game.model.TimeCycle;
 import se.chalmers.tda367.team15.game.model.camera.CameraConstraints;
 import se.chalmers.tda367.team15.game.model.camera.CameraModel;
@@ -33,7 +35,7 @@ public class GameFactory {
     public static final float WORLD_VIEWPORT_WIDTH = 15f;
     public static final float MIN_ZOOM = 0.05f;
     public static final float MAX_ZOOM = 4.0f;
-    public static final int TICKS_PER_MINUTE = 600;
+    public static final int TICKS_PER_MINUTE = 20;
 
     private GameFactory() {
     }
@@ -103,7 +105,9 @@ public class GameFactory {
         TerrainGenerator terrainGenerator = new PerlinNoiseTerrainGenerator(
                 List.of("grass1", "grass2", "grass3"),
                 System.currentTimeMillis());
-        return new GameModel(timeCycle, MAP_WIDTH, MAP_HEIGHT, terrainGenerator);
+        GameWorld gameWorld = new GameWorld(timeCycle, MAP_WIDTH, MAP_HEIGHT, terrainGenerator);
+        SimulationHandler simulationHandler = new SimulationHandler(gameWorld,timeCycle);
+        return new GameModel(timeCycle, simulationHandler,gameWorld);
     }
 
     private static CameraView createCameraView(CameraModel cameraModel) {

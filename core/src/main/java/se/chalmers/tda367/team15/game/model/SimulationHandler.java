@@ -4,8 +4,8 @@ public class SimulationHandler {
     private final GameWorld gameWorld;
     private final TimeCycle timeCycle;
 
-    private final int baseTickPerSecond = 20;
-    private final double inGameTimePerTick = 1000.0 / baseTickPerSecond;
+    private static final int baseTickPerSecond = 20;
+    private static final double inGameTimePerTickMs = 1000.0 / baseTickPerSecond;
 
 
     private int iRLTicksPerSecond = baseTickPerSecond;
@@ -15,10 +15,14 @@ public class SimulationHandler {
     private long now = System.currentTimeMillis();
     private boolean paused=false;
 
-    SimulationHandler(GameWorld gameWorld, TimeCycle timeCycle) {
+   public SimulationHandler(GameWorld gameWorld, TimeCycle timeCycle) {
         this.gameWorld = gameWorld;
         this.timeCycle = timeCycle;
-    }
+   }
+
+   public static double getInGameTimePerTickMs() {
+       return inGameTimePerTickMs;
+   }
 
     public void setTicksPerSecond(int ticksPerSecond) {
         if(ticksPerSecond < 0) {
@@ -47,7 +51,7 @@ public class SimulationHandler {
 
             accumulator += difference;
             while (accumulator >= mSPerTick) {
-                float inGameTimeDifference = (float) inGameTimePerTick / 1000f;
+                float inGameTimeDifference = (float) inGameTimePerTickMs / 1000f;
                 timeCycle.tick(); // time cycle needs to update first
                 gameWorld.update(inGameTimeDifference);
                 accumulator -= mSPerTick;

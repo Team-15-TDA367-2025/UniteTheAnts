@@ -114,7 +114,7 @@ public class GameWorld implements EntityDeathObserver, StructureDeathObserver {
         List<Entity> entities = getEntities();
         // Update all entities and structures
         for (Updatable updatable : getUpdatables()) {
-            updatable.update(deltaTime);
+            updatable.update();
         }
 
         // Update fog after movement

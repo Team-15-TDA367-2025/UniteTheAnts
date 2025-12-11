@@ -5,9 +5,10 @@ import com.badlogic.gdx.math.GridPoint2;
 import se.chalmers.tda367.team15.game.model.GameWorld;
 import se.chalmers.tda367.team15.game.model.TimeCycle;
 import se.chalmers.tda367.team15.game.model.interfaces.TimeObserver;
+import se.chalmers.tda367.team15.game.model.interfaces.Updatable;
 import se.chalmers.tda367.team15.game.model.structure.Structure;
 
-public class ResourceNode extends Structure implements TimeObserver {
+public class ResourceNode extends Structure implements Updatable, TimeObserver {
     private ResourceType type;
     private int maxAmount;
     private int currentAmount;
@@ -15,7 +16,7 @@ public class ResourceNode extends Structure implements TimeObserver {
     private int ticksRemaining; // current countdown
     private boolean depleted;
 
-    public ResourceNode(GameWorld gameWorld, GridPoint2 position, String textureName, int radius,
+    public ResourceNode(TimeCycle timeCycle , GridPoint2 position, String textureName, int radius,
             ResourceType type, int maxAmount, int cooldownTicks) {
         super(position, textureName, radius);
         this.type = type;
@@ -24,7 +25,7 @@ public class ResourceNode extends Structure implements TimeObserver {
         this.cooldownTicks = cooldownTicks;
         this.ticksRemaining = 0;
         this.depleted = false;
-        gameWorld.addTimeObserver(this);
+        timeCycle.addTimeObserver(this);
     }
 
     @Override
@@ -35,8 +36,8 @@ public class ResourceNode extends Structure implements TimeObserver {
         return super.getTextureName();
     }
 
-    @Override
-    public void onTimeUpdate(TimeCycle timeCycle) {
+   @Override
+    public void update() {
         if (depleted) {
             ticksRemaining--;
             if (ticksRemaining <= 0) {

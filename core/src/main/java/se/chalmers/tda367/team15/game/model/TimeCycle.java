@@ -1,23 +1,56 @@
 package se.chalmers.tda367.team15.game.model;
 
-public class TimeCycle {
-    private int ticks;
+import se.chalmers.tda367.team15.game.model.interfaces.TimeObserver;
+import se.chalmers.tda367.team15.game.model.interfaces.Updatable;
+
+import java.util.List;
+
+public class TimeCycle  {
+    private int minutes;
     private int ticksPerMinute;
+    private List<TimeObserver> timeObservers;
 
     public record GameTime(int totalDays, int currentHour, int currentMinute, int ticks) {
     }
 
     public TimeCycle(int ticksPerMinute) {
         this.ticksPerMinute = ticksPerMinute;
-        this.ticks = 0;
+        this.minutes = 0;
     }
 
+
     public void tick() {
-        ticks++;
+
+        if(minutes % ticksPerMinute == 0) {
+            boolean oldIsDay = getIsDay();
+            minutes++;
+            boolean newIsDay = getIsDay();
+
+            if(oldIsDay && !newIsDay) {
+                for (TimeObserver observer : timeObservers) {
+                    observer.onNightStart(this);
+                }
+            }
+            if(!oldIsDay && newIsDay) {
+                for (TimeObserver observer : timeObservers) {
+                    observer.onDayStart(this);
+                }
+            }
+        }
+
+
+    }
+
+    public void addTimeObserver(TimeObserver observer) {
+        timeObservers.add(observer);
+    }
+
+    public void removeTimeObserver(TimeObserver observer) {
+        timeObservers.remove(observer);
     }
 
     public int getTotalMinutes() {
-        return ticks;
+        return minutes;
     }
 
     public int getHour() {
@@ -37,7 +70,7 @@ public class TimeCycle {
     }
 
     public GameTime getGameTime() {
-        return new GameTime((getTotalMinutes() / (24 * 60)) + 1, getHour(), getMinute(), ticks);
+        return new GameTime((getTotalMinutes() / (24 * 60)) + 1, getHour(), getMinute(), minutes);
     }
 
     public boolean getIsDay() {

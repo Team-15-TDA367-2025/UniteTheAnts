@@ -3,6 +3,7 @@ package se.chalmers.tda367.team15.game.model.entity;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
+import se.chalmers.tda367.team15.game.model.SimulationHandler;
 import se.chalmers.tda367.team15.game.model.interfaces.Drawable;
 import se.chalmers.tda367.team15.game.model.interfaces.HasPosition;
 import se.chalmers.tda367.team15.game.model.interfaces.MovementStrategy;
@@ -32,10 +33,12 @@ public abstract class Entity implements Drawable, Updatable, HasPosition {
     }
 
     protected void handleCollision() {
-        velocity = new Vector2(0, 0); 
+        velocity = new Vector2(0, 0);
         }
 
-    public void update(float deltaTime) {
+    @Override
+    public void update() {
+        float deltaTime = (float) SimulationHandler.getInGameTimePerTickMs() * 1000;
         position.add(velocity.cpy().scl(deltaTime));
         updateRotation();
         Vector2 velocityStep = velocity.cpy().scl(deltaTime);
@@ -47,7 +50,7 @@ public abstract class Entity implements Drawable, Updatable, HasPosition {
             return;
         }
         position.set(nextPosition);
-        
+
     }
 
     @Override

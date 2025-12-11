@@ -18,16 +18,16 @@ public class GameModel {
     private final WaveManager waveManager;
     private final SimulationHandler simulationHandler;
 
-    public GameModel(TimeCycle timeCycle, SimulationHandler simulationHandler, int mapWidth, int mapHeight, TerrainGenerator generator) {
+    public GameModel(TimeCycle timeCycle, SimulationHandler simulationHandler, GameWorld gameWorld) {
 
-        this.world = new GameWorld(timeCycle, mapWidth, mapHeight, generator);
+        this.world = gameWorld;
         this.waveManager = new WaveManager(timeCycle,this);
         this.simulationHandler=simulationHandler;
-        this.world.addResourceNode(new ResourceNode(world, new GridPoint2(-50, 30), "node", 1,
+        this.world.addResourceNode(new ResourceNode(timeCycle, new GridPoint2(-50, 30), "node", 1,
                 ResourceType.FOOD, 10, 20));
-        this.world.addResourceNode(new ResourceNode(world, new GridPoint2(50, -40), "node", 1,
+        this.world.addResourceNode(new ResourceNode(timeCycle, new GridPoint2(50, -40), "node", 1,
                 ResourceType.FOOD, 10, 20));
-        this.world.addResourceNode(new ResourceNode(world, new GridPoint2(10, 10), "node", 1,
+        this.world.addResourceNode(new ResourceNode(timeCycle, new GridPoint2(10, 10), "node", 1,
                 ResourceType.FOOD, 10, 20));
     }
 
