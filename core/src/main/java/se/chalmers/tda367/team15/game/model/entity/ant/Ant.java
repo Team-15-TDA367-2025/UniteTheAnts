@@ -61,14 +61,14 @@ public class Ant extends Entity implements VisionProvider, CanBeAttacked {
     }
 
     @Override
-    public void update(float deltaTime) {
-        updateBehavior(deltaTime);
-        super.update(deltaTime);
+    public void update() {
+        updateBehavior();
+        super.update();
         updateTexture();
     }
 
-    public void updateBehavior(float deltaTime) {
-        behavior.update(system, deltaTime);
+    public void updateBehavior() {
+        behavior.update(system);
     }
 
     private void updateTexture() {

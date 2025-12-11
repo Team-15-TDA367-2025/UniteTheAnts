@@ -32,7 +32,7 @@ public class FollowTrailBehavior extends AntBehavior {
     }
 
     @Override
-    public void update(PheromoneSystem system, float deltaTime) {
+    public void update(PheromoneSystem system) {
         if (enemiesInSight()) {
             ant.setBehavior(new AttackBehavior(ant, ant.getPosition()));
             return;

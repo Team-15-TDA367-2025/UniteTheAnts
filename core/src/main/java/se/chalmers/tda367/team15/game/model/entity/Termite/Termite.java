@@ -38,15 +38,14 @@ public class Termite extends Entity implements CanBeAttacked {
 
     /**
      * Updates the termite
-     * 
-     * @param deltaTime the real time change between frames
+     *
      */
     @Override
-    public void update(float deltaTime) {
+    public void update() {
         List<Entity> entities = world.getEntities();
         List<Structure> structures = world.getStructures();
         AttackTarget target = termiteBehaviour.update(entities, structures);
-        super.update(deltaTime);
+        super.update();
         if (target != null) {
             attackComponent.attack(target);
         }

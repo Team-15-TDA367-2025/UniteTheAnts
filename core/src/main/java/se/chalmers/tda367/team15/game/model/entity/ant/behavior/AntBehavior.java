@@ -32,6 +32,6 @@ public abstract class AntBehavior {
         return !targets.isEmpty();
     }
 
-    public abstract void update(PheromoneSystem system, float deltaTime);
+    public abstract void update(PheromoneSystem system);
 
 }
