@@ -35,19 +35,19 @@ public class GameWorld implements EntityDeathObserver, StructureDeathObserver {
     private final FogOfWar fogOfWar;
     private DestructionListener destructionListener;
 
-    public GameWorld(TimeCycle timeCycle, SimulationHandler simulationHandler , int mapWidth, int mapHeight, TerrainGenerator generator) {
+    public GameWorld(TimeCycle timeCycle, SimulationHandler simulationHandler, int mapWidth, int mapHeight, TerrainGenerator generator) {
         this.worldEntities = new ArrayList<>();
         this.structures = new ArrayList<>();
         this.worldMap = new WorldMap(mapWidth, mapHeight, generator);
         this.fogOfWar = new FogOfWar(worldMap);
-        this.fogSystem = new FogSystem(this,simulationHandler,fogOfWar, worldMap);
+        this.fogSystem = new FogSystem(this, simulationHandler, fogOfWar, worldMap);
         pheromoneSystem = new PheromoneSystem(new GridPoint2(0, 0), new PheromoneGridConverter(4));
         this.resourceSystem = new ResourceSystem(this, simulationHandler);
         destructionListener = DestructionListener.getInstance();
 
         destructionListener.addEntityDeathObserver(this);
         destructionListener.addStructureDeathObserver(this);
-        this.colony = new Colony(new GridPoint2(0,0),this,timeCycle,simulationHandler);
+        this.colony = new Colony(new GridPoint2(0, 0), this, timeCycle, simulationHandler);
         structures.add(colony);
 
         //simulationHandler.addUpdateObserver(this);
@@ -105,14 +105,6 @@ public class GameWorld implements EntityDeathObserver, StructureDeathObserver {
         updatables.addAll(structures);
         return updatables;
     }
-
-    /*
-    public void update() {
-        List<Entity> entities = getEntities();
-        // Update fog after movement
-
-    }
-    */
 
     public void addEntity(Entity entity) {
         worldEntities.add(entity);

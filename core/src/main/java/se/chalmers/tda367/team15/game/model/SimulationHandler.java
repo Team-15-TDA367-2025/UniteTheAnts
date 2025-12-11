@@ -40,13 +40,6 @@ public class SimulationHandler {
        setTicksPerSecond(baseTickPerSecond);
   }
 
-
-
-   // TODO BAD!
-   public static double getInGameTimePerTickMs() {
-       return inGameTimePerTickMs;
-   }
-
     private void setTicksPerSecond(int ticksPerSecond) {
         if(ticksPerSecond < 0) {
             throw new IllegalArgumentException("ticks per second can't be negative");
