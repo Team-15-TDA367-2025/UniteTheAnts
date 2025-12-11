@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import se.chalmers.tda367.team15.game.model.AttackCategory;
 import se.chalmers.tda367.team15.game.model.DestructionListener;
 import se.chalmers.tda367.team15.game.model.GameWorld;
+import se.chalmers.tda367.team15.game.model.SimulationHandler;
 import se.chalmers.tda367.team15.game.model.entity.Entity;
 import se.chalmers.tda367.team15.game.model.entity.ant.behavior.AntBehavior;
 import se.chalmers.tda367.team15.game.model.entity.ant.behavior.WanderBehavior;
@@ -33,7 +34,7 @@ public class Ant extends Entity implements VisionProvider, CanBeAttacked {
     private float health;
     private Inventory inventory;
 
-    public Ant(Vector2 position, PheromoneSystem system, AntType type, GameWorld gameWorld) {
+    public Ant(Vector2 position, PheromoneSystem system, AntType type, GameWorld gameWorld, SimulationHandler s) {
         super(position, type.textureName());
         this.type = type;
         this.gameWorld = gameWorld;
