@@ -3,12 +3,13 @@ package se.chalmers.tda367.team15.game.model;
 import se.chalmers.tda367.team15.game.model.interfaces.TimeObserver;
 import se.chalmers.tda367.team15.game.model.interfaces.Updatable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TimeCycle  {
     private int minutes;
     private int ticksPerMinute;
-    private List<TimeObserver> timeObservers;
+    private final List<TimeObserver> timeObservers = new ArrayList<>();
 
     public record GameTime(int totalDays, int currentHour, int currentMinute, int ticks) {
     }
