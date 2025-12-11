@@ -32,7 +32,7 @@ public abstract class Entity implements Drawable, Updatable, HasPosition {
     }
 
     protected void handleCollision() {
-        velocity = new Vector2(0, 0); 
+        velocity = new Vector2(0, 0);
         }
 
     public void update(float deltaTime) {
@@ -46,7 +46,7 @@ public abstract class Entity implements Drawable, Updatable, HasPosition {
             return;
         }
         position.set(nextPosition);
-        
+
     }
 
     @Override
@@ -61,7 +61,7 @@ public abstract class Entity implements Drawable, Updatable, HasPosition {
 
     private void updateRotation() {
         if (getVelocity().len2() > 0.1f) {
-            rotation = getVelocity().angleRad() - MathUtils.PI / 2f;
+            rotation = getVelocity().angleRad(); //- MathUtils.PI / 2f;
         }
     }
 

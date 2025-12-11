@@ -61,7 +61,7 @@ public class WorldRenderer {
                 originX, originY,
                 width, height,
                 1f, 1f,
-                MathUtils.radiansToDegrees * drawable.getRotation());
+                MathUtils.radiansToDegrees * (drawable.getRotation() - (MathUtils.PI / 2f)));
     }
 
     public void dispose() {

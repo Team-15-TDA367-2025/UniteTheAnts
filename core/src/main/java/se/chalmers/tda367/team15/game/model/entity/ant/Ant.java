@@ -34,7 +34,8 @@ public class Ant extends Entity implements VisionProvider, CanBeAttacked {
 
     public Ant(Vector2 position, PheromoneSystem system, AntType type, GameWorld gameWorld) {
         super(position, type.textureName());
-        this.behavior = new WanderBehavior(this);
+        this.gameWorld = gameWorld;
+        this.behavior = new WanderBehavior(this, gameWorld);
         this.system = system;
         this.hunger = 2; // test value
 
@@ -46,7 +47,6 @@ public class Ant extends Entity implements VisionProvider, CanBeAttacked {
 
         pickRandomDirection();
         this.faction = Faction.DEMOCRATIC_REPUBLIC_OF_ANTS;
-        this.gameWorld = gameWorld;
         setMovementStrategy(new AntMovementStrategy(gameWorld.getWorldMap()));
     }
 
