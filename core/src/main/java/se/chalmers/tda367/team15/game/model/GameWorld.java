@@ -1,5 +1,6 @@
 package se.chalmers.tda367.team15.game.model;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -23,7 +24,7 @@ import se.chalmers.tda367.team15.game.model.structure.resource.ResourceSystem;
 import se.chalmers.tda367.team15.game.model.world.TerrainGenerator;
 import se.chalmers.tda367.team15.game.model.world.WorldMap;
 
-public class GameWorld implements EntityDeathObserver, StructureDeathObserver {
+public class GameWorld implements Updatable,EntityDeathObserver, StructureDeathObserver {
     private final Colony colony;
     private final PheromoneSystem pheromoneSystem;
     private List<Entity> worldEntities; // Floating positions and can move around.
@@ -34,16 +35,15 @@ public class GameWorld implements EntityDeathObserver, StructureDeathObserver {
     private final FogOfWar fogOfWar;
     private DestructionListener destructionListener;
 
-    public GameWorld(TimeCycle timeCycle, int mapWidth, int mapHeight, TerrainGenerator generator) {
-
+    public GameWorld(TimeCycle timeCycle, SimulationHandler simulationHandler , int mapWidth, int mapHeight, TerrainGenerator generator) {
+        simulationHandler.addUpdateObserver(this);
+        this.colony = new Colony(new GridPoint2(0,0),this,timeCycle ,simulationHandler);
         this.worldEntities = new ArrayList<>();
         this.structures = new ArrayList<>();
-
         this.worldMap = new WorldMap(mapWidth, mapHeight, generator);
         this.fogOfWar = new FogOfWar(worldMap);
         this.fogSystem = new FogSystem(fogOfWar, worldMap);
         pheromoneSystem = new PheromoneSystem(new GridPoint2(0, 0), new PheromoneGridConverter(4));
-        this.colony = new Colony(new GridPoint2(0, 0), this,timeCycle);
         this.resourceSystem = new ResourceSystem();
 
         destructionListener = DestructionListener.getInstance();
@@ -105,12 +105,8 @@ public class GameWorld implements EntityDeathObserver, StructureDeathObserver {
         updatables.addAll(structures);
         return updatables;
     }
-
-    public void updateTimeCycle(){
-
-    }
-
-    public void update(float deltaTime) {
+    @Override
+    public void update() {
         List<Entity> entities = getEntities();
         // Update all entities and structures
         for (Updatable updatable : getUpdatables()) {

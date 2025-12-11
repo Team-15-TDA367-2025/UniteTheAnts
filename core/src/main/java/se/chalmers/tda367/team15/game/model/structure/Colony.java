@@ -7,11 +7,7 @@ import java.util.List;
 
 import com.badlogic.gdx.math.GridPoint2;
 
-import se.chalmers.tda367.team15.game.model.AntFactory;
-import se.chalmers.tda367.team15.game.model.AttackCategory;
-import se.chalmers.tda367.team15.game.model.DestructionListener;
-import se.chalmers.tda367.team15.game.model.GameWorld;
-import se.chalmers.tda367.team15.game.model.TimeCycle;
+import se.chalmers.tda367.team15.game.model.*;
 import se.chalmers.tda367.team15.game.model.egg.EggHatchObserver;
 import se.chalmers.tda367.team15.game.model.egg.EggManager;
 import se.chalmers.tda367.team15.game.model.entity.Entity;
@@ -34,13 +30,13 @@ public class Colony extends Structure implements CanBeAttacked, EntityDeathObser
     private AntFactory antFactory;
     private Faction faction;
 
-    public Colony(GridPoint2 position, GameWorld world,TimeCycle timeCycle) {
+    public Colony(GridPoint2 position, GameWorld world,TimeCycle timeCycle ,SimulationHandler simulationHandler) {
         super(position, "colony", 4);
         this.ants = new ArrayList<>();
         this.health = MAX_HEALTH;
         faction = Faction.DEMOCRATIC_REPUBLIC_OF_ANTS;
         this.inventory = new Inventory(1000); // test value for now
-        this.eggManager = new EggManager(world);
+        this.eggManager = new EggManager(simulationHandler);
         this.eggManager.addObserver(this);
 
         timeCycle.addTimeObserver(this);

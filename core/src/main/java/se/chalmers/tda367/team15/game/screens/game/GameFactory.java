@@ -5,6 +5,7 @@ import java.util.List;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 
 import se.chalmers.tda367.team15.game.controller.*;
@@ -16,6 +17,7 @@ import se.chalmers.tda367.team15.game.model.camera.CameraConstraints;
 import se.chalmers.tda367.team15.game.model.camera.CameraModel;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntType;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntTypeRegistry;
+import se.chalmers.tda367.team15.game.model.structure.Colony;
 import se.chalmers.tda367.team15.game.model.world.PerlinNoiseTerrainGenerator;
 import se.chalmers.tda367.team15.game.model.world.TerrainGenerator;
 import se.chalmers.tda367.team15.game.view.TextureRegistry;
@@ -105,8 +107,9 @@ public class GameFactory {
         TerrainGenerator terrainGenerator = new PerlinNoiseTerrainGenerator(
                 List.of("grass1", "grass2", "grass3"),
                 System.currentTimeMillis());
-        GameWorld gameWorld = new GameWorld(timeCycle, MAP_WIDTH, MAP_HEIGHT, terrainGenerator);
-        SimulationHandler simulationHandler = new SimulationHandler(gameWorld,timeCycle);
+        SimulationHandler simulationHandler = new SimulationHandler(timeCycle);
+        GameWorld gameWorld = new GameWorld(timeCycle,simulationHandler, MAP_WIDTH, MAP_HEIGHT, terrainGenerator);
+
         return new GameModel(timeCycle, simulationHandler,gameWorld);
     }
 

@@ -1,12 +1,16 @@
 package se.chalmers.tda367.team15.game.model;
 
+import se.chalmers.tda367.team15.game.model.entity.Entity;
+import se.chalmers.tda367.team15.game.model.interfaces.Updatable;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class SimulationHandler {
-    private final GameWorld gameWorld;
     private final TimeCycle timeCycle;
 
     private static final int baseTickPerSecond = 20;
     private static final double inGameTimePerTickMs = 1000.0 / baseTickPerSecond;
-
 
     private int iRLTicksPerSecond = baseTickPerSecond;
     private double accumulator = 0;
@@ -15,9 +19,15 @@ public class SimulationHandler {
     private long now = System.currentTimeMillis();
     private boolean paused=false;
 
-   public SimulationHandler(GameWorld gameWorld, TimeCycle timeCycle) {
-        this.gameWorld = gameWorld;
+    private final List<Updatable> updateObservers = new ArrayList<>();
+
+
+   public SimulationHandler(TimeCycle timeCycle) {
         this.timeCycle = timeCycle;
+   }
+
+   public void addUpdateObserver(Updatable u) {
+       updateObservers.add(u);
    }
 
    public static double getInGameTimePerTickMs() {
@@ -53,7 +63,11 @@ public class SimulationHandler {
             while (accumulator >= mSPerTick) {
                 float inGameTimeDifference = (float) inGameTimePerTickMs / 1000f;
                 timeCycle.tick(); // time cycle needs to update first
-                gameWorld.update(inGameTimeDifference);
+
+                for(Updatable u: updateObservers) {
+                    u.update();
+                }
+
                 accumulator -= mSPerTick;
             }
         }
