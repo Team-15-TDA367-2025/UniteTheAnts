@@ -42,7 +42,6 @@ public class GameModel {
 
         colony.setAntHatchListener(this::onAntHatch);
         this.enemyFactory = new EnemyFactory(gameWorld);
-        this.waveManager = new WaveManager(timeCycle, this);
 
         // Spawn structures based on terrain generation features
         spawnTerrainStructures();
