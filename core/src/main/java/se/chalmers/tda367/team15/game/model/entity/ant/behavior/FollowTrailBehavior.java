@@ -72,6 +72,10 @@ public class FollowTrailBehavior extends AntBehavior {
                 return;
             }
         }
+        // TODO Movement logic breaks at low tick speed
+        // This breaks when tick speed is low. Ants will endlessly overshoot their destination because distance change is to high at low tick speed
+        // Before the big refactor we can just set the tick rate to something high...
+        // but it is weird that the simulation behaves differently at different tick speeds...hmmm...
 
         // 3. Movement
         Vector2 targetPos = getCenterPos(currentTarget);

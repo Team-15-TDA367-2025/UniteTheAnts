@@ -9,7 +9,7 @@ import java.util.List;
 public class SimulationHandler {
     private final TimeCycle timeCycle;
 
-    private static final int baseTickPerSecond = 20;
+    private static final int baseTickPerSecond = 100; // Do not set lower than 50
     private static final double inGameTimePerTickMs = 1000.0 / baseTickPerSecond;
 
     private int iRLTicksPerSecond = baseTickPerSecond;
