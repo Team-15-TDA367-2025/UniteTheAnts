@@ -20,7 +20,7 @@ import se.chalmers.tda367.team15.game.model.structure.Colony;
 
 public class Ant extends Entity implements VisionProvider, CanBeAttacked {
     AntType type;
-    private final int visionRadius = 4;
+    private final int visionRadius = 8;
     protected Faction faction;
     private final int hunger;
 
