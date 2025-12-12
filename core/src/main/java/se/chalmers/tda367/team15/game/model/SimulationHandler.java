@@ -9,7 +9,7 @@ import java.util.List;
 public class SimulationHandler {
     private final TimeCycle timeCycle;
 
-    private static final int baseTickPerSecond = 10;
+    private static final int baseTickPerSecond = 100; // Do not set lower than 50
     private static final double inGameTimePerTickMs = 1000.0 / baseTickPerSecond;
 
     private int iRLTicksPerSecond = baseTickPerSecond;
@@ -71,10 +71,10 @@ public class SimulationHandler {
             while (accumulator >= mSPerTick) {
                 float inGameTimeDifference = (float) inGameTimePerTickMs / 1000f;
                 timeCycle.tick(); // time cycle needs to update first
-
-                for(Updatable u: updateObservers) {
-                    u.update(inGameTimeDifference);
-                }
+                List<Updatable> updateThese = new ArrayList<>(updateObservers);
+               for (Updatable u : updateThese) {
+                   u.update(inGameTimeDifference);
+               }
 
                 accumulator -= mSPerTick;
             }

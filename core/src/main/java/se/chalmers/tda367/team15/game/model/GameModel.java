@@ -24,10 +24,9 @@ public class GameModel {
     private final SimulationHandler simulationHandler;
 
     public GameModel(TimeCycle timeCycle, SimulationHandler simulationHandler, GameWorld gameWorld) {
-
-        this.world = gameWorld;
-        this.waveManager = new WaveManager(timeCycle, this);
         this.simulationHandler=simulationHandler;
+        this.world = gameWorld;
+        this.waveManager = new WaveManager(timeCycle,this);
 
         // Spawn structures based on terrain generation features
         spawnTerrainStructures();

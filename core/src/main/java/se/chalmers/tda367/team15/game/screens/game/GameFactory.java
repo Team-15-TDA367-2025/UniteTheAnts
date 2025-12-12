@@ -15,8 +15,8 @@ import se.chalmers.tda367.team15.game.model.camera.CameraConstraints;
 import se.chalmers.tda367.team15.game.model.camera.CameraModel;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntType;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntTypeRegistry;
-import se.chalmers.tda367.team15.game.model.structure.Colony;
 import se.chalmers.tda367.team15.game.model.world.TerrainFactory;
+import se.chalmers.tda367.team15.game.model.structure.Colony;
 import se.chalmers.tda367.team15.game.model.world.TerrainGenerator;
 import se.chalmers.tda367.team15.game.view.TextureRegistry;
 import se.chalmers.tda367.team15.game.view.camera.CameraView;
@@ -35,7 +35,7 @@ public class GameFactory {
     public static final float WORLD_VIEWPORT_WIDTH = 15f;
     public static final float MIN_ZOOM = 0.05f;
     public static final float MAX_ZOOM = 4.0f;
-    public static final int TICKS_PER_MINUTE = 1;
+    public static final int TICKS_PER_MINUTE = 6;
 
     private GameFactory() {
     }
@@ -107,6 +107,7 @@ public class GameFactory {
         );
         SimulationHandler simulationHandler = new SimulationHandler(timeCycle);
         GameWorld gameWorld = new GameWorld(timeCycle,simulationHandler, MAP_WIDTH, MAP_HEIGHT, terrainGenerator);
+
         return new GameModel(timeCycle, simulationHandler,gameWorld);
     }
 
