@@ -2,8 +2,11 @@ package se.chalmers.tda367.team15.game.screens.game;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import se.chalmers.tda367.team15.game.controller.CameraController;
 import se.chalmers.tda367.team15.game.controller.HudController;
@@ -18,6 +21,7 @@ import se.chalmers.tda367.team15.game.view.camera.ViewportListener;
 import se.chalmers.tda367.team15.game.view.renderers.PheromoneRenderer;
 import se.chalmers.tda367.team15.game.view.renderers.WorldRenderer;
 import se.chalmers.tda367.team15.game.view.ui.HudView;
+import se.chalmers.tda367.team15.game.view.ui.TutorialView;
 import se.chalmers.tda367.team15.game.view.ui.UiFactory;
 
 /**
@@ -45,7 +49,11 @@ public class GameScreen extends ScreenAdapter {
     private final CameraController cameraController;
     private final HudController hudController;
 
+    private Stage popupStage;
+    private TutorialView tutorialView;
+
     private final Game game;
+
     public GameScreen(
             Game game,
             GameModel gameModel,
@@ -69,6 +77,10 @@ public class GameScreen extends ScreenAdapter {
         this.viewportListener = viewportListener;
         this.cameraController = cameraController;
         this.hudController = hudController;
+
+        this.popupStage = new Stage(new ScreenViewport());
+        tutorialView = new TutorialView(popupStage);
+        Gdx.input.setInputProcessor(new InputMultiplexer(popupStage, hudView.getStage()));
     }
 
     private GameEndReason gameHasEnded() {
@@ -102,6 +114,11 @@ public class GameScreen extends ScreenAdapter {
         sceneView.render(gameModel.getDrawables(), gameModel.getFog());
         pheromoneView.render();
         hudView.render(Gdx.graphics.getDeltaTime());
+
+        if (tutorialView.isVisible()) {
+            popupStage.act(delta);
+            popupStage.draw();
+        }
     }
 
     @Override
