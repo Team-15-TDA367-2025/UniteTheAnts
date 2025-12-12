@@ -22,11 +22,13 @@ public class GameModel {
     @SuppressWarnings("unused")
     private final WaveManager waveManager;
     private final SimulationHandler simulationHandler;
+    private final TimeCycle timeCycle;
 
     public GameModel(TimeCycle timeCycle, SimulationHandler simulationHandler, GameWorld gameWorld) {
         this.simulationHandler=simulationHandler;
         this.world = gameWorld;
-        this.waveManager = new WaveManager(timeCycle,this);
+        this.timeCycle = timeCycle;
+        this.waveManager = new WaveManager(this.timeCycle,this);
 
         // Spawn structures based on terrain generation features
         spawnTerrainStructures();
@@ -79,10 +81,10 @@ public class GameModel {
     public void setTimePaused(){
         simulationHandler.setTimePaused();
     }
-
     public void update() {
         simulationHandler.handleSimulation();
     }
+    public boolean isDay(){return timeCycle.getIsDay();}
 
     public TimeCycle.GameTime getGameTime() {
         return simulationHandler.getTimeCycle().getGameTime();
@@ -108,6 +110,7 @@ public class GameModel {
         return world.getWorldMap();
     }
 
+    public GridPoint2 getWorldSize() {return getWorldMap().getSize();}
     public int getTotalDays() {
         return simulationHandler.getTimeCycle().getTotalDays();
     }
