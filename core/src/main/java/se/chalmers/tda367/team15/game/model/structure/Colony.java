@@ -39,7 +39,7 @@ public class Colony extends Structure implements CanBeAttacked, Home, EggHatchOb
         super(position, "colony", 4);
         this.health = MAX_HEALTH;
         this.faction = Faction.DEMOCRATIC_REPUBLIC_OF_ANTS;
-        this.inventory = new Inventory(1000); // test value for now
+        this.inventory = new Inventory(1000000); // test value for now
         this.eggManager = new EggManager(simulationHandler);
         this.eggManager.addObserver(this);
         this.entityQuery = entityQuery;
