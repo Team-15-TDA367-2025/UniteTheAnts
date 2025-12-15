@@ -9,6 +9,7 @@ import se.chalmers.tda367.team15.game.model.entity.Termite.Termite;
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntType;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntTypeRegistry;
+import se.chalmers.tda367.team15.game.model.egg.EggManager;
 import se.chalmers.tda367.team15.game.model.fog.FogProvider;
 import se.chalmers.tda367.team15.game.model.fog.FogSystem;
 import se.chalmers.tda367.team15.game.model.interfaces.Drawable;
@@ -31,14 +32,16 @@ public class GameModel {
     private final EnemyFactory enemyFactory;
     private final AntFactory antFactory;
     private final Colony colony;
+    private final EggManager eggManager;
 
-    public GameModel(TimeCycle timeCycle, SimulationHandler simulationHandler, GameWorld gameWorld, FogSystem fogSystem, EntityManager entityManager) {
+    public GameModel(TimeCycle timeCycle, SimulationHandler simulationHandler, GameWorld gameWorld, FogSystem fogSystem, EntityManager entityManager, EggManager eggManager) {
         this.simulationHandler = simulationHandler;
         this.world = gameWorld;
         this.timeCycle = timeCycle;
         this.waveManager = new WaveManager(this.timeCycle,this);
         this.entityManager = entityManager;
-        this.colony = new Colony(new GridPoint2(0, 0), timeCycle, simulationHandler, entityManager);
+        this.eggManager = eggManager;
+        this.colony = new Colony(new GridPoint2(0, 0), timeCycle, entityManager, this.eggManager);
         gameWorld.setColony(colony);
         this.antFactory = new AntFactory(gameWorld.getPheromoneSystem(), colony, gameWorld);
         this.fogSystem = fogSystem;

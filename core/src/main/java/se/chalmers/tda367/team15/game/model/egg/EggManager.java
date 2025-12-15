@@ -4,11 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import se.chalmers.tda367.team15.game.model.GameWorld;
-import se.chalmers.tda367.team15.game.model.SimulationHandler;
-import se.chalmers.tda367.team15.game.model.TimeCycle;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntType;
-import se.chalmers.tda367.team15.game.model.interfaces.TimeObserver;
 import se.chalmers.tda367.team15.game.model.interfaces.Updatable;
 
 /**
@@ -19,10 +15,9 @@ public class EggManager implements Updatable {
     private final List<Egg> eggs;
     private final List<EggHatchObserver> observers;
 
-    public EggManager(SimulationHandler simulationHandler) {
+    public EggManager() {
         this.eggs = new ArrayList<>();
         this.observers = new ArrayList<>();
-        simulationHandler.addUpdateObserver(this);
     }
 
     public void addEgg(AntType type) {

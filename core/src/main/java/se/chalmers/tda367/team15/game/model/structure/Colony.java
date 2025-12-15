@@ -4,7 +4,6 @@ import com.badlogic.gdx.math.GridPoint2;
 
 import se.chalmers.tda367.team15.game.model.AttackCategory;
 import se.chalmers.tda367.team15.game.model.DestructionListener;
-import se.chalmers.tda367.team15.game.model.SimulationHandler;
 import se.chalmers.tda367.team15.game.model.TimeCycle;
 import se.chalmers.tda367.team15.game.model.egg.EggHatchObserver;
 import se.chalmers.tda367.team15.game.model.egg.EggManager;
@@ -20,7 +19,7 @@ import se.chalmers.tda367.team15.game.model.structure.resource.ResourceType;
 
 public class Colony extends Structure implements CanBeAttacked, Home, EggHatchObserver, TimeObserver {
     private Inventory inventory;
-    private EggManager eggManager;
+    private final EggManager eggManager;
     private float health;
     private float MAX_HEALTH = 600;
     private Faction faction;
@@ -35,12 +34,12 @@ public class Colony extends Structure implements CanBeAttacked, Home, EggHatchOb
         void onAntHatch(AntType type);
     }
 
-    public Colony(GridPoint2 position, TimeCycle timeCycle, SimulationHandler simulationHandler, EntityQuery entityQuery) {
+    public Colony(GridPoint2 position, TimeCycle timeCycle, EntityQuery entityQuery, EggManager eggManager) {
         super(position, "colony", 4);
         this.health = MAX_HEALTH;
         this.faction = Faction.DEMOCRATIC_REPUBLIC_OF_ANTS;
         this.inventory = new Inventory(1000000); // test value for now
-        this.eggManager = new EggManager(simulationHandler);
+        this.eggManager = eggManager;
         this.eggManager.addObserver(this);
         this.entityQuery = entityQuery;
 

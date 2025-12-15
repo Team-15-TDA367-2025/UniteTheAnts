@@ -15,6 +15,7 @@ import se.chalmers.tda367.team15.game.model.camera.CameraConstraints;
 import se.chalmers.tda367.team15.game.model.camera.CameraModel;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntType;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntTypeRegistry;
+import se.chalmers.tda367.team15.game.model.egg.EggManager;
 import se.chalmers.tda367.team15.game.model.fog.FogSystem;
 import se.chalmers.tda367.team15.game.model.world.TerrainFactory;
 import se.chalmers.tda367.team15.game.model.world.TerrainGenerator;
@@ -108,10 +109,12 @@ public class GameFactory {
         SimulationHandler simulationHandler = new SimulationHandler(timeCycle);
         EntityManager entityManager = new EntityManager();
         simulationHandler.addUpdateObserver(entityManager);
+        EggManager eggManager = new EggManager();
+        simulationHandler.addUpdateObserver(eggManager);
         GameWorld gameWorld = new GameWorld(simulationHandler, MAP_WIDTH, MAP_HEIGHT, terrainGenerator, entityManager);
         FogSystem fogSystem = new FogSystem(entityManager, gameWorld.getWorldMap());
         simulationHandler.addUpdateObserver(fogSystem);
-        return new GameModel(timeCycle, simulationHandler, gameWorld, fogSystem, entityManager);
+        return new GameModel(timeCycle, simulationHandler, gameWorld, fogSystem, entityManager, eggManager);
     }
 
     private static CameraView createCameraView(CameraModel cameraModel) {
