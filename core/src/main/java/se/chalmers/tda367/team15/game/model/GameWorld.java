@@ -13,7 +13,6 @@ import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
 import se.chalmers.tda367.team15.game.model.interfaces.StructureDeathObserver;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneSystem;
-import se.chalmers.tda367.team15.game.model.structure.Colony;
 import se.chalmers.tda367.team15.game.model.structure.Structure;
 import se.chalmers.tda367.team15.game.model.structure.resource.Resource;
 import se.chalmers.tda367.team15.game.model.structure.resource.ResourceNode;
@@ -22,31 +21,21 @@ import se.chalmers.tda367.team15.game.model.world.TerrainGenerator;
 import se.chalmers.tda367.team15.game.model.world.WorldMap;
 
 public class GameWorld implements StructureDeathObserver {
-    private Colony colony;
     private final PheromoneSystem pheromoneSystem;
     private final StructureManager structureManager;
-    private ResourceSystem resourceSystem;
+    private final ResourceSystem resourceSystem;
     private final WorldMap worldMap;
-    private EntityQuery entityQuery;
+    private final EntityQuery entityQuery;
 
-    public GameWorld(SimulationHandler simulationHandler, int mapWidth, int mapHeight, TerrainGenerator generator, EntityQuery entityQuery, StructureManager structureManager) {
+    public GameWorld(SimulationHandler simulationHandler, int mapWidth, int mapHeight, TerrainGenerator generator, EntityQuery entityQuery, StructureManager structureManager, ResourceSystem resourceSystem) {
         this.entityQuery = entityQuery;
         this.worldMap = new WorldMap(mapWidth, mapHeight, generator);
-        pheromoneSystem = new PheromoneSystem(new GridPoint2(0, 0), new PheromoneGridConverter(4), 4);
-        this.resourceSystem = new ResourceSystem(this, simulationHandler);
+        this.pheromoneSystem = new PheromoneSystem(new GridPoint2(0, 0), new PheromoneGridConverter(4), 4);
         this.structureManager = structureManager;
+        this.resourceSystem = resourceSystem;
         DestructionListener.getInstance().addStructureDeathObserver(this);
     }
-
-    public void setColony(Colony colony) {
-        this.colony = colony;
-        structureManager.addStructure(colony);
-    }
-
-    public Colony getColony() {
-        return colony;
-    }
-
+    
     public List<Structure> getStructures() {
         return Collections.unmodifiableList(structureManager.getStructures());
     }

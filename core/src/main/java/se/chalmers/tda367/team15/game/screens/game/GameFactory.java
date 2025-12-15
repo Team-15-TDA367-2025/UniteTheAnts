@@ -3,9 +3,11 @@ package se.chalmers.tda367.team15.game.screens.game;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 
 import se.chalmers.tda367.team15.game.controller.*;
+import se.chalmers.tda367.team15.game.model.AntFactory;
 import se.chalmers.tda367.team15.game.model.EntityManager;
 import se.chalmers.tda367.team15.game.model.GameModel;
 import se.chalmers.tda367.team15.game.model.GameWorld;
@@ -14,10 +16,15 @@ import se.chalmers.tda367.team15.game.model.StructureManager;
 import se.chalmers.tda367.team15.game.model.TimeCycle;
 import se.chalmers.tda367.team15.game.model.camera.CameraConstraints;
 import se.chalmers.tda367.team15.game.model.camera.CameraModel;
+import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntType;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntTypeRegistry;
 import se.chalmers.tda367.team15.game.model.egg.EggManager;
 import se.chalmers.tda367.team15.game.model.fog.FogSystem;
+import se.chalmers.tda367.team15.game.model.interfaces.Home;
+import se.chalmers.tda367.team15.game.model.pheromones.PheromoneSystem;
+import se.chalmers.tda367.team15.game.model.structure.Colony;
+import se.chalmers.tda367.team15.game.model.structure.resource.ResourceSystem;
 import se.chalmers.tda367.team15.game.model.world.TerrainFactory;
 import se.chalmers.tda367.team15.game.model.world.TerrainGenerator;
 import se.chalmers.tda367.team15.game.view.TextureRegistry;
@@ -50,8 +57,6 @@ public class GameFactory {
         CameraModel cameraModel = createCameraModel();
         GameModel gameModel = createGameModel();
 
-        gameModel.spawnInitialAnts();
-
         // 2. Create Resources
         TextureRegistry textureRegistry = new TextureRegistry();
         UiFactory uiFactory = new UiFactory(textureRegistry);
@@ -68,7 +73,8 @@ public class GameFactory {
         CameraController cameraController = new CameraController(cameraModel, cameraView);
         PheromoneController pheromoneController = new PheromoneController(gameModel, cameraView);
         SpeedController speedController = new SpeedController(gameModel);
-        HudController hudController = new HudController(hudView, gameModel, pheromoneController, speedController, uiFactory);
+        HudController hudController = new HudController(hudView, gameModel, pheromoneController, speedController,
+                uiFactory, gameModel.getTimeCycle(), gameModel.getColonyUsageProvider());
 
         // 5. Wire Input
         inputManager.addProcessor(cameraController);
@@ -105,8 +111,7 @@ public class GameFactory {
     private static GameModel createGameModel() {
         TimeCycle timeCycle = new TimeCycle(TICKS_PER_MINUTE);
         TerrainGenerator terrainGenerator = TerrainFactory.createStandardPerlinGenerator(
-            System.currentTimeMillis()
-        );
+                System.currentTimeMillis());
         // TODO: break this down
         SimulationHandler simulationHandler = new SimulationHandler(timeCycle);
 
@@ -119,11 +124,35 @@ public class GameFactory {
         StructureManager structureManager = new StructureManager();
         simulationHandler.addUpdateObserver(structureManager);
 
-        GameWorld gameWorld = new GameWorld(simulationHandler, MAP_WIDTH, MAP_HEIGHT, terrainGenerator, entityManager, structureManager);
+        ResourceSystem resourceSystem = new ResourceSystem( entityManager);
+        simulationHandler.addUpdateObserver(resourceSystem);
+
+        GameWorld gameWorld = new GameWorld(simulationHandler, MAP_WIDTH, MAP_HEIGHT, terrainGenerator, entityManager,
+                structureManager, resourceSystem);
         FogSystem fogSystem = new FogSystem(entityManager, gameWorld.getWorldMap());
         simulationHandler.addUpdateObserver(fogSystem);
 
-        return new GameModel(simulationHandler, timeCycle, gameWorld, fogSystem, entityManager, eggManager);
+        AntFactory antFactory = new AntFactory(gameWorld.getPheromoneSystem(), gameWorld.getWorldMap(), entityManager);
+
+        Colony colony = createColony(gameWorld.getPheromoneSystem(), gameWorld, timeCycle, entityManager, eggManager, structureManager, antFactory);
+
+        spawnInitialAnts(entityManager, colony, antFactory);
+
+        return new GameModel(simulationHandler, timeCycle, gameWorld, fogSystem, entityManager, colony);
+    }
+
+    public static void spawnInitialAnts(EntityManager entityManager, Home home, AntFactory antFactory) {
+        AntTypeRegistry registry = AntTypeRegistry.getInstance();
+        AntType type = registry.get("worker");
+        Ant ant = antFactory.createAnt(home, type);
+        entityManager.addEntity(ant);
+    }
+
+    private static Colony createColony(PheromoneSystem pheromoneSystem, GameWorld gameWorld, TimeCycle timeCycle, EntityManager entityManager, EggManager eggManager, StructureManager structureManager, AntFactory antFactory) {
+        Colony colony = new Colony(new GridPoint2(0, 0), timeCycle, entityManager, eggManager, antFactory, entityManager);
+        structureManager.addStructure(colony);
+        eggManager.addObserver(colony);
+        return colony;
     }
 
     private static CameraView createCameraView(CameraModel cameraModel) {

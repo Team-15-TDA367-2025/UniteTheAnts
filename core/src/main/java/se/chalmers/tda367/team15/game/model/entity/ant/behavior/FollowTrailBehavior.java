@@ -7,8 +7,9 @@ import java.util.stream.Collectors;
 
 import com.badlogic.gdx.math.Vector2;
 
-import se.chalmers.tda367.team15.game.model.GameWorld;
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
+import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
+import se.chalmers.tda367.team15.game.model.interfaces.Home;
 import se.chalmers.tda367.team15.game.model.pheromones.Pheromone;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneSystem;
@@ -21,19 +22,18 @@ public class FollowTrailBehavior extends AntBehavior {
     // Threshold as fraction of pheromone cell size (must be < 1 to avoid reaching
     // multiple cells)
     private static final float REACHED_THRESHOLD_FRACTION = 0.3f;
-    private GameWorld gameWorld;
-
+    private final Home home;
     private boolean returningToColony = false;
     private Pheromone lastPheromone = null;
     private Pheromone currentTarget = null;
     private float reachedThresholdSq;
 
-    public FollowTrailBehavior(Ant ant, GameWorld gameWorld) {
-        super(ant);
-        this.gameWorld = gameWorld;
+    public FollowTrailBehavior(Home home, EntityQuery entityQuery, Ant ant) {
+        super(ant, entityQuery);
         // Calculate threshold based on pheromone cell size
         float cellSize = ant.getSystem().getConverter().getPheromoneCellSize();
         float threshold = cellSize * REACHED_THRESHOLD_FRACTION;
+        this.home = home;
         this.reachedThresholdSq = threshold * threshold;
 
         String typeId = ant.getType().id();
@@ -56,7 +56,7 @@ public class FollowTrailBehavior extends AntBehavior {
     @Override
     public void update(PheromoneSystem system) {
         if (enemiesInSight()) {
-            ant.setBehavior(new AttackBehavior(ant, ant.getPosition(), gameWorld));
+            ant.setBehavior(new AttackBehavior(home, ant, ant.getPosition(), entityQuery));
             return;
         }
 
@@ -71,7 +71,7 @@ public class FollowTrailBehavior extends AntBehavior {
                     .orElse(null);
 
             if (lastPheromone == null) {
-                ant.setBehavior(new WanderBehavior(ant, gameWorld));
+                ant.setBehavior(new WanderBehavior(ant, home, entityQuery));
                 return;
             }
         }
@@ -92,7 +92,7 @@ public class FollowTrailBehavior extends AntBehavior {
 
             // If still no target, we lost the trail
             if (currentTarget == null) {
-                ant.setBehavior(new WanderBehavior(ant, gameWorld));
+                ant.setBehavior(new WanderBehavior(ant, home, entityQuery));
                 return;
             }
         }

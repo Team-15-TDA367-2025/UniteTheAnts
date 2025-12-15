@@ -5,17 +5,14 @@ import java.util.List;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 
-import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
-import se.chalmers.tda367.team15.game.model.entity.ant.AntType;
-import se.chalmers.tda367.team15.game.model.entity.ant.AntTypeRegistry;
-import se.chalmers.tda367.team15.game.model.entity.termite.Termite;
 import se.chalmers.tda367.team15.game.model.egg.EggManager;
+import se.chalmers.tda367.team15.game.model.entity.termite.Termite;
 import se.chalmers.tda367.team15.game.model.fog.FogProvider;
 import se.chalmers.tda367.team15.game.model.fog.FogSystem;
+import se.chalmers.tda367.team15.game.model.interfaces.ColonyUsageProvider;
 import se.chalmers.tda367.team15.game.model.interfaces.Drawable;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneSystem;
-import se.chalmers.tda367.team15.game.model.structure.Colony;
 import se.chalmers.tda367.team15.game.model.structure.resource.ResourceNode;
 import se.chalmers.tda367.team15.game.model.structure.resource.ResourceType;
 import se.chalmers.tda367.team15.game.model.world.WorldMap;
@@ -23,49 +20,27 @@ import se.chalmers.tda367.team15.game.model.world.terrain.StructureSpawn;
 
 public class GameModel {
     private final GameWorld world;
-    @SuppressWarnings("unused")
+    private final ColonyUsageProvider colonyUsageProvider;
+    // TODO: Fix
     private final WaveManager waveManager;
     private final TimeCycle timeCycle;
     private final EntityManager entityManager;
     private final FogSystem fogSystem;
     private final EnemyFactory enemyFactory;
-    private final AntFactory antFactory;
-    private final Colony colony;
-    private final EggManager eggManager;
     private final SimulationProvider simulationProvider;
 
     public GameModel(SimulationProvider simulationProvider, TimeCycle timeCycle, GameWorld gameWorld,
-            FogSystem fogSystem, EntityManager entityManager, EggManager eggManager) {
+            FogSystem fogSystem, EntityManager entityManager, ColonyUsageProvider colonyDataProvider) {
         this.simulationProvider = simulationProvider;
         this.world = gameWorld;
+        this.colonyUsageProvider = colonyDataProvider;
         this.timeCycle = timeCycle;
         this.waveManager = new WaveManager(this.timeCycle, this);
         this.entityManager = entityManager;
-        this.eggManager = eggManager;
-        this.colony = new Colony(new GridPoint2(0, 0), timeCycle, entityManager, this.eggManager);
-        gameWorld.setColony(colony);
-        this.antFactory = new AntFactory(gameWorld.getPheromoneSystem(), colony, gameWorld);
         this.fogSystem = fogSystem;
-        colony.setAntHatchListener(this::onAntHatch);
         this.enemyFactory = new EnemyFactory(gameWorld);
-
         // Spawn structures based on terrain generation features
         spawnTerrainStructures();
-    }
-
-    private void onAntHatch(AntType type) {
-        Ant ant = antFactory.createAnt(type);
-        entityManager.addEntity(ant);
-    }
-
-    /**
-     * Spawns an initial ant (used at game start).
-     */
-    public void spawnInitialAnts() {
-        AntTypeRegistry registry = AntTypeRegistry.getInstance();
-        AntType type = registry.get("worker");
-        Ant ant = antFactory.createAnt(type);
-        entityManager.addEntity(ant);
     }
 
     /**
@@ -90,6 +65,10 @@ public class GameModel {
             }
             // Add other structure types here
         }
+    }
+
+    public ColonyUsageProvider getColonyUsageProvider() {
+        return colonyUsageProvider;
     }
 
     public PheromoneGridConverter getPheromoneGridConverter() {
@@ -139,10 +118,6 @@ public class GameModel {
         return world.getPheromoneSystem();
     }
 
-    public Colony getColony() {
-        return colony;
-    }
-
     public WorldMap getWorldMap() {
         return world.getWorldMap();
     }
@@ -155,8 +130,16 @@ public class GameModel {
         return simulationProvider.getTimeCycle().getTotalDays();
     }
 
+    public EggManager getEggManager() {
+        return colonyUsageProvider.getEggManager();
+    }
+
+    // TODO: Fix this
+    public TimeCycle getTimeCycle() {
+        return timeCycle;
+    }
+
     public int getTotalAnts() {
         return world.getAnts().size();
     }
-
 }

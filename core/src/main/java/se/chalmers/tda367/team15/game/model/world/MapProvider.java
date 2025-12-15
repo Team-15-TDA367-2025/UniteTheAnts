@@ -14,4 +14,9 @@ public interface MapProvider {
     boolean isInBounds(GridPoint2 tilePos);
     /** Gets the size of the map */
     GridPoint2 getSize();
+
+    /** Gets the tile at the given position */
+    Tile getTile(GridPoint2 pos);
+    /** Gets the tile at the given world position */
+    Tile getTile(Vector2 worldPos);
 }

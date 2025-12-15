@@ -1,14 +1,17 @@
 package se.chalmers.tda367.team15.game.controller;
 
+import se.chalmers.tda367.team15.game.model.GameModel;
+import se.chalmers.tda367.team15.game.model.egg.EggManager;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntType;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntTypeRegistry;
+import se.chalmers.tda367.team15.game.model.interfaces.ColonyDataProvider;
 import se.chalmers.tda367.team15.game.model.structure.Colony;
 
 public class EggController {
-    private final Colony colony;
+    private final GameModel model;
 
-    public EggController(Colony colony) {
-        this.colony = colony;
+    public EggController(GameModel model) {
+        this.model = model;
     }
 
     /**
@@ -25,10 +28,6 @@ public class EggController {
             return false;
         }
 
-        return colony.purchaseEgg(type);
-    }
-
-    public Colony getColony() {
-        return colony;
+        return model.getColonyUsageProvider().purchaseEgg(type);
     }
 }

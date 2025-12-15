@@ -1,6 +1,5 @@
 package se.chalmers.tda367.team15.game.model.structure.resource;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,12 +7,10 @@ import java.util.Map;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 
-import se.chalmers.tda367.team15.game.model.GameWorld;
-import se.chalmers.tda367.team15.game.model.SimulationHandler;
-import se.chalmers.tda367.team15.game.model.entity.Entity;
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
+import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
+import se.chalmers.tda367.team15.game.model.interfaces.Home;
 import se.chalmers.tda367.team15.game.model.interfaces.Updatable;
-import se.chalmers.tda367.team15.game.model.structure.Colony;
 import se.chalmers.tda367.team15.game.model.structure.Structure;
 
 /**
@@ -23,27 +20,24 @@ import se.chalmers.tda367.team15.game.model.structure.Structure;
 public class ResourceSystem implements Updatable {
     private static final int PICKUP_RADIUS = 2;
     private static final int DEPOSIT_RADIUS = 2;
-    GameWorld gameWorld;
-
+    private EntityQuery entityQuery;
     private Map<GridPoint2, Resource> resourceGrid;
     private Map<GridPoint2, ResourceNode> resourceNodeGrid;
 
-    public ResourceSystem(GameWorld gameWorld, SimulationHandler simulationHandler) {
-        this.gameWorld = gameWorld;
+    public ResourceSystem(EntityQuery entityQuery) {
+        this.entityQuery = entityQuery;
         this.resourceGrid = new HashMap<>();
         this.resourceNodeGrid = new HashMap<>();
-        simulationHandler.addUpdateObserver(this);
     }
     @Override
     public void update(float deltaTime) {
 
-        Colony colony = gameWorld.getColony();
-        List<Entity> entities = new ArrayList<>(gameWorld.getEntities());
-        List<Structure> structures = new ArrayList<>(gameWorld.getStructures());
+        List<Structure> structures = entityQuery.getEntitiesOfType(Structure.class);
 
-        List<Ant> ants = filterAnts(entities);
+        List<Ant> ants = entityQuery.getEntitiesOfType(Ant.class);
+
         handleResourcePickup(ants);
-        handleResourceDeposit(ants, colony);
+        handleResourceDeposit(ants);
         structures.removeIf(structure -> structure instanceof Resource && ((Resource) structure).getAmount() <= 0);
     }
 
@@ -94,24 +88,21 @@ public class ResourceSystem implements Updatable {
         }
     }
 
-    private void handleResourceDeposit(List<Ant> ants, Colony colony) {
-        if (colony == null) {
-            return;
-        }
-
-        GridPoint2 colonyGrid = colony.getGridPosition();
-
+    private void handleResourceDeposit(List<Ant> ants) {
+        // TODO: Clean up
         for (Ant ant : ants) {
+            Home home = ant.getHome();
+            GridPoint2 homeGrid = new GridPoint2((int) home.getPosition().x, (int) home.getPosition().y);
             if (ant.getInventory().isEmpty()) {
                 continue;
             }
 
             GridPoint2 antGrid = getAntGridPosition(ant);
-            int distance = Math.abs(antGrid.x - colonyGrid.x) +
-                    Math.abs(antGrid.y - colonyGrid.y);
+            int distance = Math.abs(antGrid.x - homeGrid.x) +
+                    Math.abs(antGrid.y - homeGrid.y);
 
             if (distance <= DEPOSIT_RADIUS) {
-                ant.leaveResources(colony);
+                ant.leaveResources(home);
             }
         }
     }
@@ -151,15 +142,5 @@ public class ResourceSystem implements Updatable {
         }
 
         return false;
-    }
-
-    private List<Ant> filterAnts(List<Entity> entities) {
-        List<Ant> ants = new ArrayList<>();
-        for (Entity entity : entities) {
-            if (entity instanceof Ant) {
-                ants.add((Ant) entity);
-            }
-        }
-        return ants;
     }
 }

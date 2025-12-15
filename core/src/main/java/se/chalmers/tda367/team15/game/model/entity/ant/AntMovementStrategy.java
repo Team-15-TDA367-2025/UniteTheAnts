@@ -3,21 +3,21 @@ package se.chalmers.tda367.team15.game.model.entity.ant;
 import com.badlogic.gdx.math.Vector2;
 
 import se.chalmers.tda367.team15.game.model.interfaces.MovementStrategy;
-import se.chalmers.tda367.team15.game.model.world.WorldMap;
+import se.chalmers.tda367.team15.game.model.world.MapProvider;
 
 public class AntMovementStrategy implements MovementStrategy {
-    private WorldMap worldMap;
+    private MapProvider map;
 
-    public AntMovementStrategy(WorldMap worldMap) {
-        this.worldMap = worldMap;
+    public AntMovementStrategy(MapProvider worldMap) {
+        this.map = worldMap;
     }
 
     @Override
     public boolean canMoveTo(Vector2 position) {
-        if (!worldMap.isInBounds(position)) {
+        if (!map.isInBounds(position)) {
             return false;
         }
-        return worldMap.getTile(position).getType().isWalkable();
+        return map.getTile(position).getType().isWalkable();
     }
     
 }

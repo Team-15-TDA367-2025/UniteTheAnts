@@ -7,25 +7,23 @@ import java.util.List;
 import com.badlogic.gdx.math.Vector2;
 
 import se.chalmers.tda367.team15.game.model.AttackCategory;
-import se.chalmers.tda367.team15.game.model.GameWorld;
 import se.chalmers.tda367.team15.game.model.entity.AttackComponent;
 import se.chalmers.tda367.team15.game.model.entity.AttackTarget;
-import se.chalmers.tda367.team15.game.model.entity.Entity;
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.interfaces.CanBeAttacked;
+import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
+import se.chalmers.tda367.team15.game.model.interfaces.Home;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneSystem;
 
 public class AttackBehavior extends AntBehavior {
-    private GameWorld gameWorld;
-    HashMap<AttackCategory, Integer> targetPriority = new HashMap<>();
-    Vector2 lastPosBeforeAttack;
-    AttackComponent attackComponent;
+    private final HashMap<AttackCategory, Integer> targetPriority = new HashMap<>();
+    private final Home home;
+    private final AttackComponent attackComponent;
 
-    public AttackBehavior(Ant ant, Vector2 lastPosBeforeAttack, GameWorld gameWorld) {
-        super(ant);
+    public AttackBehavior(Home home, Ant ant, Vector2 lastPosBeforeAttack, EntityQuery entityQuery) {
+        super(ant, entityQuery);
         targetPriority.put(AttackCategory.TERMITE, 1);
-        this.gameWorld = gameWorld;
-        this.lastPosBeforeAttack = lastPosBeforeAttack;
+        this.home = home;
         this.attackComponent = new AttackComponent(5, 1000, 2, ant);
     }
 
@@ -34,7 +32,7 @@ public class AttackBehavior extends AntBehavior {
         AttackTarget target = findTarget();
 
         if (target == null) {
-            ant.setBehavior(new FollowTrailBehavior(ant, gameWorld));
+            ant.setBehavior(new FollowTrailBehavior(home, entityQuery, ant));
         } else {
             Vector2 targetV = target.hasPosition.getPosition().sub(ant.getPosition());
             ant.setVelocity(targetV.nor().scl(ant.getSpeed()));
@@ -45,7 +43,7 @@ public class AttackBehavior extends AntBehavior {
 
     private AttackTarget findTarget() {
         AttackTarget target = null;
-        List<Entity> entities = ant.getGameWorld().getEntities();
+        List<CanBeAttacked> entities = entityQuery.getEntitiesOfType(CanBeAttacked.class);
         List<AttackTarget> potentialTargets = potentialTargets(entities);
 
         // determine target
@@ -67,12 +65,10 @@ public class AttackBehavior extends AntBehavior {
         return target;
     }
 
-    private List<AttackTarget> potentialTargets(List<Entity> entities) {
+    private List<AttackTarget> potentialTargets(List<CanBeAttacked> entities) {
         List<AttackTarget> targets = new ArrayList<>();
-        for (Entity e : entities) {
-            if (e instanceof CanBeAttacked) {
-                targets.add(new AttackTarget((CanBeAttacked) e, e));
-            }
+        for (CanBeAttacked e : entities) {
+            targets.add(new AttackTarget(e, e));
         }
         targets.removeIf(t -> t.canBeAttacked.getFaction() == ant.getFaction());
         targets.removeIf(t -> t.hasPosition.getPosition().dst(ant.getPosition()) > ant.getVisionRadius());

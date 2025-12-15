@@ -12,7 +12,7 @@ import se.chalmers.tda367.team15.game.model.egg.Egg;
 import se.chalmers.tda367.team15.game.model.egg.EggManager;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntType;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntTypeRegistry;
-import se.chalmers.tda367.team15.game.model.structure.Colony;
+import se.chalmers.tda367.team15.game.model.interfaces.ColonyDataProvider;
 import se.chalmers.tda367.team15.game.model.structure.resource.ResourceType;
 
 /**
@@ -23,16 +23,15 @@ public class EggPanelView {
     private final UiFactory uiFactory;
     private final EggController eggController;
     private final EggManager eggManager;
-    private final Colony colony;
     private final Table panelTable;
     private final HorizontalGroup eggTypeGroup;
+    private final ColonyDataProvider colonyDataProvider;
 
-    public EggPanelView(UiFactory uiFactory, EggController eggController, Colony colony) {
+    public EggPanelView(UiFactory uiFactory, EggController eggController, EggManager eggManager, ColonyDataProvider colonyDataProvider) {
         this.uiFactory = uiFactory;
         this.eggController = eggController;
-        this.colony = colony;
-        this.eggManager = colony.getEggManager();
-
+        this.eggManager = eggManager;
+        this.colonyDataProvider = colonyDataProvider;
         panelTable = new Table();
         // No background - this panel is embedded in BottomBarView which has its own
         // background
@@ -131,7 +130,7 @@ public class EggPanelView {
                 // Update button enabled state based on resources
                 AntType type = AntTypeRegistry.getInstance().get(state.typeId);
                 if (type != null) {
-                    boolean canAfford = colony.getTotalResources(ResourceType.FOOD) >= type.foodCost();
+                    boolean canAfford = colonyDataProvider.getTotalResources(ResourceType.FOOD) >= type.foodCost();
                     button.setDisabled(!canAfford);
                 }
             }

@@ -75,7 +75,7 @@ public class GameScreen extends ScreenAdapter {
         if (gameModel.getTotalAnts() == 0) {
             return GameEndReason.ALL_ANTS_DEAD;
         }
-        if (gameModel.getColony().getTotalResources(ResourceType.FOOD) < 0) {
+        if (gameModel.getColonyUsageProvider().getTotalResources(ResourceType.FOOD) < 0) {
             return GameEndReason.STARVATION;
         }
         return GameEndReason.STILL_PLAYING;

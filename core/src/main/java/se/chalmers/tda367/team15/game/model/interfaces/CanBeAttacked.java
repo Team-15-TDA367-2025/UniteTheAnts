@@ -7,7 +7,7 @@ import se.chalmers.tda367.team15.game.model.faction.Faction;
  * Represents the notion that the Object can be destroyed or die in the game
  * world by attackers.
  */
-public interface CanBeAttacked {
+public interface CanBeAttacked extends HasPosition {
     /**
      * Instructs the object to take damage.
      *
