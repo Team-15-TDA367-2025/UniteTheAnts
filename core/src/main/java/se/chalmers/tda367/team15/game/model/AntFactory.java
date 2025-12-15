@@ -13,15 +13,17 @@ public class AntFactory {
     private final PheromoneSystem pheromoneSystem;
     private final MapProvider map;
     private final EntityQuery entityQuery;
+    private final DestructionListener destructionListener;
 
-    public AntFactory(PheromoneSystem pheromoneSystem, MapProvider map, EntityQuery entityQuery) {
+    public AntFactory(PheromoneSystem pheromoneSystem, MapProvider map, EntityQuery entityQuery, DestructionListener destructionListener) {
         this.pheromoneSystem = pheromoneSystem;
         this.map = map;
         this.entityQuery = entityQuery;
+        this.destructionListener = destructionListener;
     }
 
     public Ant createAnt(Home home, AntType type) {
         Vector2 position = home.getPosition();
-        return new Ant(position, pheromoneSystem, type, map, home, entityQuery);
+        return new Ant(position, pheromoneSystem, type, map, home, entityQuery, destructionListener);
     }
 }

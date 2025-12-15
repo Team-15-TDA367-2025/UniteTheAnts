@@ -21,20 +21,21 @@ import se.chalmers.tda367.team15.game.model.world.MapProvider;
 public class Ant extends Entity implements VisionProvider, CanBeAttacked {
     AntType type;
     private final int visionRadius = 8;
-    protected Faction faction;
+    protected final Faction faction;
     private final Home home;
     private final int hunger;
 
     // Stats from AntType
     private final float speed;
     private final String baseTextureName;
+    private final Inventory inventory;
+    private final DestructionListener destructionListener;
+    private final PheromoneSystem system;
+
     private AntBehavior behavior;
-    private PheromoneSystem system;
-
     private float health;
-    private Inventory inventory;
 
-    public Ant(Vector2 position, PheromoneSystem system, AntType type, MapProvider map, Home home, EntityQuery entityQuery) {
+    public Ant(Vector2 position, PheromoneSystem system, AntType type, MapProvider map, Home home, EntityQuery entityQuery, DestructionListener destructionListener) {
         super(position, type.textureName());
         this.type = type;
         this.behavior = new WanderBehavior(this, home, entityQuery);
@@ -50,6 +51,7 @@ public class Ant extends Entity implements VisionProvider, CanBeAttacked {
         pickRandomDirection();
         this.faction = Faction.DEMOCRATIC_REPUBLIC_OF_ANTS;
         setMovementStrategy(new AntMovementStrategy(map));
+        this.destructionListener = destructionListener;
     }
 
     public void pickRandomDirection() {
@@ -152,7 +154,7 @@ public class Ant extends Entity implements VisionProvider, CanBeAttacked {
 
     @Override
     public void die() {
-        DestructionListener.getInstance().notifyEntityDeathObservers(this);
+        destructionListener.notifyEntityDeathObservers(this);
     }
 
     @Override

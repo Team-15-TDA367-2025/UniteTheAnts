@@ -29,8 +29,8 @@ public class Colony extends Structure implements CanBeAttacked, Home, EggHatchOb
     private final EntityQuery entityQuery;
     private final AntFactory antFactory;
     private final EntityManager entityManager;
-
-    public Colony(GridPoint2 position, TimeCycle timeCycle, EntityQuery entityQuery, EggManager eggManager, AntFactory antFactory, EntityManager entityManager) {
+    private final DestructionListener destructionListener;
+    public Colony(GridPoint2 position, TimeCycle timeCycle, EntityQuery entityQuery, EggManager eggManager, AntFactory antFactory, EntityManager entityManager, DestructionListener destructionListener) {
         super(position, "colony", 4);
         this.health = MAX_HEALTH;
         this.faction = Faction.DEMOCRATIC_REPUBLIC_OF_ANTS;
@@ -41,6 +41,7 @@ public class Colony extends Structure implements CanBeAttacked, Home, EggHatchOb
         this.antFactory = antFactory;
         this.entityManager = entityManager;
         timeCycle.addTimeObserver(this);
+        this.destructionListener = destructionListener;
     }
 
     @Override
@@ -123,7 +124,7 @@ public class Colony extends Structure implements CanBeAttacked, Home, EggHatchOb
 
     @Override
     public void die() {
-        DestructionListener.getInstance().notifyStructureDeathObservers(this);
+        destructionListener.notifyStructureDeathObservers(this);
     }
 
     @Override

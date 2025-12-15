@@ -33,7 +33,6 @@ public class GameWorld implements StructureDeathObserver {
         this.pheromoneSystem = new PheromoneSystem(new GridPoint2(0, 0), new PheromoneGridConverter(4), 4);
         this.structureManager = structureManager;
         this.resourceSystem = resourceSystem;
-        DestructionListener.getInstance().addStructureDeathObserver(this);
     }
     
     public List<Structure> getStructures() {

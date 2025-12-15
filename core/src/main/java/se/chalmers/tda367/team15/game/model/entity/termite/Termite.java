@@ -28,9 +28,11 @@ public class Termite extends Entity implements CanBeAttacked {
     private final float MAX_HEALTH = 1;
     private float health;
     private final GameWorld world;
+    private final DestructionListener destructionListener;
 
-    public Termite(Vector2 position, GameWorld world) {
+    public Termite(Vector2 position, GameWorld world, DestructionListener destructionListener) {
         super(position, "termite");
+        this.destructionListener = destructionListener;
         this.world = world;
         this.termiteBehaviour = new TermiteBehavior(this);
         health = MAX_HEALTH;
@@ -80,7 +82,7 @@ public class Termite extends Entity implements CanBeAttacked {
     @Override
     public void die() {
         health = 0f;
-        DestructionListener.getInstance().notifyEntityDeathObservers(this);
+        destructionListener.notifyEntityDeathObservers(this);
     }
 
     @Override

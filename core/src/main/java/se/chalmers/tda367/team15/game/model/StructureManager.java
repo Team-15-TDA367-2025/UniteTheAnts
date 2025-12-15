@@ -15,10 +15,6 @@ import se.chalmers.tda367.team15.game.model.structure.Structure;
 public class StructureManager implements Updatable, StructureDeathObserver {
     private final List<Structure> structures = new ArrayList<>();
 
-    public StructureManager() {
-        DestructionListener.getInstance().addStructureDeathObserver(this);
-    }
-
     public void addStructure(Structure structure) {
         structures.add(structure);
     }

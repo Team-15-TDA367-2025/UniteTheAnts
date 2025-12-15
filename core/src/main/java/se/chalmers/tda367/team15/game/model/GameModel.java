@@ -30,7 +30,7 @@ public class GameModel {
     private final SimulationProvider simulationProvider;
 
     public GameModel(SimulationProvider simulationProvider, TimeCycle timeCycle, GameWorld gameWorld,
-            FogSystem fogSystem, EntityManager entityManager, ColonyUsageProvider colonyDataProvider) {
+            FogSystem fogSystem, EntityManager entityManager, ColonyUsageProvider colonyDataProvider, EnemyFactory enemyFactory) {
         this.simulationProvider = simulationProvider;
         this.world = gameWorld;
         this.colonyUsageProvider = colonyDataProvider;
@@ -38,7 +38,7 @@ public class GameModel {
         this.waveManager = new WaveManager(this.timeCycle, this);
         this.entityManager = entityManager;
         this.fogSystem = fogSystem;
-        this.enemyFactory = new EnemyFactory(gameWorld);
+        this.enemyFactory = enemyFactory;
         // Spawn structures based on terrain generation features
         spawnTerrainStructures();
     }
