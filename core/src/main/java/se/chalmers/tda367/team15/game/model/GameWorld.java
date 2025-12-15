@@ -24,24 +24,23 @@ import se.chalmers.tda367.team15.game.model.world.WorldMap;
 public class GameWorld implements StructureDeathObserver {
     private Colony colony;
     private final PheromoneSystem pheromoneSystem;
-    private List<Structure> structures;
+    private final StructureManager structureManager;
     private ResourceSystem resourceSystem;
     private final WorldMap worldMap;
     private EntityQuery entityQuery;
 
-    public GameWorld(SimulationHandler simulationHandler, int mapWidth, int mapHeight, TerrainGenerator generator, EntityQuery entityQuery) {
-        this.structures = new ArrayList<>();
+    public GameWorld(SimulationHandler simulationHandler, int mapWidth, int mapHeight, TerrainGenerator generator, EntityQuery entityQuery, StructureManager structureManager) {
         this.entityQuery = entityQuery;
         this.worldMap = new WorldMap(mapWidth, mapHeight, generator);
         pheromoneSystem = new PheromoneSystem(new GridPoint2(0, 0), new PheromoneGridConverter(4), 4);
         this.resourceSystem = new ResourceSystem(this, simulationHandler);
-
+        this.structureManager = structureManager;
         DestructionListener.getInstance().addStructureDeathObserver(this);
     }
 
     public void setColony(Colony colony) {
         this.colony = colony;
-        structures.add(colony);
+        structureManager.addStructure(colony);
     }
 
     public Colony getColony() {
@@ -49,7 +48,7 @@ public class GameWorld implements StructureDeathObserver {
     }
 
     public List<Structure> getStructures() {
-        return Collections.unmodifiableList(structures);
+        return Collections.unmodifiableList(structureManager.getStructures());
     }
 
     public List<Entity> getEntities() {
@@ -67,7 +66,7 @@ public class GameWorld implements StructureDeathObserver {
     }
 
     public Iterable<Drawable> getDrawables() {
-        List<Drawable> allDrawables = new ArrayList<>(structures);
+        List<Drawable> allDrawables = new ArrayList<>(structureManager.getStructures());
         allDrawables.addAll(getEntities());
         return Collections.unmodifiableList(allDrawables);
     }
@@ -81,21 +80,21 @@ public class GameWorld implements StructureDeathObserver {
     }
 
     public void addStructure(Structure structure) {
-        structures.add(structure);
+        structureManager.addStructure(structure);
     }
 
     public void addResource(Resource resource) {
-        structures.add(resource);
+        structureManager.addStructure(resource);
         resourceSystem.addResource(resource);
     }
 
     public void addResourceNode(ResourceNode resourceNode) {
-        structures.add(resourceNode);
+        structureManager.addStructure(resourceNode);
         resourceSystem.addResourceNode(resourceNode);
     }
 
     public void removeStructure(Structure s) {
-        structures.remove(s);
+        structureManager.removeStructure(s);
     }
 
     @Override

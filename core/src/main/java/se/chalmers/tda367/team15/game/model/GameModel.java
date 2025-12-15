@@ -80,7 +80,6 @@ public class GameModel {
                 GridPoint2 worldGridPos = new GridPoint2((int) worldPos.x, (int) worldPos.y);
 
                 world.addResourceNode(new ResourceNode(
-                        simulationHandler,
                         worldGridPos,
                         "node",
                         1,

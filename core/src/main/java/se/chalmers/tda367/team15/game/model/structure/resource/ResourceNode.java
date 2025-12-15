@@ -2,14 +2,9 @@ package se.chalmers.tda367.team15.game.model.structure.resource;
 
 import com.badlogic.gdx.math.GridPoint2;
 
-import se.chalmers.tda367.team15.game.model.GameWorld;
-import se.chalmers.tda367.team15.game.model.SimulationHandler;
-import se.chalmers.tda367.team15.game.model.TimeCycle;
-import se.chalmers.tda367.team15.game.model.interfaces.TimeObserver;
-import se.chalmers.tda367.team15.game.model.interfaces.Updatable;
 import se.chalmers.tda367.team15.game.model.structure.Structure;
 
-public class ResourceNode extends Structure implements Updatable {
+public class ResourceNode extends Structure {
     private ResourceType type;
     private int maxAmount;
     private int currentAmount;
@@ -17,7 +12,7 @@ public class ResourceNode extends Structure implements Updatable {
     private int ticksRemaining; // current countdown
     private boolean depleted;
 
-    public ResourceNode(SimulationHandler simulationHandler, GridPoint2 position, String textureName, int radius,
+    public ResourceNode(GridPoint2 position, String textureName, int radius,
                         ResourceType type, int maxAmount, int cooldownTicks) {
         super(position, textureName, radius);
         this.type = type;
@@ -26,7 +21,6 @@ public class ResourceNode extends Structure implements Updatable {
         this.cooldownTicks = cooldownTicks;
         this.ticksRemaining = 0;
         this.depleted = false;
-        simulationHandler.addUpdateObserver(this);
     }
 
     @Override

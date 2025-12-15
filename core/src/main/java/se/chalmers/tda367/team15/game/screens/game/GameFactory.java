@@ -10,6 +10,7 @@ import se.chalmers.tda367.team15.game.model.EntityManager;
 import se.chalmers.tda367.team15.game.model.GameModel;
 import se.chalmers.tda367.team15.game.model.GameWorld;
 import se.chalmers.tda367.team15.game.model.SimulationHandler;
+import se.chalmers.tda367.team15.game.model.StructureManager;
 import se.chalmers.tda367.team15.game.model.TimeCycle;
 import se.chalmers.tda367.team15.game.model.camera.CameraConstraints;
 import se.chalmers.tda367.team15.game.model.camera.CameraModel;
@@ -106,14 +107,22 @@ public class GameFactory {
         TerrainGenerator terrainGenerator = TerrainFactory.createStandardPerlinGenerator(
             System.currentTimeMillis()
         );
+        // TODO: break this down
         SimulationHandler simulationHandler = new SimulationHandler(timeCycle);
+
         EntityManager entityManager = new EntityManager();
         simulationHandler.addUpdateObserver(entityManager);
+
         EggManager eggManager = new EggManager();
         simulationHandler.addUpdateObserver(eggManager);
-        GameWorld gameWorld = new GameWorld(simulationHandler, MAP_WIDTH, MAP_HEIGHT, terrainGenerator, entityManager);
+
+        StructureManager structureManager = new StructureManager();
+        simulationHandler.addUpdateObserver(structureManager);
+
+        GameWorld gameWorld = new GameWorld(simulationHandler, MAP_WIDTH, MAP_HEIGHT, terrainGenerator, entityManager, structureManager);
         FogSystem fogSystem = new FogSystem(entityManager, gameWorld.getWorldMap());
         simulationHandler.addUpdateObserver(fogSystem);
+
         return new GameModel(timeCycle, simulationHandler, gameWorld, fogSystem, entityManager, eggManager);
     }
 
