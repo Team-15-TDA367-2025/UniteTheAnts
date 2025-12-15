@@ -25,7 +25,6 @@ public class GameModel {
     private final GameWorld world;
     @SuppressWarnings("unused")
     private final WaveManager waveManager;
-    private final SimulationHandler simulationHandler;
     private final TimeCycle timeCycle;
     private final EntityManager entityManager;
     private final FogSystem fogSystem;
@@ -33,12 +32,14 @@ public class GameModel {
     private final AntFactory antFactory;
     private final Colony colony;
     private final EggManager eggManager;
+    private final SimulationProvider simulationProvider;
 
-    public GameModel(TimeCycle timeCycle, SimulationHandler simulationHandler, GameWorld gameWorld, FogSystem fogSystem, EntityManager entityManager, EggManager eggManager) {
-        this.simulationHandler = simulationHandler;
+    public GameModel(SimulationProvider simulationProvider, TimeCycle timeCycle, GameWorld gameWorld,
+            FogSystem fogSystem, EntityManager entityManager, EggManager eggManager) {
+        this.simulationProvider = simulationProvider;
         this.world = gameWorld;
         this.timeCycle = timeCycle;
-        this.waveManager = new WaveManager(this.timeCycle,this);
+        this.waveManager = new WaveManager(this.timeCycle, this);
         this.entityManager = entityManager;
         this.eggManager = eggManager;
         this.colony = new Colony(new GridPoint2(0, 0), timeCycle, entityManager, this.eggManager);
@@ -103,24 +104,27 @@ public class GameModel {
     }
 
     public void setTimeFast() {
-        simulationHandler.setTimeFast();
+        simulationProvider.setTimeFast();
     }
 
     public void setTimeNormal() {
-        simulationHandler.setTimeNormal();
+        simulationProvider.setTimeNormal();
     }
 
     public void setTimePaused() {
-        simulationHandler.setTimePaused();
+        simulationProvider.setTimePaused();
     }
 
     public void update() {
-        simulationHandler.handleSimulation();
+        simulationProvider.handleSimulation();
     }
-    public boolean isDay(){return timeCycle.getIsDay();}
+
+    public boolean isDay() {
+        return timeCycle.getIsDay();
+    }
 
     public TimeCycle.GameTime getGameTime() {
-        return simulationHandler.getTimeCycle().getGameTime();
+        return simulationProvider.getTimeCycle().getGameTime();
     }
 
     public Iterable<Drawable> getDrawables() {
@@ -143,9 +147,12 @@ public class GameModel {
         return world.getWorldMap();
     }
 
-    public GridPoint2 getWorldSize() {return getWorldMap().getSize();}
+    public GridPoint2 getWorldSize() {
+        return getWorldMap().getSize();
+    }
+
     public int getTotalDays() {
-        return simulationHandler.getTimeCycle().getTotalDays();
+        return simulationProvider.getTimeCycle().getTotalDays();
     }
 
     public int getTotalAnts() {

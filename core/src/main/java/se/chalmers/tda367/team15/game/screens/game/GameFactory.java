@@ -123,7 +123,7 @@ public class GameFactory {
         FogSystem fogSystem = new FogSystem(entityManager, gameWorld.getWorldMap());
         simulationHandler.addUpdateObserver(fogSystem);
 
-        return new GameModel(timeCycle, simulationHandler, gameWorld, fogSystem, entityManager, eggManager);
+        return new GameModel(simulationHandler, timeCycle, gameWorld, fogSystem, entityManager, eggManager);
     }
 
     private static CameraView createCameraView(CameraModel cameraModel) {

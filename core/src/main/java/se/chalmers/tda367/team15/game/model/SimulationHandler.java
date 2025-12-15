@@ -5,7 +5,7 @@ import se.chalmers.tda367.team15.game.model.interfaces.Updatable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SimulationHandler {
+public class SimulationHandler implements SimulationProvider {
     private final TimeCycle timeCycle;
 
     private static final int baseTickPerSecond = 100; // Do not set lower than 50
