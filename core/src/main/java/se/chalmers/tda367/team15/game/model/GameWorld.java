@@ -29,17 +29,14 @@ public class GameWorld implements StructureDeathObserver {
     private final WorldMap worldMap;
     private EntityQuery entityQuery;
 
-    public GameWorld(SimulationHandler simulationHandler, int mapWidth, int mapHeight, TerrainGenerator generator) {
+    public GameWorld(SimulationHandler simulationHandler, int mapWidth, int mapHeight, TerrainGenerator generator, EntityQuery entityQuery) {
         this.structures = new ArrayList<>();
+        this.entityQuery = entityQuery;
         this.worldMap = new WorldMap(mapWidth, mapHeight, generator);
         pheromoneSystem = new PheromoneSystem(new GridPoint2(0, 0), new PheromoneGridConverter(4), 4);
         this.resourceSystem = new ResourceSystem(this, simulationHandler);
 
         DestructionListener.getInstance().addStructureDeathObserver(this);
-    }
-
-    public void setEntityQuery(EntityQuery entityQuery) {
-        this.entityQuery = entityQuery;
     }
 
     public void setColony(Colony colony) {

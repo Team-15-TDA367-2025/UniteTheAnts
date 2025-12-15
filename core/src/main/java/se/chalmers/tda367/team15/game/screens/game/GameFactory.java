@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 
 import se.chalmers.tda367.team15.game.controller.*;
+import se.chalmers.tda367.team15.game.model.EntityManager;
 import se.chalmers.tda367.team15.game.model.GameModel;
 import se.chalmers.tda367.team15.game.model.GameWorld;
 import se.chalmers.tda367.team15.game.model.SimulationHandler;
@@ -14,6 +15,7 @@ import se.chalmers.tda367.team15.game.model.camera.CameraConstraints;
 import se.chalmers.tda367.team15.game.model.camera.CameraModel;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntType;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntTypeRegistry;
+import se.chalmers.tda367.team15.game.model.fog.FogSystem;
 import se.chalmers.tda367.team15.game.model.world.TerrainFactory;
 import se.chalmers.tda367.team15.game.model.world.TerrainGenerator;
 import se.chalmers.tda367.team15.game.view.TextureRegistry;
@@ -104,9 +106,12 @@ public class GameFactory {
             System.currentTimeMillis()
         );
         SimulationHandler simulationHandler = new SimulationHandler(timeCycle);
-        GameWorld gameWorld = new GameWorld(simulationHandler, MAP_WIDTH, MAP_HEIGHT, terrainGenerator);
-
-        return new GameModel(timeCycle, simulationHandler, gameWorld);
+        EntityManager entityManager = new EntityManager();
+        simulationHandler.addUpdateObserver(entityManager);
+        GameWorld gameWorld = new GameWorld(simulationHandler, MAP_WIDTH, MAP_HEIGHT, terrainGenerator, entityManager);
+        FogSystem fogSystem = new FogSystem(entityManager, gameWorld.getWorldMap());
+        simulationHandler.addUpdateObserver(fogSystem);
+        return new GameModel(timeCycle, simulationHandler, gameWorld, fogSystem, entityManager);
     }
 
     private static CameraView createCameraView(CameraModel cameraModel) {

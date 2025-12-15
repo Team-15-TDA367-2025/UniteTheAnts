@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.GridPoint2;
 import se.chalmers.tda367.team15.game.model.world.MapProvider;
 
 // Data store for fog of war, only used by FogSystem
-public class FogOfWar implements FogProvider {
+class FogOfWar implements FogProvider {
     private final boolean[][] discovered;
     private final MapProvider mapProvider;
 

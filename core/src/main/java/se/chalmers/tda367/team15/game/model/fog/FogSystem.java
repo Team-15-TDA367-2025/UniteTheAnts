@@ -6,7 +6,6 @@ import java.util.List;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 
-import se.chalmers.tda367.team15.game.model.SimulationHandler;
 import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
 import se.chalmers.tda367.team15.game.model.interfaces.Updatable;
 import se.chalmers.tda367.team15.game.model.interfaces.VisionProvider;
@@ -15,15 +14,14 @@ import se.chalmers.tda367.team15.game.model.world.MapProvider;
 public class FogSystem implements FogProvider, Updatable {
     private final FogOfWar fogOfWar;
     private final MapProvider mapProvider;
-
     private final EntityQuery entityQuery;
 
-    public FogSystem(EntityQuery entityQuery, SimulationHandler simulationHandler, MapProvider mapProvider) {
+    public FogSystem(EntityQuery entityQuery, MapProvider mapProvider) {
         this.mapProvider = mapProvider;
-        this.fogOfWar = new FogOfWar(mapProvider);
         this.entityQuery = entityQuery;
-        simulationHandler.addUpdateObserver(this);
+        this.fogOfWar = new FogOfWar(mapProvider);
     }
+
     @Override
     public void update(float deltaTime) {
         List<VisionProvider> visionProviders = new ArrayList<>(entityQuery.getEntitiesOfType(VisionProvider.class));

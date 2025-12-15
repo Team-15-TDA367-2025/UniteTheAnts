@@ -16,8 +16,7 @@ import se.chalmers.tda367.team15.game.model.interfaces.Updatable;
 public class EntityManager implements Updatable, EntityDeathObserver, EntityQuery {
     private final List<Entity> entities = new ArrayList<>();
 
-    public EntityManager(SimulationHandler simulationHandler) {
-        simulationHandler.addUpdateObserver(this);
+    public EntityManager() {
         DestructionListener.getInstance().addEntityDeathObserver(this);
     }
 

@@ -32,17 +32,16 @@ public class GameModel {
     private final AntFactory antFactory;
     private final Colony colony;
 
-    public GameModel(TimeCycle timeCycle, SimulationHandler simulationHandler, GameWorld gameWorld) {
+    public GameModel(TimeCycle timeCycle, SimulationHandler simulationHandler, GameWorld gameWorld, FogSystem fogSystem, EntityManager entityManager) {
         this.simulationHandler = simulationHandler;
         this.world = gameWorld;
         this.timeCycle = timeCycle;
         this.waveManager = new WaveManager(this.timeCycle,this);
-        this.entityManager = new EntityManager(simulationHandler);
-        gameWorld.setEntityQuery(entityManager);
+        this.entityManager = entityManager;
         this.colony = new Colony(new GridPoint2(0, 0), timeCycle, simulationHandler, entityManager);
         gameWorld.setColony(colony);
         this.antFactory = new AntFactory(gameWorld.getPheromoneSystem(), colony, gameWorld);
-        this.fogSystem = new FogSystem(entityManager, simulationHandler, gameWorld.getWorldMap());
+        this.fogSystem = fogSystem;
         colony.setAntHatchListener(this::onAntHatch);
         this.enemyFactory = new EnemyFactory(gameWorld);
 
