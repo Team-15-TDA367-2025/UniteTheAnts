@@ -184,7 +184,7 @@ public class GameFactory {
             if ("resource_node".equals(spawn.getType())) {
                 Vector2 structurePos = map.tileToWorld(spawn.getPosition());
                 GridPoint2 worldGridPos = new GridPoint2((int) structurePos.x, (int) structurePos.y);
-
+                
                 structureManager.addStructure(new ResourceNode(
                     worldGridPos,
                     "node",

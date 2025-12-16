@@ -63,11 +63,11 @@ public class ResourcePlacementFeature implements TerrainFeature {
             StructureSpawn structureSpawn = new StructureSpawn(point, "resource_node");
 
 
-            float distanceToMiddle = point.dst(0,0);
+            float distanceToMiddle = point.dst(width/2,height/2);
 
-            System.out.println(point.x + " : " + point.y + " : " + distanceToMiddle);
+            int calculatedAmount = Math.toIntExact(Math.round(distanceToMiddle)/10) + 2;
 
-            structureSpawn.getProperties().put("amount", Math.toIntExact((long) distanceToMiddle));
+            structureSpawn.getProperties().put("amount", calculatedAmount);
             context.addStructureSpawn(structureSpawn);
             applyNucleationZone(context, point);
         }
