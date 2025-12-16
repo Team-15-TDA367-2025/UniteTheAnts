@@ -6,9 +6,9 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 
+import se.chalmers.tda367.team15.game.model.managers.PheromoneManager;
 import se.chalmers.tda367.team15.game.model.pheromones.Pheromone;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
-import se.chalmers.tda367.team15.game.model.pheromones.PheromoneSystem;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneType;
 import se.chalmers.tda367.team15.game.view.camera.CameraView;
 
@@ -16,10 +16,10 @@ import se.chalmers.tda367.team15.game.view.camera.CameraView;
 public class PheromoneRenderer {
     private final ShapeRenderer shapeRenderer;
     private final CameraView cameraView;
-    private final PheromoneSystem pheromoneSystem;
+    private final PheromoneManager pheromoneSystem;
     private final PheromoneGridConverter converter;
 
-    public PheromoneRenderer(CameraView cameraView, PheromoneSystem pheromoneSystem) {
+    public PheromoneRenderer(CameraView cameraView, PheromoneManager pheromoneSystem) {
         this.cameraView = cameraView;
         this.pheromoneSystem = pheromoneSystem;
         this.converter = pheromoneSystem.getConverter();

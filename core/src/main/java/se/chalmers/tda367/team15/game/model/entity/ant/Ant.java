@@ -14,8 +14,8 @@ import se.chalmers.tda367.team15.game.model.interfaces.CanBeAttacked;
 import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
 import se.chalmers.tda367.team15.game.model.interfaces.Home;
 import se.chalmers.tda367.team15.game.model.interfaces.VisionProvider;
+import se.chalmers.tda367.team15.game.model.managers.PheromoneManager;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
-import se.chalmers.tda367.team15.game.model.pheromones.PheromoneSystem;
 import se.chalmers.tda367.team15.game.model.world.MapProvider;
 
 public class Ant extends Entity implements VisionProvider, CanBeAttacked {
@@ -30,12 +30,12 @@ public class Ant extends Entity implements VisionProvider, CanBeAttacked {
     private final String baseTextureName;
     private final Inventory inventory;
     private final DestructionListener destructionListener;
-    private final PheromoneSystem system;
+    private final PheromoneManager system;
 
     private AntBehavior behavior;
     private float health;
 
-    public Ant(Vector2 position, PheromoneSystem system, AntType type, MapProvider map, Home home, EntityQuery entityQuery, DestructionListener destructionListener) {
+    public Ant(Vector2 position, PheromoneManager system, AntType type, MapProvider map, Home home, EntityQuery entityQuery, DestructionListener destructionListener) {
         super(position, type.textureName());
         this.type = type;
         this.behavior = new WanderBehavior(this, home, entityQuery);
@@ -97,7 +97,7 @@ public class Ant extends Entity implements VisionProvider, CanBeAttacked {
         return converter.worldToPheromoneGrid(position);
     }
 
-    public PheromoneSystem getSystem() {
+    public PheromoneManager getSystem() {
         return system;
     }
 

@@ -12,13 +12,13 @@ import se.chalmers.tda367.team15.game.model.entity.Entity;
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntTypeRegistry;
 import se.chalmers.tda367.team15.game.model.fog.FogProvider;
-import se.chalmers.tda367.team15.game.model.fog.FogSystem;
+import se.chalmers.tda367.team15.game.model.fog.FogManager;
 import se.chalmers.tda367.team15.game.model.interfaces.ColonyUsageProvider;
 import se.chalmers.tda367.team15.game.model.interfaces.Drawable;
 import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
+import se.chalmers.tda367.team15.game.model.managers.PheromoneManager;
 import se.chalmers.tda367.team15.game.model.managers.StructureManager;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
-import se.chalmers.tda367.team15.game.model.pheromones.PheromoneSystem;
 import se.chalmers.tda367.team15.game.model.structure.resource.ResourceNode;
 import se.chalmers.tda367.team15.game.model.structure.resource.ResourceType;
 import se.chalmers.tda367.team15.game.model.world.WorldMap;
@@ -28,16 +28,16 @@ public class GameModel {
     private final ColonyUsageProvider colonyUsageProvider;
     // TODO: Fix
     private final TimeCycle timeCycle;
-    private final FogSystem fogSystem;
+    private final FogManager fogSystem;
     private final SimulationProvider simulationProvider;
-    private final PheromoneSystem pheromoneSystem;
+    private final PheromoneManager pheromoneSystem;
     private final WorldMap worldMap;
     private final AntTypeRegistry antTypeRegistry;
     private final StructureManager structureManager;
     private final EntityQuery entityQuery;
 
     public GameModel(SimulationProvider simulationProvider, TimeCycle timeCycle,
-            FogSystem fogSystem, ColonyUsageProvider colonyUsageProvider, PheromoneSystem pheromoneSystem,
+            FogManager fogSystem, ColonyUsageProvider colonyUsageProvider, PheromoneManager pheromoneSystem,
             WorldMap worldMap, AntTypeRegistry antTypeRegistry, StructureManager structureManager, EntityQuery entityQuery) {
         this.simulationProvider = simulationProvider;
         this.colonyUsageProvider = colonyUsageProvider;
@@ -123,7 +123,7 @@ public class GameModel {
         return antTypeRegistry;
     }
 
-    public PheromoneSystem getPheromoneSystem() {
+    public PheromoneManager getPheromoneSystem() {
         return pheromoneSystem;
     }
 

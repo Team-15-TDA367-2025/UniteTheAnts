@@ -22,16 +22,16 @@ import se.chalmers.tda367.team15.game.model.egg.EggManager;
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntType;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntTypeRegistry;
-import se.chalmers.tda367.team15.game.model.fog.FogSystem;
+import se.chalmers.tda367.team15.game.model.fog.FogManager;
 import se.chalmers.tda367.team15.game.model.interfaces.Home;
 import se.chalmers.tda367.team15.game.model.managers.EntityManager;
+import se.chalmers.tda367.team15.game.model.managers.PheromoneManager;
+import se.chalmers.tda367.team15.game.model.managers.ResourceManager;
 import se.chalmers.tda367.team15.game.model.managers.SimulationManager;
 import se.chalmers.tda367.team15.game.model.managers.StructureManager;
 import se.chalmers.tda367.team15.game.model.managers.WaveManager;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
-import se.chalmers.tda367.team15.game.model.pheromones.PheromoneSystem;
 import se.chalmers.tda367.team15.game.model.structure.Colony;
-import se.chalmers.tda367.team15.game.model.structure.resource.ResourceSystem;
 import se.chalmers.tda367.team15.game.model.world.TerrainFactory;
 import se.chalmers.tda367.team15.game.model.world.TerrainGenerator;
 import se.chalmers.tda367.team15.game.model.world.WorldMap;
@@ -133,17 +133,17 @@ public class GameFactory {
         simulationManager.addUpdateObserver(structureManager);
         destructionListener.addStructureDeathObserver(structureManager);
 
-        ResourceSystem resourceSystem = new ResourceSystem(entityManager, structureManager);
+        ResourceManager resourceSystem = new ResourceManager(entityManager, structureManager);
         simulationManager.addUpdateObserver(resourceSystem);
 
         WorldMap worldMap = new WorldMap(MAP_WIDTH, MAP_HEIGHT, terrainGenerator);
 
         EnemyFactory enemyFactory = new EnemyFactory(entityManager, structureManager, destructionListener);
-        FogSystem fogSystem = new FogSystem(entityManager, worldMap);
+        FogManager fogSystem = new FogManager(entityManager, worldMap);
         simulationManager.addUpdateObserver(fogSystem);
         PheromoneGridConverter pheromoneGridConverter = new PheromoneGridConverter(4);
 
-        PheromoneSystem pheromoneSystem = new PheromoneSystem(new GridPoint2(0, 0), pheromoneGridConverter, 4);
+        PheromoneManager pheromoneSystem = new PheromoneManager(new GridPoint2(0, 0), pheromoneGridConverter, 4);
         AntFactory antFactory = new AntFactory(pheromoneSystem, worldMap, entityManager,
                 destructionListener);
 

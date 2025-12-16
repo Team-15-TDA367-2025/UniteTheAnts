@@ -9,8 +9,8 @@ import com.badlogic.gdx.math.Vector2;
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
 import se.chalmers.tda367.team15.game.model.interfaces.Home;
+import se.chalmers.tda367.team15.game.model.managers.PheromoneManager;
 import se.chalmers.tda367.team15.game.model.pheromones.Pheromone;
-import se.chalmers.tda367.team15.game.model.pheromones.PheromoneSystem;
 
 public class WanderBehavior extends AntBehavior{
     private final Home home;
@@ -61,7 +61,7 @@ public class WanderBehavior extends AntBehavior{
 
 
     @Override
-    public void update(PheromoneSystem system) {
+    public void update(PheromoneManager system) {
 
         if (enemiesInSight()) {
             ant.setBehavior(new AttackBehavior(home, ant, ant.getPosition(), entityQuery));

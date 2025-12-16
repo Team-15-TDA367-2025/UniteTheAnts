@@ -13,7 +13,7 @@ import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.interfaces.CanBeAttacked;
 import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
 import se.chalmers.tda367.team15.game.model.interfaces.Home;
-import se.chalmers.tda367.team15.game.model.pheromones.PheromoneSystem;
+import se.chalmers.tda367.team15.game.model.managers.PheromoneManager;
 
 public class AttackBehavior extends AntBehavior {
     private final HashMap<AttackCategory, Integer> targetPriority = new HashMap<>();
@@ -28,7 +28,7 @@ public class AttackBehavior extends AntBehavior {
     }
 
     @Override
-    public void update(PheromoneSystem system) {
+    public void update(PheromoneManager system) {
         AttackTarget target = findTarget();
 
         if (target == null) {

@@ -6,16 +6,16 @@ import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntType;
 import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
 import se.chalmers.tda367.team15.game.model.interfaces.Home;
-import se.chalmers.tda367.team15.game.model.pheromones.PheromoneSystem;
+import se.chalmers.tda367.team15.game.model.managers.PheromoneManager;
 import se.chalmers.tda367.team15.game.model.world.MapProvider;
 
 public class AntFactory {
-    private final PheromoneSystem pheromoneSystem;
+    private final PheromoneManager pheromoneSystem;
     private final MapProvider map;
     private final EntityQuery entityQuery;
     private final DestructionListener destructionListener;
 
-    public AntFactory(PheromoneSystem pheromoneSystem, MapProvider map, EntityQuery entityQuery, DestructionListener destructionListener) {
+    public AntFactory(PheromoneManager pheromoneSystem, MapProvider map, EntityQuery entityQuery, DestructionListener destructionListener) {
         this.pheromoneSystem = pheromoneSystem;
         this.map = map;
         this.entityQuery = entityQuery;
