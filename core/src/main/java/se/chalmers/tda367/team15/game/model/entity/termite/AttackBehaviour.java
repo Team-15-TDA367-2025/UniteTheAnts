@@ -7,13 +7,14 @@ import se.chalmers.tda367.team15.game.model.interfaces.CanAttack;
 import se.chalmers.tda367.team15.game.model.interfaces.CanBeAttacked;
 
 public class AttackBehaviour extends TermiteBehaviour {
-    AttackTargetingComponent attackTargetingComponent;
-    AttackComponent attackComponent;
-    CanAttack canAttack;
+    private final AttackTargetingComponent attackTargetingComponent;
+    private final AttackComponent attackComponent;
+    private CanAttack canAttack;
 
-    AttackBehaviour( AttackTargetingComponent attackTargetingComponent, AttackComponent attackComponent) {
+    AttackBehaviour(CanAttack canAttack,AttackTargetingComponent attackTargetingComponent, AttackComponent attackComponent) {
         this.attackTargetingComponent = attackTargetingComponent;
         this.attackComponent= attackComponent;
+        this.canAttack=canAttack;
     }
     @Override
     public void update() {
