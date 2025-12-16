@@ -4,6 +4,10 @@ import com.badlogic.gdx.math.Vector2;
 
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntType;
+import se.chalmers.tda367.team15.game.model.entity.ant.behavior.trail.AttackTrailStrategy;
+import se.chalmers.tda367.team15.game.model.entity.ant.behavior.trail.ExploreTrailStrategy;
+import se.chalmers.tda367.team15.game.model.entity.ant.behavior.trail.GatherTrailStrategy;
+import se.chalmers.tda367.team15.game.model.entity.ant.behavior.trail.TrailStrategy;
 import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
 import se.chalmers.tda367.team15.game.model.interfaces.Home;
 import se.chalmers.tda367.team15.game.model.managers.PheromoneManager;
@@ -15,7 +19,8 @@ public class AntFactory {
     private final EntityQuery entityQuery;
     private final DestructionListener destructionListener;
 
-    public AntFactory(PheromoneManager pheromoneManager, MapProvider map, EntityQuery entityQuery, DestructionListener destructionListener) {
+    public AntFactory(PheromoneManager pheromoneManager, MapProvider map, EntityQuery entityQuery,
+            DestructionListener destructionListener) {
         this.pheromoneManager = pheromoneManager;
         this.map = map;
         this.entityQuery = entityQuery;
@@ -24,6 +29,16 @@ public class AntFactory {
 
     public Ant createAnt(Home home, AntType type) {
         Vector2 position = home.getPosition();
-        return new Ant(position, pheromoneManager, type, map, home, entityQuery, destructionListener);
+        TrailStrategy strategy = createStrategy(type);
+        return new Ant(position, pheromoneManager, type, map, home, entityQuery, destructionListener, strategy);
+    }
+
+    private TrailStrategy createStrategy(AntType type) {
+        return switch (type.id()) {
+            case "worker" -> new GatherTrailStrategy();
+            case "soldier" -> new AttackTrailStrategy(entityQuery, pheromoneManager.getConverter());
+            case "scout" -> new ExploreTrailStrategy();
+            default -> new GatherTrailStrategy();
+        };
     }
 }

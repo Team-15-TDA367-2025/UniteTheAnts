@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
+import se.chalmers.tda367.team15.game.model.entity.ant.behavior.trail.TrailStrategy;
 import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
 import se.chalmers.tda367.team15.game.model.interfaces.Home;
 import se.chalmers.tda367.team15.game.model.managers.PheromoneManager;
@@ -16,12 +17,16 @@ import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
 public class WanderBehavior extends AntBehavior {
     private final Home home;
     private final PheromoneGridConverter converter;
+    private final TrailStrategy trailStrategy;
+    private final PheromoneManager pheromoneManager;
 
-    // TODO: we should not need to pass along everything to all behaviors
-    public WanderBehavior(Ant ant, Home home, EntityQuery entityQuery, PheromoneGridConverter converter) {
+    public WanderBehavior(Ant ant, Home home, EntityQuery entityQuery, PheromoneGridConverter converter,
+            TrailStrategy trailStrategy, PheromoneManager pheromoneManager) {
         super(ant, entityQuery);
         this.home = home;
         this.converter = converter;
+        this.trailStrategy = trailStrategy;
+        this.pheromoneManager = pheromoneManager;
     }
 
     private void changeTrajectory() {
@@ -65,7 +70,8 @@ public class WanderBehavior extends AntBehavior {
     public void update(PheromoneManager system) {
 
         if (enemiesInSight()) {
-            ant.setBehavior(new AttackBehavior(home, ant, ant.getPosition(), entityQuery, converter));
+            ant.setBehavior(new AttackBehavior(home, ant, ant.getPosition(), entityQuery, converter, trailStrategy,
+                    pheromoneManager));
             return;
         }
         changeTrajectory();
@@ -76,7 +82,8 @@ public class WanderBehavior extends AntBehavior {
                 .toList();
 
         if (!neighbors.isEmpty()) {
-            ant.setBehavior(new FollowTrailBehavior(home, entityQuery, ant, converter));
+            ant.setBehavior(
+                    new FollowTrailBehavior(home, entityQuery, ant, converter, trailStrategy, pheromoneManager));
         }
 
     }

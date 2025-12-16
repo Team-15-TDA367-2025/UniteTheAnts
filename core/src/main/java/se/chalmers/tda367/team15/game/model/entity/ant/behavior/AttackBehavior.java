@@ -10,6 +10,7 @@ import se.chalmers.tda367.team15.game.model.AttackCategory;
 import se.chalmers.tda367.team15.game.model.entity.AttackComponent;
 import se.chalmers.tda367.team15.game.model.entity.AttackTarget;
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
+import se.chalmers.tda367.team15.game.model.entity.ant.behavior.trail.TrailStrategy;
 import se.chalmers.tda367.team15.game.model.interfaces.CanBeAttacked;
 import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
 import se.chalmers.tda367.team15.game.model.interfaces.Home;
@@ -21,13 +22,18 @@ public class AttackBehavior extends AntBehavior {
     private final Home home;
     private final AttackComponent attackComponent;
     private final PheromoneGridConverter converter;
+    private final TrailStrategy trailStrategy;
+    private final PheromoneManager pheromoneManager;
 
-    public AttackBehavior(Home home, Ant ant, Vector2 lastPosBeforeAttack, EntityQuery entityQuery, PheromoneGridConverter converter) {
+    public AttackBehavior(Home home, Ant ant, Vector2 lastPosBeforeAttack, EntityQuery entityQuery,
+            PheromoneGridConverter converter, TrailStrategy trailStrategy, PheromoneManager pheromoneManager) {
         super(ant, entityQuery);
         targetPriority.put(AttackCategory.TERMITE, 1);
         this.home = home;
         this.attackComponent = new AttackComponent(5, 1000, 2, ant);
         this.converter = converter;
+        this.trailStrategy = trailStrategy;
+        this.pheromoneManager = pheromoneManager;
     }
 
     @Override
@@ -35,7 +41,8 @@ public class AttackBehavior extends AntBehavior {
         AttackTarget target = findTarget();
 
         if (target == null) {
-            ant.setBehavior(new FollowTrailBehavior(home, entityQuery, ant, converter));
+            ant.setBehavior(
+                    new FollowTrailBehavior(home, entityQuery, ant, converter, trailStrategy, pheromoneManager));
         } else {
             Vector2 targetV = target.hasPosition.getPosition().sub(ant.getPosition());
             ant.setVelocity(targetV.nor().scl(ant.getSpeed()));

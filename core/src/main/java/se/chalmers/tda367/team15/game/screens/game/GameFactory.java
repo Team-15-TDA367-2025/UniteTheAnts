@@ -213,7 +213,7 @@ public class GameFactory {
                 0, // Capacity
                 "scout", // Texture
                 Set.of(PheromoneType.EXPLORE), // Allowed pheromones
-                0.02f // Low home bias - scouts wander far
+                0.01f // Low home bias - scouts wander far
         ));
 
         // Soldier: Low speed, high HP, 0 capacity, expensive

@@ -21,19 +21,6 @@ public class ExploreTrailStrategy implements TrailStrategy {
 
     private static final float SPEED_MULTIPLIER = 1.3f;
 
-    private final PheromoneManager pheromoneManager;
-    private final Home home;
-    private final EntityQuery entityQuery;
-    private final PheromoneGridConverter converter;
-
-    public ExploreTrailStrategy(PheromoneManager pheromoneManager, Home home,
-            EntityQuery entityQuery, PheromoneGridConverter converter) {
-        this.pheromoneManager = pheromoneManager;
-        this.home = home;
-        this.entityQuery = entityQuery;
-        this.converter = converter;
-    }
-
     @Override
     public Pheromone selectNextPheromone(Ant ant, List<Pheromone> neighbors, Pheromone current) {
         if (neighbors.isEmpty()) {
@@ -67,14 +54,17 @@ public class ExploreTrailStrategy implements TrailStrategy {
     }
 
     @Override
-    public void onTrailEnd(Ant ant, Pheromone current) {
+    public void onTrailEnd(Ant ant, Pheromone current, PheromoneManager pheromoneManagerParam,
+            Home homeParam, EntityQuery entityQueryParam, PheromoneGridConverter converterParam,
+            TrailStrategy strategy) {
         // Destroy the pheromone at trail end
         if (current != null) {
-            pheromoneManager.removePheromone(current.getPosition());
+            pheromoneManagerParam.removePheromone(current.getPosition());
         }
 
         // Switch to wander behavior with low home bias
-        ant.setBehavior(new WanderBehavior(ant, home, entityQuery, converter));
+        ant.setBehavior(
+                new WanderBehavior(ant, homeParam, entityQueryParam, converterParam, strategy, pheromoneManagerParam));
     }
 
     @Override

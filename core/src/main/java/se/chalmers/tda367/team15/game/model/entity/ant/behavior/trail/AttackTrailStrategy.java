@@ -6,7 +6,10 @@ import java.util.List;
 import com.badlogic.gdx.math.Vector2;
 
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
+import se.chalmers.tda367.team15.game.model.entity.ant.behavior.WanderBehavior;
 import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
+import se.chalmers.tda367.team15.game.model.interfaces.Home;
+import se.chalmers.tda367.team15.game.model.managers.PheromoneManager;
 import se.chalmers.tda367.team15.game.model.pheromones.Pheromone;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
 
@@ -64,9 +67,10 @@ public class AttackTrailStrategy implements TrailStrategy {
     }
 
     @Override
-    public void onTrailEnd(Ant ant, Pheromone current) {
-        // At trail end, soldier patrols back and forth (handled by selectNextPheromone
-        // fallback)
+    public void onTrailEnd(Ant ant, Pheromone current, PheromoneManager pheromoneManager,
+            Home home, EntityQuery entityQueryParam, PheromoneGridConverter converterParam, TrailStrategy strategy) {
+        // At trail end, soldier patrols back and forth (switch to wander)
+        ant.setBehavior(new WanderBehavior(ant, home, entityQueryParam, converterParam, strategy, pheromoneManager));
     }
 
     @Override

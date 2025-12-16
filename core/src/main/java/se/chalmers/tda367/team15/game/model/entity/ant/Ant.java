@@ -9,6 +9,7 @@ import se.chalmers.tda367.team15.game.model.DestructionListener;
 import se.chalmers.tda367.team15.game.model.entity.Entity;
 import se.chalmers.tda367.team15.game.model.entity.ant.behavior.AntBehavior;
 import se.chalmers.tda367.team15.game.model.entity.ant.behavior.WanderBehavior;
+import se.chalmers.tda367.team15.game.model.entity.ant.behavior.trail.TrailStrategy;
 import se.chalmers.tda367.team15.game.model.faction.Faction;
 import se.chalmers.tda367.team15.game.model.interfaces.CanBeAttacked;
 import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
@@ -33,17 +34,17 @@ public class Ant extends Entity implements VisionProvider, CanBeAttacked {
     private final Inventory inventory;
     private final DestructionListener destructionListener;
     private final PheromoneManager system;
+    private final TrailStrategy trailStrategy;
 
     private AntBehavior behavior;
     private float health;
 
-    // TODO - Antigravity: Long parameter list (7 params) - consider Builder pattern
-    // or parameter object
     public Ant(Vector2 position, PheromoneManager system, AntType type, MapProvider map, Home home,
-            EntityQuery entityQuery, DestructionListener destructionListener) {
+            EntityQuery entityQuery, DestructionListener destructionListener, TrailStrategy trailStrategy) {
         super(position, type.textureName());
         this.type = type;
-        this.behavior = new WanderBehavior(this, home, entityQuery, system.getConverter());
+        this.trailStrategy = trailStrategy;
+        this.behavior = new WanderBehavior(this, home, entityQuery, system.getConverter(), trailStrategy, system);
         this.system = system;
         // TODO - Antigravity: Magic number - hunger should be in AntType
         this.hunger = 2; // test value

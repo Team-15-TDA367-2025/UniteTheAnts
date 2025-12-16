@@ -4,7 +4,12 @@ import java.util.Comparator;
 import java.util.List;
 
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
+import se.chalmers.tda367.team15.game.model.entity.ant.behavior.WanderBehavior;
+import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
+import se.chalmers.tda367.team15.game.model.interfaces.Home;
+import se.chalmers.tda367.team15.game.model.managers.PheromoneManager;
 import se.chalmers.tda367.team15.game.model.pheromones.Pheromone;
+import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
 
 /**
  * Trail strategy for worker ants following GATHER pheromones.
@@ -37,9 +42,10 @@ public class GatherTrailStrategy implements TrailStrategy {
     }
 
     @Override
-    public void onTrailEnd(Ant ant, Pheromone current) {
-        // At trail end, worker should return home
-        // The next selectNextPheromone call will handle direction change
+    public void onTrailEnd(Ant ant, Pheromone current, PheromoneManager pheromoneManager,
+            Home home, EntityQuery entityQuery, PheromoneGridConverter converter, TrailStrategy strategy) {
+        // At trail end, worker should switch to wander behavior
+        ant.setBehavior(new WanderBehavior(ant, home, entityQuery, converter, strategy, pheromoneManager));
     }
 
     @Override
