@@ -153,8 +153,8 @@ public class GameFactory {
         EggManager eggManager = new EggManager(antTypeRegistry, antFactory);
         timeCycle.addTimeObserver(eggManager);
 
-        Colony colony = createColony(pheromoneSystem, gameWorld, timeCycle, entityManager, eggManager,
-                structureManager, antFactory, destructionListener);
+        Colony colony = createColony(timeCycle, entityManager, eggManager,
+                structureManager, destructionListener);
 
         spawnInitialAnts(entityManager, colony, antFactory, antTypeRegistry);
 
@@ -169,9 +169,9 @@ public class GameFactory {
         entityManager.addEntity(ant);
     }
 
-    private static Colony createColony(PheromoneSystem pheromoneSystem, GameWorld gameWorld, TimeCycle timeCycle,
+    private static Colony createColony(TimeCycle timeCycle,
             EntityManager entityManager, EggManager eggManager, StructureManager structureManager,
-            AntFactory antFactory, DestructionListener destructionListener) {
+            DestructionListener destructionListener) {
         Colony colony = new Colony(new GridPoint2(0, 0), timeCycle, entityManager, eggManager,
                 entityManager, destructionListener);
         structureManager.addStructure(colony);
