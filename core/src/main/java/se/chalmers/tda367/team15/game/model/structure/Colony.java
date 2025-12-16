@@ -2,9 +2,9 @@ package se.chalmers.tda367.team15.game.model.structure;
 
 import com.badlogic.gdx.math.GridPoint2;
 
+import se.chalmers.tda367.team15.game.model.AntFactory;
 import se.chalmers.tda367.team15.game.model.AttackCategory;
 import se.chalmers.tda367.team15.game.model.DestructionListener;
-import se.chalmers.tda367.team15.game.model.SimulationHandler;
 import se.chalmers.tda367.team15.game.model.TimeCycle;
 import se.chalmers.tda367.team15.game.model.egg.EggHatchObserver;
 import se.chalmers.tda367.team15.game.model.egg.EggManager;
@@ -13,42 +13,33 @@ import se.chalmers.tda367.team15.game.model.entity.ant.AntType;
 import se.chalmers.tda367.team15.game.model.entity.ant.Inventory;
 import se.chalmers.tda367.team15.game.model.faction.Faction;
 import se.chalmers.tda367.team15.game.model.interfaces.CanBeAttacked;
+import se.chalmers.tda367.team15.game.model.interfaces.ColonyUsageProvider;
 import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
 import se.chalmers.tda367.team15.game.model.interfaces.Home;
 import se.chalmers.tda367.team15.game.model.interfaces.TimeObserver;
+import se.chalmers.tda367.team15.game.model.managers.EntityManager;
 import se.chalmers.tda367.team15.game.model.structure.resource.ResourceType;
 
-public class Colony extends Structure implements CanBeAttacked, Home, EggHatchObserver, TimeObserver {
+public class Colony extends Structure implements CanBeAttacked, Home, EggHatchObserver, TimeObserver, ColonyUsageProvider {
     private Inventory inventory;
-    private EggManager eggManager;
+    private final EggManager eggManager;
     private float health;
     private float MAX_HEALTH = 600;
     private Faction faction;
     private final EntityQuery entityQuery;
-    private AntHatchListener antHatchListener;
+    private final EntityManager entityManager;
+    private final DestructionListener destructionListener;
 
-    /**
-     * Listener for when ants hatch from eggs.
-     * Used to notify external systems (like GameModel) to create and add the ant.
-     */
-    public interface AntHatchListener {
-        void onAntHatch(AntType type);
-    }
-
-    public Colony(GridPoint2 position, TimeCycle timeCycle, SimulationHandler simulationHandler, EntityQuery entityQuery) {
+    public Colony(GridPoint2 position, TimeCycle timeCycle, EntityQuery entityQuery, EggManager eggManager, EntityManager entityManager, DestructionListener destructionListener) {
         super(position, "colony", 4);
         this.health = MAX_HEALTH;
         this.faction = Faction.DEMOCRATIC_REPUBLIC_OF_ANTS;
         this.inventory = new Inventory(1000000); // test value for now
-        this.eggManager = new EggManager(simulationHandler);
-        this.eggManager.addObserver(this);
+        this.eggManager = eggManager;
         this.entityQuery = entityQuery;
-
+        this.entityManager = entityManager;
         timeCycle.addTimeObserver(this);
-    }
-
-    public void setAntHatchListener(AntHatchListener listener) {
-        this.antHatchListener = listener;
+        this.destructionListener = destructionListener;
     }
 
     @Override
@@ -65,7 +56,8 @@ public class Colony extends Structure implements CanBeAttacked, Home, EggHatchOb
         return deposited;
     }
 
-    public int calculateConsumption() {
+    @Override
+    public int getConsumption() {
         int total = 0;
         for (Ant ant : entityQuery.getEntitiesOfType(Ant.class)) {
             total += ant.getHunger();
@@ -101,20 +93,15 @@ public class Colony extends Structure implements CanBeAttacked, Home, EggHatchOb
         return true;
     }
 
-    public int getAntCount() {
-        return entityQuery.getEntitiesOfType(Ant.class).size();
+    @Override
+    public void onEggHatch(AntFactory factory, AntType type) {
+        // TODO: Kinda violates SRP
+        Ant ant = factory.createAnt(this, type);
+        this.entityManager.addEntity(ant);
     }
 
-    @Override
-    public void onEggHatch(AntType type) {
-        if (antHatchListener != null) {
-            antHatchListener.onAntHatch(type);
-        }
-    }
-
-    @Override
     public void onDayStart() {
-        applyConsumption(calculateConsumption());
+        applyConsumption(getConsumption());
     }
 
     @Override
@@ -132,11 +119,17 @@ public class Colony extends Structure implements CanBeAttacked, Home, EggHatchOb
 
     @Override
     public void die() {
-        DestructionListener.getInstance().notifyStructureDeathObservers(this);
+        destructionListener.notifyStructureDeathObservers(this);
     }
 
     @Override
     public AttackCategory getAttackCategory() {
         return AttackCategory.ANT_COLONY;
+    }
+
+    @Override
+    public int getTotalAnts() {
+        // TODO: fix this
+        return entityQuery.getEntitiesOfType(Ant.class).size();
     }
 }

@@ -1,4 +1,4 @@
-package se.chalmers.tda367.team15.game.model;
+package se.chalmers.tda367.team15.game.model.managers;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,11 +16,6 @@ import se.chalmers.tda367.team15.game.model.interfaces.Updatable;
 public class EntityManager implements Updatable, EntityDeathObserver, EntityQuery {
     private final List<Entity> entities = new ArrayList<>();
 
-    public EntityManager(SimulationHandler simulationHandler) {
-        simulationHandler.addUpdateObserver(this);
-        DestructionListener.getInstance().addEntityDeathObserver(this);
-    }
-
     public void addEntity(Entity entity) {
         entities.add(entity);
     }
@@ -30,7 +25,7 @@ public class EntityManager implements Updatable, EntityDeathObserver, EntityQuer
     }
 
     @Override
-    public <T extends Entity> List<T> getEntitiesOfType(Class<T> type) {
+    public <T> List<T> getEntitiesOfType(Class<T> type) {
         List<T> result = new ArrayList<>();
         for (Entity entity : entities) {
             if (type.isInstance(entity)) {

@@ -1,4 +1,4 @@
-package se.chalmers.tda367.team15.game.model.pheromones;
+package se.chalmers.tda367.team15.game.model.managers;
 
 import java.util.ArrayDeque;
 import java.util.Collection;
@@ -6,18 +6,28 @@ import java.util.Deque;
 import java.util.List;
 
 import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.Vector2;
 
-public class PheromoneSystem {
+import se.chalmers.tda367.team15.game.model.pheromones.Pheromone;
+import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGrid;
+import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
+import se.chalmers.tda367.team15.game.model.pheromones.PheromoneType;
+
+public class PheromoneManager {
     private static final int[][] NEIGHBOR_OFFSETS = { { 0, 1 }, { 0, -1 }, { 1, 0 }, { -1, 0 } };
 
     private final PheromoneGrid pheromoneGrid;
-    private final GridPoint2 colonyPosition;
+    private final GridPoint2 colonyPheromoneGridPosition;
     private final PheromoneGridConverter converter;
+    private final int colonyGridSize;
 
-    public PheromoneSystem(GridPoint2 colonyPosition, PheromoneGridConverter converter) {
+    public PheromoneManager(GridPoint2 colonyWorldPosition, PheromoneGridConverter converter, int colonySizeInTiles) {
         this.pheromoneGrid = new PheromoneGrid();
-        this.colonyPosition = colonyPosition;
         this.converter = converter;
+        // Convert colony world position to pheromone grid coordinates
+        Vector2 colonyWorldVec = new Vector2(colonyWorldPosition.x, colonyWorldPosition.y);
+        this.colonyPheromoneGridPosition = converter.worldToPheromoneGrid(colonyWorldVec);
+        this.colonyGridSize = colonySizeInTiles * converter.getPheromonesPerTile();
     }
 
     public PheromoneGridConverter getConverter() {
@@ -125,9 +135,14 @@ public class PheromoneSystem {
         for (int[] offset : NEIGHBOR_OFFSETS) {
             GridPoint2 neighborPos = new GridPoint2(pos.x + offset[0], pos.y + offset[1]);
 
-            if (neighborPos.equals(colonyPosition)) {
-                minDistance = 0;
-                foundValidParent = true;
+            if (isInsideColony(neighborPos)) {
+                // Calculate Manhattan distance from colony center (0,0 in grid coordinates)
+                int distanceFromCenter = Math.abs(neighborPos.x - colonyPheromoneGridPosition.x) 
+                                       + Math.abs(neighborPos.y - colonyPheromoneGridPosition.y);
+                if (distanceFromCenter < minDistance) {
+                    minDistance = distanceFromCenter;
+                    foundValidParent = true;
+                }
             } else {
                 Pheromone pheromone = pheromoneGrid.getPheromoneAt(neighborPos);
 
@@ -139,6 +154,10 @@ public class PheromoneSystem {
         }
 
         return foundValidParent ? minDistance : -1;
+    }
+
+    private boolean isInsideColony(GridPoint2 pos) {
+        return pos.dst(colonyPheromoneGridPosition) < colonyGridSize / 2;
     }
 
     /**

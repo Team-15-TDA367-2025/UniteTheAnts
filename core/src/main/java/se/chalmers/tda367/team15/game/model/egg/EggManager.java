@@ -4,29 +4,30 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import se.chalmers.tda367.team15.game.model.GameWorld;
-import se.chalmers.tda367.team15.game.model.SimulationHandler;
-import se.chalmers.tda367.team15.game.model.TimeCycle;
+import se.chalmers.tda367.team15.game.model.AntFactory;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntType;
+import se.chalmers.tda367.team15.game.model.entity.ant.AntTypeRegistry;
 import se.chalmers.tda367.team15.game.model.interfaces.TimeObserver;
-import se.chalmers.tda367.team15.game.model.interfaces.Updatable;
 
 /**
  * Manages the collection of eggs and their development lifecycle.
  * Implements TimeObserver to tick eggs on game time updates.
  */
-public class EggManager implements Updatable {
+public class EggManager implements TimeObserver {
     private final List<Egg> eggs;
     private final List<EggHatchObserver> observers;
+    private final AntTypeRegistry antTypeRegistry;
+    private final AntFactory antFactory;
 
-    public EggManager(SimulationHandler simulationHandler) {
+    public EggManager(AntTypeRegistry antTypeRegistry, AntFactory antFactory) {
+        this.antTypeRegistry = antTypeRegistry;
+        this.antFactory = antFactory;
         this.eggs = new ArrayList<>();
         this.observers = new ArrayList<>();
-        simulationHandler.addUpdateObserver(this);
     }
 
     public void addEgg(AntType type) {
-        Egg egg = new Egg(type.id(), type.developmentTicks());
+        Egg egg = new Egg(type.id(), type.developmentTicks(), antTypeRegistry);
         eggs.add(egg);
     }
 
@@ -39,20 +40,20 @@ public class EggManager implements Updatable {
     }
 
     @Override
-    public void update(float deltaTime) {
+    public void onMinute() {
         for (Egg egg : eggs) {
             egg.tick();
-
-            if (egg.isHatched()) {
-                AntType type = egg.getType();
-                if (type == null) {
-                    continue;
-                }
-
-                for (EggHatchObserver observer : observers) {
-                    observer.onEggHatch(type);
-                }
+            if (!egg.isHatched()) {
+                continue;
             }
+
+            AntType type = egg.getType();
+
+            if (type == null) {
+                throw new IllegalArgumentException("Egg type is null");
+            }
+
+            observers.forEach(observer -> observer.onEggHatch(antFactory, type));
         }
         eggs.removeIf(Egg::isHatched);
     }

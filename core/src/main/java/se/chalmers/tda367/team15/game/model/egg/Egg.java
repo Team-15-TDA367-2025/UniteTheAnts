@@ -12,10 +12,12 @@ public class Egg {
     private final String typeId;
     private int ticksRemaining; // Number of ticks remaining until hatching (can be negative, meaning the egg is
                                 // hatched)
+    private final AntTypeRegistry antTypeRegistry;
 
-    public Egg(String typeId, int ticksRemaining) {
+    public Egg(String typeId, int ticksRemaining, AntTypeRegistry antTypeRegistry) {
         this.typeId = typeId;
         this.ticksRemaining = ticksRemaining;
+        this.antTypeRegistry = antTypeRegistry;
     }
 
     public String getTypeId() {
@@ -36,7 +38,7 @@ public class Egg {
 
     /** @return progress from 0.0 (just laid) to 1.0 (ready to hatch) */
     public float getProgress() {
-        AntType type = AntTypeRegistry.getInstance().get(typeId);
+        AntType type = antTypeRegistry.get(typeId);
         if (type == null) {
             return 0.0f;
         }
@@ -48,6 +50,6 @@ public class Egg {
 
     /** @return the AntType, or null if not found */
     public AntType getType() {
-        return AntTypeRegistry.getInstance().get(typeId);
+        return antTypeRegistry.get(typeId);
     }
 }

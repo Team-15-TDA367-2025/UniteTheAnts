@@ -1,10 +1,12 @@
-package se.chalmers.tda367.team15.game.model;
+package se.chalmers.tda367.team15.game.model.managers;
 
 import java.util.Random;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
+import se.chalmers.tda367.team15.game.model.EnemyFactory;
+import se.chalmers.tda367.team15.game.model.entity.termite.Termite;
 import se.chalmers.tda367.team15.game.model.interfaces.TimeObserver;
 
 /**
@@ -13,11 +15,12 @@ import se.chalmers.tda367.team15.game.model.interfaces.TimeObserver;
  */
 public class WaveManager implements TimeObserver {
     private int nightNumber = 0;
-    private GameModel gameModel;
+    private EnemyFactory enemyFactory;
+    private EntityManager entityManager;
 
-    WaveManager(TimeCycle timeCycle, GameModel gameModel) {
-        this.gameModel = gameModel;
-        timeCycle.addTimeObserver(this);
+    public WaveManager(EnemyFactory enemyFactory, EntityManager entityManager) {
+        this.enemyFactory = enemyFactory;
+        this.entityManager = entityManager;
     }
 
     public int getNightNumber() {
@@ -29,16 +32,15 @@ public class WaveManager implements TimeObserver {
      * will have scattered positions from a random direction.
      */
     private void spawnWave() {
-
         int nEnemies = nightNumber * 2;
 
         // spawn location
         Vector2 spawnLocation = scatter(new Vector2(0, 0), 45);
         // spawn enemies
         for (int i = 0; i < nEnemies; i++) {
-            gameModel.spawnTermite(scatter(spawnLocation, 15));
+            Termite termite = enemyFactory.createTermite(scatter(spawnLocation, 15));
+            entityManager.addEntity(termite);
         }
-
     }
 
     /**

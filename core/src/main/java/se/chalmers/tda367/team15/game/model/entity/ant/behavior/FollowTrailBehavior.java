@@ -7,11 +7,12 @@ import java.util.stream.Collectors;
 
 import com.badlogic.gdx.math.Vector2;
 
-import se.chalmers.tda367.team15.game.model.GameWorld;
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
+import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
+import se.chalmers.tda367.team15.game.model.interfaces.Home;
+import se.chalmers.tda367.team15.game.model.managers.PheromoneManager;
 import se.chalmers.tda367.team15.game.model.pheromones.Pheromone;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
-import se.chalmers.tda367.team15.game.model.pheromones.PheromoneSystem;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneType;
 
 public class FollowTrailBehavior extends AntBehavior {
@@ -21,21 +22,21 @@ public class FollowTrailBehavior extends AntBehavior {
     // Threshold as fraction of pheromone cell size (must be < 1 to avoid reaching
     // multiple cells)
     private static final float REACHED_THRESHOLD_FRACTION = 0.3f;
-    private GameWorld gameWorld;
-
+    private final Home home;
     private boolean returningToColony = false;
     private Pheromone lastPheromone = null;
     private Pheromone currentTarget = null;
     private float reachedThresholdSq;
+    private final PheromoneGridConverter converter;
 
-    public FollowTrailBehavior(Ant ant, GameWorld gameWorld) {
-        super(ant);
-        this.gameWorld = gameWorld;
+    public FollowTrailBehavior(Home home, EntityQuery entityQuery, Ant ant, PheromoneGridConverter converter) {
+        super(ant, entityQuery);
         // Calculate threshold based on pheromone cell size
-        float cellSize = ant.getSystem().getConverter().getPheromoneCellSize();
+        float cellSize = converter.getPheromoneCellSize();
         float threshold = cellSize * REACHED_THRESHOLD_FRACTION;
+        this.home = home;
         this.reachedThresholdSq = threshold * threshold;
-
+        this.converter = converter;
         String typeId = ant.getType().id();
         switch (typeId) {
             case "scout" -> {
@@ -54,9 +55,9 @@ public class FollowTrailBehavior extends AntBehavior {
     }
 
     @Override
-    public void update(PheromoneSystem system) {
+    public void update(PheromoneManager system) {
         if (enemiesInSight()) {
-            ant.setBehavior(new AttackBehavior(ant, ant.getPosition(), gameWorld));
+            ant.setBehavior(new AttackBehavior(home, ant, ant.getPosition(), entityQuery, converter));
             return;
         }
 
@@ -71,7 +72,7 @@ public class FollowTrailBehavior extends AntBehavior {
                     .orElse(null);
 
             if (lastPheromone == null) {
-                ant.setBehavior(new WanderBehavior(ant, gameWorld));
+                ant.setBehavior(new WanderBehavior(ant, home, entityQuery, converter));
                 return;
             }
         }
@@ -92,7 +93,7 @@ public class FollowTrailBehavior extends AntBehavior {
 
             // If still no target, we lost the trail
             if (currentTarget == null) {
-                ant.setBehavior(new WanderBehavior(ant, gameWorld));
+                ant.setBehavior(new WanderBehavior(ant, home, entityQuery, converter));
                 return;
             }
         }
@@ -109,7 +110,7 @@ public class FollowTrailBehavior extends AntBehavior {
         if (distSq > 0.001f) {
             // Scale speed based on distance to avoid overshooting
             float maxSpeed = ant.getSpeed() * SPEED_BOOST_ON_TRAIL;
-            float cellSize = ant.getSystem().getConverter().getPheromoneCellSize();
+            float cellSize = converter.getPheromoneCellSize();
             // Slow down when close to target to prevent overshooting
             float speed = Math.min(maxSpeed, Math.max(ant.getSpeed(), (float) Math.sqrt(distSq) / cellSize * maxSpeed));
             ant.setVelocity(diff.nor().scl(speed));
@@ -121,6 +122,10 @@ public class FollowTrailBehavior extends AntBehavior {
     }
 
     private Pheromone findNextPheromone(List<Pheromone> neighbors, boolean returning) {
+        if (lastPheromone == null) {
+            System.err.println("Last pheromone is null");
+            return null;
+        }
         int currentDist = lastPheromone.getDistance();
 
         List<Pheromone> candidates = neighbors.stream()
@@ -141,14 +146,12 @@ public class FollowTrailBehavior extends AntBehavior {
 
     private Vector2 getCenterPos(Pheromone p) {
         // Convert pheromone grid position to world position (center of cell)
-        PheromoneGridConverter converter = ant.getSystem().getConverter();
         return converter.pheromoneGridToWorld(p.getPosition());
     }
 
     @Override
     public void handleCollision() {
         returningToColony = true;
-        List<Pheromone> neighbors = ant.getSystem().getPheromonesIn3x3(ant.getGridPosition());
-        currentTarget = findNextPheromone(neighbors, returningToColony);
+        currentTarget = null;
     }
 }

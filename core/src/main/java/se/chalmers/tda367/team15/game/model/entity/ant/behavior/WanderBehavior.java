@@ -1,27 +1,27 @@
 package se.chalmers.tda367.team15.game.model.entity.ant.behavior;
 
-import java.sql.Time;
 import java.util.List;
 
 import com.badlogic.gdx.math.GridPoint2;
-
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import se.chalmers.tda367.team15.game.model.GameWorld;
-import se.chalmers.tda367.team15.game.model.SimulationHandler;
-import se.chalmers.tda367.team15.game.model.TimeCycle;
+
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
-import se.chalmers.tda367.team15.game.model.interfaces.TimeObserver;
+import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
+import se.chalmers.tda367.team15.game.model.interfaces.Home;
+import se.chalmers.tda367.team15.game.model.managers.PheromoneManager;
 import se.chalmers.tda367.team15.game.model.pheromones.Pheromone;
-import se.chalmers.tda367.team15.game.model.pheromones.PheromoneSystem;
+import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
 
 public class WanderBehavior extends AntBehavior{
-    private GameWorld gameWorld;
+    private final Home home;
+    private final PheromoneGridConverter converter;
 
-    public WanderBehavior(Ant ant, GameWorld world) {
-        super(ant);
-        this.gameWorld = world;
-
+    // TODO: we should not need to pass along everything to all behaviors
+    public WanderBehavior(Ant ant, Home home, EntityQuery entityQuery, PheromoneGridConverter converter) {
+        super(ant, entityQuery);
+        this.home = home;
+        this.converter = converter;
     }
 
     private void changeTrajectory() {
@@ -42,7 +42,7 @@ public class WanderBehavior extends AntBehavior{
     }
 
     private float getHomeTurn(float angle) {
-        Vector2 colonyPos = gameWorld.getColony().getPosition();
+        Vector2 colonyPos = home.getPosition();
         Vector2 antPos = ant.getPosition();
 
         // Direction from ant toward colony
@@ -65,10 +65,10 @@ public class WanderBehavior extends AntBehavior{
 
 
     @Override
-    public void update(PheromoneSystem system) {
+    public void update(PheromoneManager system) {
 
         if (enemiesInSight()) {
-            ant.setBehavior(new AttackBehavior(ant, ant.getPosition(), gameWorld));
+            ant.setBehavior(new AttackBehavior(home, ant, ant.getPosition(), entityQuery, converter));
             return;
         }
         changeTrajectory();
@@ -77,7 +77,7 @@ public class WanderBehavior extends AntBehavior{
         List<Pheromone> neighbors = system.getPheromonesIn3x3(gridPos);
 
         if (!neighbors.isEmpty()) {
-            ant.setBehavior(new FollowTrailBehavior(ant, gameWorld));
+            ant.setBehavior(new FollowTrailBehavior(home, entityQuery, ant, converter));
         }
 
     }

@@ -11,19 +11,12 @@ import java.util.Map;
  * Uses singleton pattern for global access.
  */
 public class AntTypeRegistry {
-    private static AntTypeRegistry instance;
     private final Map<String, AntType> types;
 
-    private AntTypeRegistry() {
+    public AntTypeRegistry() {
         this.types = new HashMap<>();
     }
 
-    public static AntTypeRegistry getInstance() {
-        if (instance == null) {
-            instance = new AntTypeRegistry();
-        }
-        return instance;
-    }
 
     /**
      * Registers a new ant type.
@@ -50,11 +43,5 @@ public class AntTypeRegistry {
 
     public boolean contains(String id) {
         return types.containsKey(id);
-    }
-
-    // Should be called when restarting the game to prevent duplicate registration
-    // errors.
-    public void clear() {
-        types.clear();
     }
 }

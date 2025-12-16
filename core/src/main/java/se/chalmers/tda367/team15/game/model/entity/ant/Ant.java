@@ -6,41 +6,42 @@ import com.badlogic.gdx.math.Vector2;
 
 import se.chalmers.tda367.team15.game.model.AttackCategory;
 import se.chalmers.tda367.team15.game.model.DestructionListener;
-import se.chalmers.tda367.team15.game.model.GameWorld;
 import se.chalmers.tda367.team15.game.model.entity.Entity;
 import se.chalmers.tda367.team15.game.model.entity.ant.behavior.AntBehavior;
 import se.chalmers.tda367.team15.game.model.entity.ant.behavior.WanderBehavior;
 import se.chalmers.tda367.team15.game.model.faction.Faction;
 import se.chalmers.tda367.team15.game.model.interfaces.CanBeAttacked;
+import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
 import se.chalmers.tda367.team15.game.model.interfaces.Home;
 import se.chalmers.tda367.team15.game.model.interfaces.VisionProvider;
+import se.chalmers.tda367.team15.game.model.managers.PheromoneManager;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
-import se.chalmers.tda367.team15.game.model.pheromones.PheromoneSystem;
+import se.chalmers.tda367.team15.game.model.world.MapProvider;
 
 public class Ant extends Entity implements VisionProvider, CanBeAttacked {
     AntType type;
     private final int visionRadius = 8;
-    protected Faction faction;
+    protected final Faction faction;
+    private final Home home;
     private final int hunger;
 
     // Stats from AntType
     private final float speed;
     private final String baseTextureName;
-    private GameWorld gameWorld;
+    private final Inventory inventory;
+    private final DestructionListener destructionListener;
+    private final PheromoneManager system;
+
     private AntBehavior behavior;
-    private PheromoneSystem system;
-
     private float health;
-    private Inventory inventory;
 
-    public Ant(Vector2 position, PheromoneSystem system, AntType type, GameWorld gameWorld) {
+    public Ant(Vector2 position, PheromoneManager system, AntType type, MapProvider map, Home home, EntityQuery entityQuery, DestructionListener destructionListener) {
         super(position, type.textureName());
         this.type = type;
-        this.gameWorld = gameWorld;
-        this.behavior = new WanderBehavior(this, gameWorld);
+        this.behavior = new WanderBehavior(this, home, entityQuery, system.getConverter());
         this.system = system;
         this.hunger = 2; // test value
-
+        this.home = home;
         // Initialize from AntType
         this.speed = type.moveSpeed();
         this.health = type.maxHealth();
@@ -49,7 +50,8 @@ public class Ant extends Entity implements VisionProvider, CanBeAttacked {
 
         pickRandomDirection();
         this.faction = Faction.DEMOCRATIC_REPUBLIC_OF_ANTS;
-        setMovementStrategy(new AntMovementStrategy(gameWorld.getWorldMap()));
+        setMovementStrategy(new AntMovementStrategy(map));
+        this.destructionListener = destructionListener;
     }
 
     public void pickRandomDirection() {
@@ -95,10 +97,6 @@ public class Ant extends Entity implements VisionProvider, CanBeAttacked {
         return converter.worldToPheromoneGrid(position);
     }
 
-    public PheromoneSystem getSystem() {
-        return system;
-    }
-
     public Inventory getInventory() {
         return inventory;
     }
@@ -133,6 +131,10 @@ public class Ant extends Entity implements VisionProvider, CanBeAttacked {
         return visionRadius;
     }
 
+    public Home getHome() {
+        return home;
+    }
+
     @Override
     public Faction getFaction() {
         return faction;
@@ -148,15 +150,11 @@ public class Ant extends Entity implements VisionProvider, CanBeAttacked {
 
     @Override
     public void die() {
-        DestructionListener.getInstance().notifyEntityDeathObservers(this);
+        destructionListener.notifyEntityDeathObservers(this);
     }
 
     @Override
     public AttackCategory getAttackCategory() {
         return AttackCategory.WORKER_ANT;
-    }
-
-    public GameWorld getGameWorld() {
-        return gameWorld;
     }
 }

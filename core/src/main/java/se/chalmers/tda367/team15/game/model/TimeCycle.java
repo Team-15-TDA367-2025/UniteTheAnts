@@ -1,46 +1,48 @@
 package se.chalmers.tda367.team15.game.model;
 
 import se.chalmers.tda367.team15.game.model.interfaces.TimeObserver;
+import se.chalmers.tda367.team15.game.model.interfaces.Updatable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TimeCycle  {
+public class TimeCycle implements Updatable {
     private int minutes;
-    private int ticksPerMinute;
+    private final float timePerMinute;
     private final List<TimeObserver> timeObservers = new ArrayList<>();
 
-    private int tickCountDown;
+    private float timeSinceLastMinute = 0;
+
     public record GameTime(int totalDays, int currentHour, int currentMinute, int ticks) {
     }
 
-    public TimeCycle(int ticksPerMinute) {
-        this.ticksPerMinute = ticksPerMinute;
-        tickCountDown= ticksPerMinute;
+    public TimeCycle(float timePerMinute) {
         this.minutes = 0;
-
+        this.timePerMinute = timePerMinute;
     }
 
+    @Override
+    public void update(float deltaTime) {
+        timeSinceLastMinute += deltaTime;
+        if (timeSinceLastMinute >= timePerMinute) {
+            timeSinceLastMinute = 0;
+            boolean oldIsDay = getIsDay();
+            minutes++;
+            boolean newIsDay = getIsDay();
 
-    public void tick() {
-            tickCountDown--;
-            if(tickCountDown==0) {
-                tickCountDown=ticksPerMinute;
-                boolean oldIsDay = getIsDay();
-                minutes++;
-                boolean newIsDay = getIsDay();
+            for (TimeObserver observer : timeObservers) {
+                observer.onMinute();
 
-                if(oldIsDay && !newIsDay) {
-                    for (TimeObserver observer : timeObservers) {
-                        observer.onNightStart();
-                    }
+                if (oldIsDay && !newIsDay) {
+                    observer.onNightStart();
+
                 }
-                if(!oldIsDay && newIsDay) {
-                    for (TimeObserver observer : timeObservers) {
-                        observer.onDayStart();
-                    }
+                if (!oldIsDay && newIsDay) {
+                    observer.onDayStart();
                 }
             }
+
+        }
     }
 
     public void addTimeObserver(TimeObserver observer) {
@@ -61,14 +63,6 @@ public class TimeCycle  {
 
     public int getMinute() {
         return getTotalMinutes() % 60;
-    }
-
-    public void setTicksPerMinute(int ticksPerMinute) {
-        this.ticksPerMinute = ticksPerMinute;
-    }
-
-    public int getTicksPerMinute() {
-        return ticksPerMinute;
     }
 
     public GameTime getGameTime() {

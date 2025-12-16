@@ -3,19 +3,38 @@ package se.chalmers.tda367.team15.game.screens.game;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 
-import se.chalmers.tda367.team15.game.controller.*;
+import se.chalmers.tda367.team15.game.controller.CameraController;
+import se.chalmers.tda367.team15.game.controller.HudController;
+import se.chalmers.tda367.team15.game.controller.InputManager;
+import se.chalmers.tda367.team15.game.controller.PheromoneController;
+import se.chalmers.tda367.team15.game.controller.SpeedController;
+import se.chalmers.tda367.team15.game.model.AntFactory;
+import se.chalmers.tda367.team15.game.model.DestructionListener;
+import se.chalmers.tda367.team15.game.model.EnemyFactory;
 import se.chalmers.tda367.team15.game.model.GameModel;
-import se.chalmers.tda367.team15.game.model.GameWorld;
-import se.chalmers.tda367.team15.game.model.SimulationHandler;
 import se.chalmers.tda367.team15.game.model.TimeCycle;
 import se.chalmers.tda367.team15.game.model.camera.CameraConstraints;
 import se.chalmers.tda367.team15.game.model.camera.CameraModel;
+import se.chalmers.tda367.team15.game.model.egg.EggManager;
+import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntType;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntTypeRegistry;
+import se.chalmers.tda367.team15.game.model.fog.FogManager;
+import se.chalmers.tda367.team15.game.model.interfaces.Home;
+import se.chalmers.tda367.team15.game.model.managers.EntityManager;
+import se.chalmers.tda367.team15.game.model.managers.PheromoneManager;
+import se.chalmers.tda367.team15.game.model.managers.ResourceManager;
+import se.chalmers.tda367.team15.game.model.managers.SimulationManager;
+import se.chalmers.tda367.team15.game.model.managers.StructureManager;
+import se.chalmers.tda367.team15.game.model.managers.WaveManager;
+import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
+import se.chalmers.tda367.team15.game.model.structure.Colony;
 import se.chalmers.tda367.team15.game.model.world.TerrainFactory;
 import se.chalmers.tda367.team15.game.model.world.TerrainGenerator;
+import se.chalmers.tda367.team15.game.model.world.WorldMap;
 import se.chalmers.tda367.team15.game.view.TextureRegistry;
 import se.chalmers.tda367.team15.game.view.camera.CameraView;
 import se.chalmers.tda367.team15.game.view.camera.ViewportListener;
@@ -39,14 +58,9 @@ public class GameFactory {
     }
 
     public static GameScreen createGameScreen(Game game) {
-        // 0. Initialize ant types (must happen before models)
-        initializeAntTypes();
-
         // 1. Create Models
         CameraModel cameraModel = createCameraModel();
         GameModel gameModel = createGameModel();
-
-        gameModel.spawnInitialAnts();
 
         // 2. Create Resources
         TextureRegistry textureRegistry = new TextureRegistry();
@@ -55,8 +69,8 @@ public class GameFactory {
 
         // 3. Create Views
         CameraView cameraView = createCameraView(cameraModel);
-        WorldRenderer sceneView = new WorldRenderer(cameraView, textureRegistry, gameModel);
-        PheromoneRenderer pheromoneView = new PheromoneRenderer(cameraView, gameModel.getPheromoneSystem());
+        WorldRenderer sceneView = new WorldRenderer(cameraView, textureRegistry, gameModel, gameModel.getFogProvider());
+        PheromoneRenderer pheromoneView = new PheromoneRenderer(cameraView, gameModel.getPheromoneManager());
         HudView hudView = new HudView(hudBatch, uiFactory);
 
         // 4. Create Controllers
@@ -64,7 +78,9 @@ public class GameFactory {
         CameraController cameraController = new CameraController(cameraModel, cameraView);
         PheromoneController pheromoneController = new PheromoneController(gameModel, cameraView);
         SpeedController speedController = new SpeedController(gameModel);
-        HudController hudController = new HudController(hudView, gameModel, pheromoneController, speedController, uiFactory);
+        HudController hudController = new HudController(hudView, gameModel.getAntTypeRegistry(),
+                gameModel.getEggManager(), pheromoneController, speedController,
+                uiFactory, gameModel.getTimeCycle(), gameModel.getColonyUsageProvider());
 
         // 5. Wire Input
         inputManager.addProcessor(cameraController);
@@ -99,14 +115,68 @@ public class GameFactory {
     }
 
     private static GameModel createGameModel() {
-        TimeCycle timeCycle = new TimeCycle(TICKS_PER_MINUTE);
-        TerrainGenerator terrainGenerator = TerrainFactory.createStandardPerlinGenerator(
-            System.currentTimeMillis()
-        );
-        SimulationHandler simulationHandler = new SimulationHandler(timeCycle);
-        GameWorld gameWorld = new GameWorld(simulationHandler, MAP_WIDTH, MAP_HEIGHT, terrainGenerator);
+        AntTypeRegistry antTypeRegistry = createAntTypeRegistry();
 
-        return new GameModel(timeCycle, simulationHandler, gameWorld);
+        TerrainGenerator terrainGenerator = TerrainFactory.createStandardPerlinGenerator(
+                System.currentTimeMillis());
+        // TODO: break this down
+        SimulationManager simulationManager = new SimulationManager();
+        TimeCycle timeCycle = new TimeCycle(1f / TICKS_PER_MINUTE);
+        simulationManager.addUpdateObserver(timeCycle);
+
+        DestructionListener destructionListener = new DestructionListener();
+        EntityManager entityManager = new EntityManager();
+        simulationManager.addUpdateObserver(entityManager);
+        destructionListener.addEntityDeathObserver(entityManager);
+
+        StructureManager structureManager = new StructureManager();
+        simulationManager.addUpdateObserver(structureManager);
+        destructionListener.addStructureDeathObserver(structureManager);
+
+        ResourceManager resourceManager = new ResourceManager(entityManager, structureManager);
+        simulationManager.addUpdateObserver(resourceManager);
+
+        WorldMap worldMap = new WorldMap(MAP_WIDTH, MAP_HEIGHT, terrainGenerator);
+
+        EnemyFactory enemyFactory = new EnemyFactory(entityManager, structureManager, destructionListener);
+        FogManager fogManager = new FogManager(entityManager, worldMap);
+        simulationManager.addUpdateObserver(fogManager);
+        PheromoneGridConverter pheromoneGridConverter = new PheromoneGridConverter(4);
+
+        PheromoneManager pheromoneManager = new PheromoneManager(new GridPoint2(0, 0), pheromoneGridConverter, 4);
+        AntFactory antFactory = new AntFactory(pheromoneManager, worldMap, entityManager,
+                destructionListener);
+
+        EggManager eggManager = new EggManager(antTypeRegistry, antFactory);
+        timeCycle.addTimeObserver(eggManager);
+
+        Colony colony = createColony(timeCycle, entityManager, eggManager,
+                structureManager, destructionListener);
+
+        spawnInitialAnts(entityManager, colony, antFactory, antTypeRegistry);
+
+        WaveManager waveManager = new WaveManager(enemyFactory, entityManager);
+        timeCycle.addTimeObserver(waveManager);
+
+        return new GameModel(simulationManager, timeCycle, fogManager, colony,
+                pheromoneManager, worldMap, antTypeRegistry, structureManager, entityManager);
+    }
+
+    public static void spawnInitialAnts(EntityManager entityManager, Home home, AntFactory antFactory,
+            AntTypeRegistry antTypeRegistry) {
+        AntType type = antTypeRegistry.get("worker");
+        Ant ant = antFactory.createAnt(home, type);
+        entityManager.addEntity(ant);
+    }
+
+    private static Colony createColony(TimeCycle timeCycle,
+            EntityManager entityManager, EggManager eggManager, StructureManager structureManager,
+            DestructionListener destructionListener) {
+        Colony colony = new Colony(new GridPoint2(0, 0), timeCycle, entityManager, eggManager,
+                entityManager, destructionListener);
+        structureManager.addStructure(colony);
+        eggManager.addObserver(colony);
+        return colony;
     }
 
     private static CameraView createCameraView(CameraModel cameraModel) {
@@ -125,10 +195,8 @@ public class GameFactory {
      * This must be called before creating GameModel to ensure ant types are
      * available.
      */
-    private static void initializeAntTypes() {
-        AntTypeRegistry registry = AntTypeRegistry.getInstance();
-        registry.clear();
-
+    private static AntTypeRegistry createAntTypeRegistry() {
+        AntTypeRegistry registry = new AntTypeRegistry();
         // Scout: High speed, low HP, 0 capacity, cheap/fast to hatch
         registry.register(new AntType(
                 "scout",
@@ -164,5 +232,7 @@ public class GameFactory {
                 10, // Capacity
                 "ant" // Texture
         ));
+
+        return registry;
     }
 }

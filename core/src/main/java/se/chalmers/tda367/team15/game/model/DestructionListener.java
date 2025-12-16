@@ -12,20 +12,12 @@ import se.chalmers.tda367.team15.game.model.structure.Structure;
  * is destroyed.
  */
 public class DestructionListener {
-    static DestructionListener destructionListener;
-    private LinkedHashSet<EntityDeathObserver> entityObservers;
-    private LinkedHashSet<StructureDeathObserver> structureDeathObservers;
+    private final LinkedHashSet<EntityDeathObserver> entityObservers;
+    private final LinkedHashSet<StructureDeathObserver> structureDeathObservers;
 
-    private DestructionListener() {
+    public DestructionListener() {
         this.entityObservers = new LinkedHashSet<>();
-        structureDeathObservers = new LinkedHashSet<>();
-    }
-
-    static public DestructionListener getInstance() {
-        if (destructionListener == null) {
-            destructionListener = new DestructionListener();
-        }
-        return destructionListener;
+        this.structureDeathObservers = new LinkedHashSet<>();
     }
 
     public void addEntityDeathObserver(EntityDeathObserver obs) {
