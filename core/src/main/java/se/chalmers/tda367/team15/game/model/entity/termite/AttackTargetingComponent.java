@@ -17,13 +17,11 @@ public class AttackTargetingComponent {
     EntityQuery entityQuery;
     StructureManager structureManager;
     HashMap<AttackCategory, Integer> targetPriority;
-    private final int visionRadius;
-    AttackTargetingComponent(CanAttack canAttack, EntityQuery entityQuery, StructureManager structureManager, HashMap<AttackCategory, Integer> targetPriority, int visionRadius) {
+    AttackTargetingComponent(CanAttack canAttack, EntityQuery entityQuery, StructureManager structureManager, HashMap<AttackCategory, Integer> targetPriority) {
         this.canAttack = canAttack;
         this.entityQuery = entityQuery;
         this.structureManager=structureManager;
         this.targetPriority = targetPriority;
-        this.visionRadius=visionRadius;
     }
 
     /**
@@ -58,10 +56,10 @@ public class AttackTargetingComponent {
         return target;
     }
 
-    List<CanBeAttacked> potentialTargets() {
+   private List<CanBeAttacked> potentialTargets() {
         List<CanBeAttacked> targets = entityQuery.getEntitiesOfType(CanBeAttacked.class);
         targets.removeIf(t -> t.getFaction() == canAttack.getFaction());
-        targets.removeIf(t -> t.getPosition().dst(canAttack.getPosition()) > CanAttack.getVisionRadius());
+        targets.removeIf(t -> t.getPosition().dst(canAttack.getPosition()) > canAttack.getVisionRadius());
         return targets;
     }
 }

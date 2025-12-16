@@ -23,7 +23,7 @@ public class Termite extends Entity implements CanBeAttacked {
     private final int visionRadius = 8;
     private final Faction faction = Faction.TERMITE_PROTECTORATE;
 
-    private final TermiteBehavior termiteBehaviour;
+    private final TermiteBehaviourManager termiteBehaviourManager;
     private AttackComponent attackComponent = new AttackComponent(5, 1000, 2.0f, this);
     private final float MAX_HEALTH = 1;
     private float health;
@@ -31,12 +31,12 @@ public class Termite extends Entity implements CanBeAttacked {
     private final StructureManager structureManager;
     private final DestructionListener destructionListener;
 
-    public Termite(Vector2 position, EntityQuery entityQuery, StructureManager structureManager, DestructionListener destructionListener, HashMap<AttackCategory, Integer> targetPriority) {
+    public Termite(Vector2 position, EntityQuery entityQuery, StructureManager structureManager, DestructionListener destructionListener, TermiteBehaviourManager termiteBehaviorManager) {
         super(position, "termite");
         this.destructionListener = destructionListener;
         this.entityQuery = entityQuery;
         this.structureManager = structureManager;
-        this.termiteBehaviour = new TermiteBehaviorManager(this,entityQuery,structureManager,targetPriority);
+        this.termiteBehaviourManager = termiteBehaviorManager;
         health = MAX_HEALTH;
         this.SPEED = 2.9f;
     }
@@ -47,7 +47,7 @@ public class Termite extends Entity implements CanBeAttacked {
      */
     @Override
     public void update(float deltaTime) {
-             .update();
+        termiteBehaviourManager.update();
         super.update(deltaTime);
 
     }
