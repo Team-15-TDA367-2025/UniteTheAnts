@@ -1,5 +1,7 @@
 package se.chalmers.tda367.team15.game.screens.game;
 
+import java.util.Set;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -31,6 +33,7 @@ import se.chalmers.tda367.team15.game.model.managers.SimulationManager;
 import se.chalmers.tda367.team15.game.model.managers.StructureManager;
 import se.chalmers.tda367.team15.game.model.managers.WaveManager;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
+import se.chalmers.tda367.team15.game.model.pheromones.PheromoneType;
 import se.chalmers.tda367.team15.game.model.structure.Colony;
 import se.chalmers.tda367.team15.game.model.world.TerrainFactory;
 import se.chalmers.tda367.team15.game.model.world.TerrainGenerator;
@@ -208,7 +211,9 @@ public class GameFactory {
                 4f, // Max Health
                 8f, // Speed
                 0, // Capacity
-                "scout" // Texture
+                "scout", // Texture
+                Set.of(PheromoneType.EXPLORE), // Allowed pheromones
+                0.02f // Low home bias - scouts wander far
         ));
 
         // Soldier: Low speed, high HP, 0 capacity, expensive
@@ -220,7 +225,9 @@ public class GameFactory {
                 20f, // Max Health
                 2f, // Speed
                 0, // Capacity
-                "ant" // Texture
+                "ant", // Texture
+                Set.of(PheromoneType.ATTACK), // Allowed pheromones
+                0.05f // Medium home bias
         ));
 
         // Worker: Medium speed, medium HP, some capacity
@@ -232,7 +239,9 @@ public class GameFactory {
                 6f, // Max Health
                 5f, // Speed
                 10, // Capacity
-                "ant" // Texture
+                "ant", // Texture
+                Set.of(PheromoneType.GATHER), // Allowed pheromones
+                0.05f // Medium home bias
         ));
 
         return registry;

@@ -13,11 +13,8 @@ import se.chalmers.tda367.team15.game.model.interfaces.Home;
 import se.chalmers.tda367.team15.game.model.managers.PheromoneManager;
 import se.chalmers.tda367.team15.game.model.pheromones.Pheromone;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
-import se.chalmers.tda367.team15.game.model.pheromones.PheromoneType;
 
 public class FollowTrailBehavior extends AntBehavior {
-    private final PheromoneType allowedType;
-
     private static final float SPEED_BOOST_ON_TRAIL = 1.5f;
     // Threshold as fraction of pheromone cell size (must be < 1 to avoid reaching
     // multiple cells)
@@ -37,23 +34,6 @@ public class FollowTrailBehavior extends AntBehavior {
         this.home = home;
         this.reachedThresholdSq = threshold * threshold;
         this.converter = converter;
-        String typeId = ant.getType().id();
-        // TODO - Antigravity: OCP violation - move type-to-pheromone mapping to AntType
-        // instead of switch on string
-        switch (typeId) {
-            case "scout" -> {
-                allowedType = PheromoneType.EXPLORE;
-            }
-            case "soldier" -> {
-                allowedType = PheromoneType.ATTACK;
-            }
-            case "worker" -> {
-                allowedType = PheromoneType.GATHER;
-            }
-            default -> {
-                allowedType = PheromoneType.EXPLORE;
-            }
-        }
     }
 
     @Override
@@ -64,7 +44,7 @@ public class FollowTrailBehavior extends AntBehavior {
         }
 
         List<Pheromone> neighbors = system.getPheromonesIn3x3(ant.getGridPosition()).stream()
-                .filter(p -> p.getType() == allowedType)
+                .filter(p -> ant.getType().allowedPheromones().contains(p.getType()))
                 .collect(Collectors.toList());
 
         // 1. Initialization / Re-anchoring
