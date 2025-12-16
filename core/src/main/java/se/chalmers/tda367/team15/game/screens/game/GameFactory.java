@@ -127,9 +127,6 @@ public class GameFactory {
         simulationHandler.addUpdateObserver(entityManager);
         destructionListener.addEntityDeathObserver(entityManager);
 
-        EggManager eggManager = new EggManager(antTypeRegistry);
-        timeCycle.addTimeObserver(eggManager);
-
         StructureManager structureManager = new StructureManager();
         simulationHandler.addUpdateObserver(structureManager);
         destructionListener.addStructureDeathObserver(structureManager);
@@ -153,15 +150,20 @@ public class GameFactory {
         AntFactory antFactory = new AntFactory(pheromoneSystem, worldMap, entityManager,
                 destructionListener);
 
+        EggManager eggManager = new EggManager(antTypeRegistry, antFactory);
+        timeCycle.addTimeObserver(eggManager);
+
         Colony colony = createColony(pheromoneSystem, gameWorld, timeCycle, entityManager, eggManager,
                 structureManager, antFactory, destructionListener);
 
         spawnInitialAnts(entityManager, colony, antFactory, antTypeRegistry);
 
-        return new GameModel(simulationHandler, timeCycle, gameWorld, fogSystem, entityManager, colony, enemyFactory, pheromoneSystem, worldMap, antTypeRegistry);
+        return new GameModel(simulationHandler, timeCycle, gameWorld, fogSystem, entityManager, colony, enemyFactory,
+                pheromoneSystem, worldMap, antTypeRegistry);
     }
 
-    public static void spawnInitialAnts(EntityManager entityManager, Home home, AntFactory antFactory, AntTypeRegistry antTypeRegistry) {
+    public static void spawnInitialAnts(EntityManager entityManager, Home home, AntFactory antFactory,
+            AntTypeRegistry antTypeRegistry) {
         AntType type = antTypeRegistry.get("worker");
         Ant ant = antFactory.createAnt(home, type);
         entityManager.addEntity(ant);
@@ -170,7 +172,7 @@ public class GameFactory {
     private static Colony createColony(PheromoneSystem pheromoneSystem, GameWorld gameWorld, TimeCycle timeCycle,
             EntityManager entityManager, EggManager eggManager, StructureManager structureManager,
             AntFactory antFactory, DestructionListener destructionListener) {
-        Colony colony = new Colony(new GridPoint2(0, 0), timeCycle, entityManager, eggManager, antFactory,
+        Colony colony = new Colony(new GridPoint2(0, 0), timeCycle, entityManager, eggManager,
                 entityManager, destructionListener);
         structureManager.addStructure(colony);
         eggManager.addObserver(colony);

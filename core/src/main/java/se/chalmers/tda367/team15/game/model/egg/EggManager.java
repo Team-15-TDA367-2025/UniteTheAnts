@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import se.chalmers.tda367.team15.game.model.AntFactory;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntType;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntTypeRegistry;
 import se.chalmers.tda367.team15.game.model.interfaces.TimeObserver;
@@ -16,9 +17,11 @@ public class EggManager implements TimeObserver {
     private final List<Egg> eggs;
     private final List<EggHatchObserver> observers;
     private final AntTypeRegistry antTypeRegistry;
+    private final AntFactory antFactory;
 
-    public EggManager(AntTypeRegistry antTypeRegistry) {
+    public EggManager(AntTypeRegistry antTypeRegistry, AntFactory antFactory) {
         this.antTypeRegistry = antTypeRegistry;
+        this.antFactory = antFactory;
         this.eggs = new ArrayList<>();
         this.observers = new ArrayList<>();
     }
@@ -48,7 +51,7 @@ public class EggManager implements TimeObserver {
                 }
 
                 for (EggHatchObserver observer : observers) {
-                    observer.onEggHatch(type);
+                    observer.onEggHatch(antFactory, type);
                 }
             }
         }

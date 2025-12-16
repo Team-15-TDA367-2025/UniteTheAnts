@@ -27,10 +27,10 @@ public class Colony extends Structure implements CanBeAttacked, Home, EggHatchOb
     private float MAX_HEALTH = 600;
     private Faction faction;
     private final EntityQuery entityQuery;
-    private final AntFactory antFactory;
     private final EntityManager entityManager;
     private final DestructionListener destructionListener;
-    public Colony(GridPoint2 position, TimeCycle timeCycle, EntityQuery entityQuery, EggManager eggManager, AntFactory antFactory, EntityManager entityManager, DestructionListener destructionListener) {
+
+    public Colony(GridPoint2 position, TimeCycle timeCycle, EntityQuery entityQuery, EggManager eggManager, EntityManager entityManager, DestructionListener destructionListener) {
         super(position, "colony", 4);
         this.health = MAX_HEALTH;
         this.faction = Faction.DEMOCRATIC_REPUBLIC_OF_ANTS;
@@ -38,7 +38,6 @@ public class Colony extends Structure implements CanBeAttacked, Home, EggHatchOb
         this.eggManager = eggManager;
         this.eggManager.addObserver(this);
         this.entityQuery = entityQuery;
-        this.antFactory = antFactory;
         this.entityManager = entityManager;
         timeCycle.addTimeObserver(this);
         this.destructionListener = destructionListener;
@@ -100,8 +99,9 @@ public class Colony extends Structure implements CanBeAttacked, Home, EggHatchOb
     }
 
     @Override
-    public void onEggHatch(AntType type) {
-        Ant ant = this.antFactory.createAnt(this, type);
+    public void onEggHatch(AntFactory factory, AntType type) {
+        // TODO: Kinda violates SRP
+        Ant ant = factory.createAnt(this, type);
         this.entityManager.addEntity(ant);
     }
 
