@@ -12,7 +12,7 @@ import se.chalmers.tda367.team15.game.model.entity.Entity;
 import se.chalmers.tda367.team15.game.model.faction.Faction;
 import se.chalmers.tda367.team15.game.model.interfaces.CanBeAttacked;
 import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
-import se.chalmers.tda367.team15.game.model.managers.StructureManager;
+import se.chalmers.tda367.team15.game.model.interfaces.StructureProvider;
 import se.chalmers.tda367.team15.game.model.structure.Structure;
 
 /**
@@ -29,14 +29,14 @@ public class Termite extends Entity implements CanBeAttacked {
     private final float MAX_HEALTH = 1;
     private float health;
     private final EntityQuery entityQuery;
-    private final StructureManager structureManager;
+    private final StructureProvider structureProvider;
     private final DestructionListener destructionListener;
 
-    public Termite(Vector2 position, EntityQuery entityQuery, StructureManager structureManager, DestructionListener destructionListener) {
+    public Termite(Vector2 position, EntityQuery entityQuery, StructureProvider structureProvider, DestructionListener destructionListener) {
         super(position, "termite");
         this.destructionListener = destructionListener;
         this.entityQuery = entityQuery;
-        this.structureManager = structureManager;
+        this.structureProvider = structureProvider;
         this.termiteBehaviour = new TermiteBehavior(this);
         health = MAX_HEALTH;
     }
@@ -48,7 +48,7 @@ public class Termite extends Entity implements CanBeAttacked {
     @Override
     public void update(float deltaTime) {
         List<Entity> entities = entityQuery.getEntitiesOfType(Entity.class);
-        List<Structure> structures = structureManager.getStructures();
+        List<Structure> structures = structureProvider.getStructures();
         AttackTarget target = termiteBehaviour.update(entities, structures);
         super.update(deltaTime);
         if (target != null) {
