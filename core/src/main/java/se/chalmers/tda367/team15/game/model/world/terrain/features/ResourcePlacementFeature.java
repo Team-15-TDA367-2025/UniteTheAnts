@@ -16,7 +16,7 @@ import se.chalmers.tda367.team15.game.model.world.terrain.TerrainGenerationConte
  * Places resource nucleation points and ensures they are on valid ground.
  */
 public class ResourcePlacementFeature implements TerrainFeature {
-    
+
     private final int nucleationCount;
     private final int nucleationRadius;
     private final int nucleationMinDistance;
@@ -58,7 +58,11 @@ public class ResourcePlacementFeature implements TerrainFeature {
 
         // 3. Register Spawns and Apply Zone Textures
         for (GridPoint2 point : points) {
-            context.addStructureSpawn(new StructureSpawn(point, "resource_node"));
+            StructureSpawn structureSpawn = new StructureSpawn(point, "resource_node");
+
+            structureSpawn.getProperties().put("amount", 10);
+
+            context.addStructureSpawn(structureSpawn);
             applyNucleationZone(context, point);
         }
     }

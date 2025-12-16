@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 
+import com.badlogic.gdx.math.Vector2;
 import se.chalmers.tda367.team15.game.controller.CameraController;
 import se.chalmers.tda367.team15.game.controller.HudController;
 import se.chalmers.tda367.team15.game.controller.InputManager;
@@ -32,9 +33,13 @@ import se.chalmers.tda367.team15.game.model.managers.StructureManager;
 import se.chalmers.tda367.team15.game.model.managers.WaveManager;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
 import se.chalmers.tda367.team15.game.model.structure.Colony;
+import se.chalmers.tda367.team15.game.model.structure.resource.ResourceNode;
+import se.chalmers.tda367.team15.game.model.structure.resource.ResourceType;
+import se.chalmers.tda367.team15.game.model.world.MapProvider;
 import se.chalmers.tda367.team15.game.model.world.TerrainFactory;
 import se.chalmers.tda367.team15.game.model.world.TerrainGenerator;
 import se.chalmers.tda367.team15.game.model.world.WorldMap;
+import se.chalmers.tda367.team15.game.model.world.terrain.StructureSpawn;
 import se.chalmers.tda367.team15.game.view.TextureRegistry;
 import se.chalmers.tda367.team15.game.view.camera.CameraView;
 import se.chalmers.tda367.team15.game.view.camera.ViewportListener;
@@ -155,6 +160,8 @@ public class GameFactory {
 
         spawnInitialAnts(entityManager, colony, antFactory, antTypeRegistry);
 
+        spawnTerrainStructures(structureManager, worldMap);
+
         WaveManager waveManager = new WaveManager(enemyFactory, entityManager);
         timeCycle.addTimeObserver(waveManager);
 
@@ -167,6 +174,27 @@ public class GameFactory {
         AntType type = antTypeRegistry.get("worker");
         Ant ant = antFactory.createAnt(home, type);
         entityManager.addEntity(ant);
+    }
+
+    /**
+     * Spawns structures determined by terrain generation features.
+     */
+    private static void spawnTerrainStructures(StructureManager structureManager, MapProvider map) {
+        for (StructureSpawn spawn : map.getStructureSpawns()) {
+            if ("resource_node".equals(spawn.getType())) {
+                Vector2 structurePos = map.tileToWorld(spawn.getPosition());
+                GridPoint2 worldGridPos = new GridPoint2((int) structurePos.x, (int) structurePos.y);
+
+                structureManager.addStructure(new ResourceNode(
+                    worldGridPos,
+                    "node",
+                    1,
+                    ResourceType.FOOD,
+                    (Integer) spawn.getProperties().get("amount"),
+                    20));
+            }
+            // Add other structure types here
+        }
     }
 
     private static Colony createColony(TimeCycle timeCycle,
