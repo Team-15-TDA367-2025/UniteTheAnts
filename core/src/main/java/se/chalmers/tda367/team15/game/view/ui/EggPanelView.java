@@ -26,12 +26,14 @@ public class EggPanelView {
     private final Table panelTable;
     private final HorizontalGroup eggTypeGroup;
     private final ColonyDataProvider colonyDataProvider;
+    private final AntTypeRegistry antTypeRegistry;
 
-    public EggPanelView(UiFactory uiFactory, EggController eggController, EggManager eggManager, ColonyDataProvider colonyDataProvider) {
+    public EggPanelView(UiFactory uiFactory, EggController eggController, EggManager eggManager, ColonyDataProvider colonyDataProvider, AntTypeRegistry antTypeRegistry) {
         this.uiFactory = uiFactory;
         this.eggController = eggController;
         this.eggManager = eggManager;
         this.colonyDataProvider = colonyDataProvider;
+        this.antTypeRegistry = antTypeRegistry;
         panelTable = new Table();
         // No background - this panel is embedded in BottomBarView which has its own
         // background
@@ -48,9 +50,7 @@ public class EggPanelView {
      * Dynamically builds purchase buttons for all registered ant types.
      */
     private void buildEggTypeButtons() {
-        AntTypeRegistry registry = AntTypeRegistry.getInstance();
-
-        for (AntType type : registry.getAll()) {
+        for (AntType type : antTypeRegistry.getAll()) {
             Table eggTypeContainer = createEggTypeButton(type);
             eggTypeGroup.addActor(eggTypeContainer);
         }
@@ -128,7 +128,7 @@ public class EggPanelView {
                 }
 
                 // Update button enabled state based on resources
-                AntType type = AntTypeRegistry.getInstance().get(state.typeId);
+                AntType type = antTypeRegistry.get(state.typeId);
                 if (type != null) {
                     boolean canAfford = colonyDataProvider.getTotalResources(ResourceType.FOOD) >= type.foodCost();
                     button.setDisabled(!canAfford);

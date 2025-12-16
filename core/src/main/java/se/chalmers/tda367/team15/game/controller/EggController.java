@@ -2,7 +2,6 @@ package se.chalmers.tda367.team15.game.controller;
 
 import se.chalmers.tda367.team15.game.model.GameModel;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntType;
-import se.chalmers.tda367.team15.game.model.entity.ant.AntTypeRegistry;
 
 public class EggController {
     private final GameModel model;
@@ -18,8 +17,8 @@ public class EggController {
      * @return true if the purchase was successful, false otherwise
      */
     public boolean purchaseEgg(String typeId) {
-        AntTypeRegistry registry = AntTypeRegistry.getInstance();
-        AntType type = registry.get(typeId);
+        //TODO: this is kinda ugly
+        AntType type = model.getAntTypeRegistry().get(typeId);
 
         if (type == null) {
             return false;

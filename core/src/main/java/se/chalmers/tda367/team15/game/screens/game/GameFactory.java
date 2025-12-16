@@ -55,9 +55,6 @@ public class GameFactory {
     }
 
     public static GameScreen createGameScreen(Game game) {
-        // 0. Initialize ant types (must happen before models)
-        initializeAntTypes();
-
         // 1. Create Models
         CameraModel cameraModel = createCameraModel();
         GameModel gameModel = createGameModel();
@@ -117,6 +114,8 @@ public class GameFactory {
     }
 
     private static GameModel createGameModel() {
+        AntTypeRegistry antTypeRegistry = createAntTypeRegistry();
+
         TimeCycle timeCycle = new TimeCycle(TICKS_PER_MINUTE);
         TerrainGenerator terrainGenerator = TerrainFactory.createStandardPerlinGenerator(
                 System.currentTimeMillis());
@@ -128,7 +127,7 @@ public class GameFactory {
         simulationHandler.addUpdateObserver(entityManager);
         destructionListener.addEntityDeathObserver(entityManager);
 
-        EggManager eggManager = new EggManager();
+        EggManager eggManager = new EggManager(antTypeRegistry);
         timeCycle.addTimeObserver(eggManager);
 
         StructureManager structureManager = new StructureManager();
@@ -157,14 +156,13 @@ public class GameFactory {
         Colony colony = createColony(pheromoneSystem, gameWorld, timeCycle, entityManager, eggManager,
                 structureManager, antFactory, destructionListener);
 
-        spawnInitialAnts(entityManager, colony, antFactory);
+        spawnInitialAnts(entityManager, colony, antFactory, antTypeRegistry);
 
-        return new GameModel(simulationHandler, timeCycle, gameWorld, fogSystem, entityManager, colony, enemyFactory, pheromoneSystem, worldMap);
+        return new GameModel(simulationHandler, timeCycle, gameWorld, fogSystem, entityManager, colony, enemyFactory, pheromoneSystem, worldMap, antTypeRegistry);
     }
 
-    public static void spawnInitialAnts(EntityManager entityManager, Home home, AntFactory antFactory) {
-        AntTypeRegistry registry = AntTypeRegistry.getInstance();
-        AntType type = registry.get("worker");
+    public static void spawnInitialAnts(EntityManager entityManager, Home home, AntFactory antFactory, AntTypeRegistry antTypeRegistry) {
+        AntType type = antTypeRegistry.get("worker");
         Ant ant = antFactory.createAnt(home, type);
         entityManager.addEntity(ant);
     }
@@ -195,10 +193,8 @@ public class GameFactory {
      * This must be called before creating GameModel to ensure ant types are
      * available.
      */
-    private static void initializeAntTypes() {
-        AntTypeRegistry registry = AntTypeRegistry.getInstance();
-        registry.clear();
-
+    private static AntTypeRegistry createAntTypeRegistry() {
+        AntTypeRegistry registry = new AntTypeRegistry();
         // Scout: High speed, low HP, 0 capacity, cheap/fast to hatch
         registry.register(new AntType(
                 "scout",
@@ -234,5 +230,7 @@ public class GameFactory {
                 10, // Capacity
                 "ant" // Texture
         ));
+
+        return registry;
     }
 }

@@ -27,7 +27,7 @@ public class HudController implements PheromoneSelectionListener {
         this.colonyUsageProvider = colonyUsageProvider;
         // Create egg controller and panel
         this.eggController = new EggController(model);
-        this.eggPanelView = new EggPanelView(uiFactory, eggController, model.getEggManager(), colonyUsageProvider);
+        this.eggPanelView = new EggPanelView(uiFactory, eggController, model.getEggManager(), colonyUsageProvider, model.getAntTypeRegistry());
 
         initializeListeners();
     }
