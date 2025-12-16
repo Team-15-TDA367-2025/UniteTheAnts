@@ -75,11 +75,9 @@ public class GameFactory {
         CameraController cameraController = new CameraController(cameraModel, cameraView);
         PheromoneController pheromoneController = new PheromoneController(gameModel, cameraView);
         SpeedController speedController = new SpeedController(gameModel);
-        HudController hudController = new HudController(hudView, gameModel, pheromoneController, speedController,
+        HudController hudController = new HudController(hudView, gameModel.getAntTypeRegistry(),
+                gameModel.getEggManager(), pheromoneController, speedController,
                 uiFactory, gameModel.getTimeCycle(), gameModel.getColonyUsageProvider());
-
-        WaveManager waveManager = new WaveManager(gameModel);
-        gameModel.getTimeCycle().addTimeObserver(waveManager);
 
         // 5. Wire Input
         inputManager.addProcessor(cameraController);
@@ -117,8 +115,8 @@ public class GameFactory {
         AntTypeRegistry antTypeRegistry = createAntTypeRegistry();
 
         TerrainGenerator terrainGenerator = TerrainFactory.createStandardPerlinGenerator(
-            System.currentTimeMillis());
-            // TODO: break this down
+                System.currentTimeMillis());
+        // TODO: break this down
         SimulationManager simulationManager = new SimulationManager();
         TimeCycle timeCycle = new TimeCycle(1f / TICKS_PER_MINUTE);
         simulationManager.addUpdateObserver(timeCycle);
@@ -159,7 +157,10 @@ public class GameFactory {
 
         spawnInitialAnts(entityManager, colony, antFactory, antTypeRegistry);
 
-        return new GameModel(simulationManager, timeCycle, gameWorld, fogSystem, entityManager, colony, enemyFactory,
+        WaveManager waveManager = new WaveManager(enemyFactory, entityManager);
+        timeCycle.addTimeObserver(waveManager);
+
+        return new GameModel(simulationManager, timeCycle, gameWorld, fogSystem, colony,
                 pheromoneSystem, worldMap, antTypeRegistry);
     }
 

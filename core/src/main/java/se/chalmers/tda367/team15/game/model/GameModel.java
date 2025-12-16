@@ -7,12 +7,10 @@ import com.badlogic.gdx.math.Vector2;
 
 import se.chalmers.tda367.team15.game.model.egg.EggManager;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntTypeRegistry;
-import se.chalmers.tda367.team15.game.model.entity.termite.Termite;
 import se.chalmers.tda367.team15.game.model.fog.FogProvider;
 import se.chalmers.tda367.team15.game.model.fog.FogSystem;
 import se.chalmers.tda367.team15.game.model.interfaces.ColonyUsageProvider;
 import se.chalmers.tda367.team15.game.model.interfaces.Drawable;
-import se.chalmers.tda367.team15.game.model.managers.EntityManager;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneSystem;
 import se.chalmers.tda367.team15.game.model.structure.resource.ResourceNode;
@@ -25,23 +23,19 @@ public class GameModel {
     private final ColonyUsageProvider colonyUsageProvider;
     // TODO: Fix
     private final TimeCycle timeCycle;
-    private final EntityManager entityManager;
     private final FogSystem fogSystem;
-    private final EnemyFactory enemyFactory;
     private final SimulationProvider simulationProvider;
     private final PheromoneSystem pheromoneSystem;
     private final WorldMap worldMap;
     private final AntTypeRegistry antTypeRegistry;
 
     public GameModel(SimulationProvider simulationProvider, TimeCycle timeCycle, GameWorld gameWorld,
-            FogSystem fogSystem, EntityManager entityManager, ColonyUsageProvider colonyDataProvider, EnemyFactory enemyFactory, PheromoneSystem pheromoneSystem, WorldMap worldMap, AntTypeRegistry antTypeRegistry) {
+            FogSystem fogSystem, ColonyUsageProvider colonyUsageProvider, PheromoneSystem pheromoneSystem, WorldMap worldMap, AntTypeRegistry antTypeRegistry) {
         this.simulationProvider = simulationProvider;
         this.world = gameWorld;
-        this.colonyUsageProvider = colonyDataProvider;
+        this.colonyUsageProvider = colonyUsageProvider;
         this.timeCycle = timeCycle;
-        this.entityManager = entityManager;
         this.fogSystem = fogSystem;
-        this.enemyFactory = enemyFactory;
         this.pheromoneSystem = pheromoneSystem;
         this.worldMap = worldMap;
         this.antTypeRegistry = antTypeRegistry;
@@ -81,11 +75,6 @@ public class GameModel {
     }
 
     // --- FACADE METHODS (Actions) ---
-
-    public void spawnTermite(Vector2 position) {
-        Termite termite = enemyFactory.createTermite(position);
-        entityManager.addEntity(termite);
-    }
 
     public void setTimeFast() {
         simulationProvider.setTimeFast();
