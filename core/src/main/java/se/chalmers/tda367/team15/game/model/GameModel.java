@@ -108,7 +108,7 @@ public class GameModel {
     }
 
     public TimeCycle.GameTime getGameTime() {
-        return simulationProvider.getTimeCycle().getGameTime();
+        return timeCycle.getGameTime();
     }
 
     public Iterable<Drawable> getDrawables() {
@@ -136,7 +136,7 @@ public class GameModel {
     }
 
     public int getTotalDays() {
-        return simulationProvider.getTimeCycle().getTotalDays();
+        return timeCycle.getTotalDays();
     }
 
     public EggManager getEggManager() {

@@ -116,11 +116,12 @@ public class GameFactory {
     private static GameModel createGameModel() {
         AntTypeRegistry antTypeRegistry = createAntTypeRegistry();
 
-        TimeCycle timeCycle = new TimeCycle(TICKS_PER_MINUTE);
         TerrainGenerator terrainGenerator = TerrainFactory.createStandardPerlinGenerator(
-                System.currentTimeMillis());
-        // TODO: break this down
-        SimulationManager simulationManager = new SimulationManager(timeCycle);
+            System.currentTimeMillis());
+            // TODO: break this down
+        SimulationManager simulationManager = new SimulationManager();
+        TimeCycle timeCycle = new TimeCycle(1f / TICKS_PER_MINUTE);
+        simulationManager.addUpdateObserver(timeCycle);
 
         DestructionListener destructionListener = new DestructionListener();
         EntityManager entityManager = new EntityManager();

@@ -1,15 +1,12 @@
 package se.chalmers.tda367.team15.game.model.managers;
 
-import se.chalmers.tda367.team15.game.model.SimulationProvider;
-import se.chalmers.tda367.team15.game.model.TimeCycle;
-import se.chalmers.tda367.team15.game.model.interfaces.Updatable;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class SimulationManager implements SimulationProvider {
-    private final TimeCycle timeCycle;
+import se.chalmers.tda367.team15.game.model.SimulationProvider;
+import se.chalmers.tda367.team15.game.model.interfaces.Updatable;
 
+public class SimulationManager implements SimulationProvider {
     private static final int baseTickPerSecond = 100; // Do not set lower than 50
     private static final double inGameTimePerTickMs = 1000.0 / baseTickPerSecond;
 
@@ -23,8 +20,7 @@ public class SimulationManager implements SimulationProvider {
     private final List<Updatable> updateObservers = new ArrayList<>();
 
 
-   public SimulationManager(TimeCycle timeCycle) {
-        this.timeCycle = timeCycle;
+   public SimulationManager() {
    }
 
    public void addUpdateObserver(Updatable u) {
@@ -57,10 +53,6 @@ public class SimulationManager implements SimulationProvider {
 
     }
 
-    public TimeCycle getTimeCycle() {
-        return timeCycle;
-    }
-
     public void handleSimulation() {
         if(iRLTicksPerSecond!=0) {
             long mSPerTick = mSPerTick();
@@ -71,7 +63,6 @@ public class SimulationManager implements SimulationProvider {
             accumulator += difference;
             while (accumulator >= mSPerTick) {
                 float inGameTimeDifference = (float) inGameTimePerTickMs / 1000f;
-                timeCycle.tick(); // time cycle needs to update first
                 List<Updatable> updateThese = new ArrayList<>(updateObservers);
                for (Updatable u : updateThese) {
                    u.update(inGameTimeDifference);
