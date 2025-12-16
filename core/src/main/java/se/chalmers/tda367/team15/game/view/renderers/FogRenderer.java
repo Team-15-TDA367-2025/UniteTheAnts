@@ -36,8 +36,6 @@ public class FogRenderer {
         
         if (!fogShader.isCompiled()) {
             Gdx.app.error("FogRenderer", "Shader compilation failed: " + fogShader.getLog());
-        } else {
-            Gdx.app.log("FogRenderer", "Shader compiled successfully");
         }
         
         fogBatch.setShader(fogShader);
@@ -116,14 +114,12 @@ public class FogRenderer {
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         
-        // Set screen-space projection matrix to avoid z-fighting
         Matrix4 screenProjection = new Matrix4();
         screenProjection.setToOrtho2D(0, 0, screenWidth, screenHeight);
         fogBatch.setProjectionMatrix(screenProjection);
         
         fogBatch.begin();
         
-        // Set shader uniforms AFTER begin() so they don't get overwritten
         fogShader.setUniformf("u_time", time);
         fogShader.setUniformf("u_resolution", (float) screenWidth, (float) screenHeight);
         
