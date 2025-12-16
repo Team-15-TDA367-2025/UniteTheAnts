@@ -4,33 +4,24 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.badlogic.gdx.math.GridPoint2;
-
 import se.chalmers.tda367.team15.game.model.entity.Entity;
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.interfaces.Drawable;
 import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
 import se.chalmers.tda367.team15.game.model.interfaces.StructureDeathObserver;
-import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
-import se.chalmers.tda367.team15.game.model.pheromones.PheromoneSystem;
 import se.chalmers.tda367.team15.game.model.structure.Structure;
 import se.chalmers.tda367.team15.game.model.structure.resource.Resource;
 import se.chalmers.tda367.team15.game.model.structure.resource.ResourceNode;
 import se.chalmers.tda367.team15.game.model.structure.resource.ResourceSystem;
 import se.chalmers.tda367.team15.game.model.world.TerrainGenerator;
-import se.chalmers.tda367.team15.game.model.world.WorldMap;
 
 public class GameWorld implements StructureDeathObserver {
-    private final PheromoneSystem pheromoneSystem;
     private final StructureManager structureManager;
     private final ResourceSystem resourceSystem;
-    private final WorldMap worldMap;
     private final EntityQuery entityQuery;
 
-    public GameWorld(SimulationHandler simulationHandler, int mapWidth, int mapHeight, TerrainGenerator generator, EntityQuery entityQuery, StructureManager structureManager, ResourceSystem resourceSystem) {
+    public GameWorld(int mapWidth, int mapHeight, TerrainGenerator generator, EntityQuery entityQuery, StructureManager structureManager, ResourceSystem resourceSystem) {
         this.entityQuery = entityQuery;
-        this.worldMap = new WorldMap(mapWidth, mapHeight, generator);
-        this.pheromoneSystem = new PheromoneSystem(new GridPoint2(0, 0), new PheromoneGridConverter(4), 4);
         this.structureManager = structureManager;
         this.resourceSystem = resourceSystem;
     }
@@ -57,14 +48,6 @@ public class GameWorld implements StructureDeathObserver {
         List<Drawable> allDrawables = new ArrayList<>(structureManager.getStructures());
         allDrawables.addAll(getEntities());
         return Collections.unmodifiableList(allDrawables);
-    }
-
-    public PheromoneSystem getPheromoneSystem() {
-        return pheromoneSystem;
-    }
-
-    public WorldMap getWorldMap() {
-        return worldMap;
     }
 
     public void addStructure(Structure structure) {

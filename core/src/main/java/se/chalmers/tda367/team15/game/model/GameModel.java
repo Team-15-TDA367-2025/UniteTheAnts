@@ -27,9 +27,11 @@ public class GameModel {
     private final FogSystem fogSystem;
     private final EnemyFactory enemyFactory;
     private final SimulationProvider simulationProvider;
+    private final PheromoneSystem pheromoneSystem;
+    private final WorldMap worldMap;
 
     public GameModel(SimulationProvider simulationProvider, TimeCycle timeCycle, GameWorld gameWorld,
-            FogSystem fogSystem, EntityManager entityManager, ColonyUsageProvider colonyDataProvider, EnemyFactory enemyFactory) {
+            FogSystem fogSystem, EntityManager entityManager, ColonyUsageProvider colonyDataProvider, EnemyFactory enemyFactory, PheromoneSystem pheromoneSystem, WorldMap worldMap) {
         this.simulationProvider = simulationProvider;
         this.world = gameWorld;
         this.colonyUsageProvider = colonyDataProvider;
@@ -37,6 +39,8 @@ public class GameModel {
         this.entityManager = entityManager;
         this.fogSystem = fogSystem;
         this.enemyFactory = enemyFactory;
+        this.pheromoneSystem = pheromoneSystem;
+        this.worldMap = worldMap;
         // Spawn structures based on terrain generation features
         spawnTerrainStructures();
     }
@@ -45,7 +49,6 @@ public class GameModel {
      * Spawns structures determined by terrain generation features.
      */
     private void spawnTerrainStructures() {
-        WorldMap worldMap = world.getWorldMap();
         List<StructureSpawn> spawns = worldMap.getStructureSpawns();
 
         for (StructureSpawn spawn : spawns) {
@@ -70,7 +73,7 @@ public class GameModel {
     }
 
     public PheromoneGridConverter getPheromoneGridConverter() {
-        return world.getPheromoneSystem().getConverter();
+        return pheromoneSystem.getConverter();
     }
 
     // --- FACADE METHODS (Actions) ---
@@ -113,11 +116,11 @@ public class GameModel {
     }
 
     public PheromoneSystem getPheromoneSystem() {
-        return world.getPheromoneSystem();
+        return pheromoneSystem;
     }
 
     public WorldMap getWorldMap() {
-        return world.getWorldMap();
+        return worldMap;
     }
 
     public GridPoint2 getWorldSize() {
