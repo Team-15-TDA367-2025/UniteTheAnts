@@ -88,10 +88,6 @@ public class Ant extends Entity implements VisionProvider, CanBeAttacked {
         this.behavior = behavior;
     }
 
-    public float getSpeed() {
-        return speed;
-    }
-
     public GridPoint2 getGridPosition() {
         PheromoneGridConverter converter = system.getConverter();
         return converter.worldToPheromoneGrid(position);

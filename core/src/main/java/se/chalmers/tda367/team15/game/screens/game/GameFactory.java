@@ -11,11 +11,7 @@ import se.chalmers.tda367.team15.game.controller.HudController;
 import se.chalmers.tda367.team15.game.controller.InputManager;
 import se.chalmers.tda367.team15.game.controller.PheromoneController;
 import se.chalmers.tda367.team15.game.controller.SpeedController;
-import se.chalmers.tda367.team15.game.model.AntFactory;
-import se.chalmers.tda367.team15.game.model.DestructionListener;
-import se.chalmers.tda367.team15.game.model.EnemyFactory;
-import se.chalmers.tda367.team15.game.model.GameModel;
-import se.chalmers.tda367.team15.game.model.TimeCycle;
+import se.chalmers.tda367.team15.game.model.*;
 import se.chalmers.tda367.team15.game.model.camera.CameraConstraints;
 import se.chalmers.tda367.team15.game.model.camera.CameraModel;
 import se.chalmers.tda367.team15.game.model.egg.EggManager;
@@ -42,6 +38,8 @@ import se.chalmers.tda367.team15.game.view.renderers.PheromoneRenderer;
 import se.chalmers.tda367.team15.game.view.renderers.WorldRenderer;
 import se.chalmers.tda367.team15.game.view.ui.HudView;
 import se.chalmers.tda367.team15.game.view.ui.UiFactory;
+
+import java.util.HashMap;
 
 /**
  * Factory for creating and wiring the GameScreen.
@@ -138,7 +136,12 @@ public class GameFactory {
 
         WorldMap worldMap = new WorldMap(MAP_WIDTH, MAP_HEIGHT, terrainGenerator);
 
-        EnemyFactory enemyFactory = new EnemyFactory(entityManager, structureManager, destructionListener, targetPriority);
+        // Termite target priority
+        HashMap<AttackCategory, Integer> termiteTargetPriority = new HashMap<>();
+        termiteTargetPriority.put(AttackCategory.WORKER_ANT, 2);
+        termiteTargetPriority.put(AttackCategory.ANT_COLONY, 1);
+
+        EnemyFactory enemyFactory = new EnemyFactory(entityManager, structureManager, destructionListener, termiteTargetPriority);
         FogSystem fogSystem = new FogSystem(entityManager, worldMap);
         simulationManager.addUpdateObserver(fogSystem);
         PheromoneGridConverter pheromoneGridConverter = new PheromoneGridConverter(4);

@@ -13,6 +13,7 @@ public abstract class Entity implements Drawable, Updatable, HasPosition {
     private String textureName;
     protected Vector2 velocity;
     private MovementStrategy movementStrategy;
+    protected float SPEED;
 
     // TODO reduce amount of parameters clients need to handle
     // Some kind of entity factory might help reduce the amount of parameters
@@ -72,6 +73,10 @@ public abstract class Entity implements Drawable, Updatable, HasPosition {
 
     public void setTextureName(String textureName) {
         this.textureName = textureName;
+    }
+
+    public float getSpeed() {
+        return SPEED;
     }
 
     public Vector2 getVelocity() {

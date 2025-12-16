@@ -1,5 +1,7 @@
 package se.chalmers.tda367.team15.game.model.entity;
 
+import se.chalmers.tda367.team15.game.model.interfaces.CanBeAttacked;
+
 /**
  * Class that handles the attack logic of anything that can attack.
  */
@@ -29,12 +31,12 @@ public class AttackComponent {
         this.lastAttackTimeMS = 0;
     }
 
-    public void attack(AttackTarget target) {
+    public void attack(CanBeAttacked target) {
         long now = System.currentTimeMillis();
         if (now - lastAttackTimeMS > ATTACK_COOLDOWN_MS) {
-            if (target.hasPosition.getPosition().dst(host.getPosition()) <= ATTACK_RANGE) {
+            if (target.getPosition().dst(host.getPosition()) <= ATTACK_RANGE) {
                 lastAttackTimeMS = System.currentTimeMillis();
-                target.canBeAttacked.takeDamage(ATTACK_DMG);
+                target.takeDamage(ATTACK_DMG);
             }
         }
     }

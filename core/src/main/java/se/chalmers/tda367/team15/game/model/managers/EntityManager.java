@@ -34,7 +34,6 @@ public class EntityManager implements Updatable, EntityDeathObserver, EntityQuer
         }
         return result;
     }
-
     @Override
     public void update(float deltaTime) {
         List<Entity> toUpdate = new ArrayList<>(entities);
