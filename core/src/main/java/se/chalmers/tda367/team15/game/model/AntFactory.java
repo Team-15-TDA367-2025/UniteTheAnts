@@ -10,13 +10,13 @@ import se.chalmers.tda367.team15.game.model.managers.PheromoneManager;
 import se.chalmers.tda367.team15.game.model.world.MapProvider;
 
 public class AntFactory {
-    private final PheromoneManager pheromoneSystem;
+    private final PheromoneManager pheromoneManager;
     private final MapProvider map;
     private final EntityQuery entityQuery;
     private final DestructionListener destructionListener;
 
-    public AntFactory(PheromoneManager pheromoneSystem, MapProvider map, EntityQuery entityQuery, DestructionListener destructionListener) {
-        this.pheromoneSystem = pheromoneSystem;
+    public AntFactory(PheromoneManager pheromoneManager, MapProvider map, EntityQuery entityQuery, DestructionListener destructionListener) {
+        this.pheromoneManager = pheromoneManager;
         this.map = map;
         this.entityQuery = entityQuery;
         this.destructionListener = destructionListener;
@@ -24,6 +24,6 @@ public class AntFactory {
 
     public Ant createAnt(Home home, AntType type) {
         Vector2 position = home.getPosition();
-        return new Ant(position, pheromoneSystem, type, map, home, entityQuery, destructionListener);
+        return new Ant(position, pheromoneManager, type, map, home, entityQuery, destructionListener);
     }
 }

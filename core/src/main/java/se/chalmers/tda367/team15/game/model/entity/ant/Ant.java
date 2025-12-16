@@ -38,7 +38,7 @@ public class Ant extends Entity implements VisionProvider, CanBeAttacked {
     public Ant(Vector2 position, PheromoneManager system, AntType type, MapProvider map, Home home, EntityQuery entityQuery, DestructionListener destructionListener) {
         super(position, type.textureName());
         this.type = type;
-        this.behavior = new WanderBehavior(this, home, entityQuery);
+        this.behavior = new WanderBehavior(this, home, entityQuery, system.getConverter());
         this.system = system;
         this.hunger = 2; // test value
         this.home = home;
@@ -95,10 +95,6 @@ public class Ant extends Entity implements VisionProvider, CanBeAttacked {
     public GridPoint2 getGridPosition() {
         PheromoneGridConverter converter = system.getConverter();
         return converter.worldToPheromoneGrid(position);
-    }
-
-    public PheromoneManager getSystem() {
-        return system;
     }
 
     public Inventory getInventory() {

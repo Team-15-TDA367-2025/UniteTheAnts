@@ -16,13 +16,13 @@ import se.chalmers.tda367.team15.game.view.camera.CameraView;
 public class PheromoneRenderer {
     private final ShapeRenderer shapeRenderer;
     private final CameraView cameraView;
-    private final PheromoneManager pheromoneSystem;
+    private final PheromoneManager pheromoneManager;
     private final PheromoneGridConverter converter;
 
-    public PheromoneRenderer(CameraView cameraView, PheromoneManager pheromoneSystem) {
+    public PheromoneRenderer(CameraView cameraView, PheromoneManager pheromoneManager) {
         this.cameraView = cameraView;
-        this.pheromoneSystem = pheromoneSystem;
-        this.converter = pheromoneSystem.getConverter();
+        this.pheromoneManager = pheromoneManager;
+        this.converter = pheromoneManager.getConverter();
         this.shapeRenderer = new ShapeRenderer();
     }
 
@@ -33,11 +33,11 @@ public class PheromoneRenderer {
 
         // Find max distance for normalization
         int maxDistance = 0;
-        for (Pheromone pheromone : pheromoneSystem.getPheromones()) {
+        for (Pheromone pheromone : pheromoneManager.getPheromones()) {
             maxDistance = Math.max(maxDistance, pheromone.getDistance());
         }
 
-        for (Pheromone pheromone : pheromoneSystem.getPheromones()) {
+        for (Pheromone pheromone : pheromoneManager.getPheromones()) {
             Color baseColor = getColorForType(pheromone.getType());
             float fadeFactor = calculateFadeFactor(pheromone.getDistance(), maxDistance);
 

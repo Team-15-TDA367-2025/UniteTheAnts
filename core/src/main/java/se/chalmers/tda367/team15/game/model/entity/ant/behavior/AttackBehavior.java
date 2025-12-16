@@ -14,17 +14,20 @@ import se.chalmers.tda367.team15.game.model.interfaces.CanBeAttacked;
 import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
 import se.chalmers.tda367.team15.game.model.interfaces.Home;
 import se.chalmers.tda367.team15.game.model.managers.PheromoneManager;
+import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
 
 public class AttackBehavior extends AntBehavior {
     private final HashMap<AttackCategory, Integer> targetPriority = new HashMap<>();
     private final Home home;
     private final AttackComponent attackComponent;
+    private final PheromoneGridConverter converter;
 
-    public AttackBehavior(Home home, Ant ant, Vector2 lastPosBeforeAttack, EntityQuery entityQuery) {
+    public AttackBehavior(Home home, Ant ant, Vector2 lastPosBeforeAttack, EntityQuery entityQuery, PheromoneGridConverter converter) {
         super(ant, entityQuery);
         targetPriority.put(AttackCategory.TERMITE, 1);
         this.home = home;
         this.attackComponent = new AttackComponent(5, 1000, 2, ant);
+        this.converter = converter;
     }
 
     @Override
@@ -32,7 +35,7 @@ public class AttackBehavior extends AntBehavior {
         AttackTarget target = findTarget();
 
         if (target == null) {
-            ant.setBehavior(new FollowTrailBehavior(home, entityQuery, ant));
+            ant.setBehavior(new FollowTrailBehavior(home, entityQuery, ant, converter));
         } else {
             Vector2 targetV = target.hasPosition.getPosition().sub(ant.getPosition());
             ant.setVelocity(targetV.nor().scl(ant.getSpeed()));

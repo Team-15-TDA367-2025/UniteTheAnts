@@ -70,7 +70,7 @@ public class GameFactory {
         // 3. Create Views
         CameraView cameraView = createCameraView(cameraModel);
         WorldRenderer sceneView = new WorldRenderer(cameraView, textureRegistry, gameModel, gameModel.getFogProvider());
-        PheromoneRenderer pheromoneView = new PheromoneRenderer(cameraView, gameModel.getPheromoneSystem());
+        PheromoneRenderer pheromoneView = new PheromoneRenderer(cameraView, gameModel.getPheromoneManager());
         HudView hudView = new HudView(hudBatch, uiFactory);
 
         // 4. Create Controllers
@@ -133,18 +133,18 @@ public class GameFactory {
         simulationManager.addUpdateObserver(structureManager);
         destructionListener.addStructureDeathObserver(structureManager);
 
-        ResourceManager resourceSystem = new ResourceManager(entityManager, structureManager);
-        simulationManager.addUpdateObserver(resourceSystem);
+        ResourceManager resourceManager = new ResourceManager(entityManager, structureManager);
+        simulationManager.addUpdateObserver(resourceManager);
 
         WorldMap worldMap = new WorldMap(MAP_WIDTH, MAP_HEIGHT, terrainGenerator);
 
         EnemyFactory enemyFactory = new EnemyFactory(entityManager, structureManager, destructionListener);
-        FogManager fogSystem = new FogManager(entityManager, worldMap);
-        simulationManager.addUpdateObserver(fogSystem);
+        FogManager fogManager = new FogManager(entityManager, worldMap);
+        simulationManager.addUpdateObserver(fogManager);
         PheromoneGridConverter pheromoneGridConverter = new PheromoneGridConverter(4);
 
-        PheromoneManager pheromoneSystem = new PheromoneManager(new GridPoint2(0, 0), pheromoneGridConverter, 4);
-        AntFactory antFactory = new AntFactory(pheromoneSystem, worldMap, entityManager,
+        PheromoneManager pheromoneManager = new PheromoneManager(new GridPoint2(0, 0), pheromoneGridConverter, 4);
+        AntFactory antFactory = new AntFactory(pheromoneManager, worldMap, entityManager,
                 destructionListener);
 
         EggManager eggManager = new EggManager(antTypeRegistry, antFactory);
@@ -158,8 +158,8 @@ public class GameFactory {
         WaveManager waveManager = new WaveManager(enemyFactory, entityManager);
         timeCycle.addTimeObserver(waveManager);
 
-        return new GameModel(simulationManager, timeCycle, fogSystem, colony,
-                pheromoneSystem, worldMap, antTypeRegistry, structureManager, entityManager);
+        return new GameModel(simulationManager, timeCycle, fogManager, colony,
+                pheromoneManager, worldMap, antTypeRegistry, structureManager, entityManager);
     }
 
     public static void spawnInitialAnts(EntityManager entityManager, Home home, AntFactory antFactory,

@@ -28,22 +28,22 @@ public class GameModel {
     private final ColonyUsageProvider colonyUsageProvider;
     // TODO: Fix
     private final TimeCycle timeCycle;
-    private final FogManager fogSystem;
+    private final FogManager fogManager;
     private final SimulationProvider simulationProvider;
-    private final PheromoneManager pheromoneSystem;
+    private final PheromoneManager pheromoneManager;
     private final WorldMap worldMap;
     private final AntTypeRegistry antTypeRegistry;
     private final StructureManager structureManager;
     private final EntityQuery entityQuery;
 
     public GameModel(SimulationProvider simulationProvider, TimeCycle timeCycle,
-            FogManager fogSystem, ColonyUsageProvider colonyUsageProvider, PheromoneManager pheromoneSystem,
+            FogManager fogManager, ColonyUsageProvider colonyUsageProvider, PheromoneManager pheromoneManager,
             WorldMap worldMap, AntTypeRegistry antTypeRegistry, StructureManager structureManager, EntityQuery entityQuery) {
         this.simulationProvider = simulationProvider;
         this.colonyUsageProvider = colonyUsageProvider;
         this.timeCycle = timeCycle;
-        this.fogSystem = fogSystem;
-        this.pheromoneSystem = pheromoneSystem;
+        this.fogManager = fogManager;
+        this.pheromoneManager = pheromoneManager;
         this.worldMap = worldMap;
         this.antTypeRegistry = antTypeRegistry;
         this.structureManager = structureManager;
@@ -86,7 +86,7 @@ public class GameModel {
     }
 
     public PheromoneGridConverter getPheromoneGridConverter() {
-        return pheromoneSystem.getConverter();
+        return pheromoneManager.getConverter();
     }
 
     // --- FACADE METHODS (Actions) ---
@@ -116,15 +116,15 @@ public class GameModel {
     }
 
     public FogProvider getFogProvider() {
-        return fogSystem;
+        return fogManager;
     }
 
     public AntTypeRegistry getAntTypeRegistry() {
         return antTypeRegistry;
     }
 
-    public PheromoneManager getPheromoneSystem() {
-        return pheromoneSystem;
+    public PheromoneManager getPheromoneManager() {
+        return pheromoneManager;
     }
 
     public WorldMap getWorldMap() {
