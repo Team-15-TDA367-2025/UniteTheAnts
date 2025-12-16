@@ -94,10 +94,6 @@ public class Colony extends Structure implements CanBeAttacked, Home, EggHatchOb
         return true;
     }
 
-    public int getAntCount() {
-        return entityQuery.getEntitiesOfType(Ant.class).size();
-    }
-
     @Override
     public void onEggHatch(AntFactory factory, AntType type) {
         // TODO: Kinda violates SRP

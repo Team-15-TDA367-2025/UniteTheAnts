@@ -7,13 +7,13 @@ import com.badlogic.gdx.math.Vector2;
 
 import se.chalmers.tda367.team15.game.model.AttackCategory;
 import se.chalmers.tda367.team15.game.model.DestructionListener;
-import se.chalmers.tda367.team15.game.model.GameWorld;
 import se.chalmers.tda367.team15.game.model.entity.AttackComponent;
 import se.chalmers.tda367.team15.game.model.entity.AttackTarget;
 import se.chalmers.tda367.team15.game.model.entity.Entity;
 import se.chalmers.tda367.team15.game.model.faction.Faction;
 import se.chalmers.tda367.team15.game.model.interfaces.CanBeAttacked;
 import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
+import se.chalmers.tda367.team15.game.model.managers.StructureManager;
 import se.chalmers.tda367.team15.game.model.structure.Structure;
 
 /**
@@ -29,15 +29,16 @@ public class Termite extends Entity implements CanBeAttacked {
     private AttackComponent attackComponent = new AttackComponent(5, 1000, 2.0f, this);
     private final float MAX_HEALTH = 1;
     private float health;
-    private final GameWorld world;
-    private final DestructionListener destructionListener;
     private final EntityQuery entityQuery;
+    private final StructureManager structureManager;
+    private final DestructionListener destructionListener;
 
-    public Termite(Vector2 position, EntityQuery entityQuery, DestructionListener destructionListener, HashMap<AttackCategory, Integer> targetPriority) {
+    public Termite(Vector2 position, EntityQuery entityQuery, StructureManager structureManager, DestructionListener destructionListener, HashMap<AttackCategory, Integer> targetPriority) {
         super(position, "termite");
         this.destructionListener = destructionListener;
+        this.entityQuery = entityQuery;
+        this.structureManager = structureManager;
         this.termiteBehaviour = new TermiteBehavior(this,entityQuery,targetPriority);
-        this.entityQuery=entityQuery;
         health = MAX_HEALTH;
     }
 
@@ -45,11 +46,10 @@ public class Termite extends Entity implements CanBeAttacked {
      * Updates the termite
      *
      */
-    // TODO world should give these?
     @Override
     public void update(float deltaTime) {
-        List<Entity> entities = entityQ
-        List<Structure> structures = world.getStructures();
+        List<Entity> entities = entityQuery.getEntitiesOfType(Entity.class);
+        List<Structure> structures = structureManager.getStructures();
         AttackTarget target = termiteBehaviour.update(entities, structures);
         super.update(deltaTime);
         if (target != null) {
