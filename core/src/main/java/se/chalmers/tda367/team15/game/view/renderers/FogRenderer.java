@@ -77,6 +77,10 @@ public class FogRenderer {
             fogMaskTexture = new Texture(fogPixmap);
             // Use linear filtering for smoother fog edges when zoomed
             fogMaskTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+
+            // Cache the size to prevent recreating every frame
+            fogWidth = width;
+            fogHeight = height;
             textureNeedsUpdate = true;
         }
     }
@@ -184,7 +188,6 @@ public class FogRenderer {
         fogBatch.begin();
 
         fogShader.setUniformf("u_time", time);
-        fogShader.setUniformf("u_resolution", (float) screenWidth, (float) screenHeight);
 
         // Pass camera/world info so shader can calculate world coordinates
         fogShader.setUniformf("u_cameraPos", cameraView.getPosition().x, cameraView.getPosition().y);

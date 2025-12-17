@@ -96,25 +96,13 @@ void main() {
     // Fog color - dark forest green
     vec3 fogColor = vec3(0.09, 0.188, 0.11);
     
-    // EARLY-OUT OPTIMIZATION: Sample fog mask FIRST before any expensive calculations
+    // Sample fog mask - values: 0 = revealed, 1 = fogged, in-between = adjacent to revealed
     float originalMask = texture2D(u_texture, v_texCoords).r;
     
-    // Thresholds for early-out (adjust for edge detection sensitivity)
-    const float TRANSPARENT_THRESHOLD = 0.01;  // Below this = fully revealed
-    const float OPAQUE_THRESHOLD = 0.99;       // Above this = fully fogged
-    
-    // Early-out for fully revealed pixels (no fog) - discard entirely
-    if (originalMask < TRANSPARENT_THRESHOLD) {
+    // Early-out for fully revealed pixels (no fog at all)
+    if (originalMask < 0.001) {
         discard;
     }
-    
-    // Early-out for fully opaque fog - just render solid color, no noise needed
-    if (originalMask > OPAQUE_THRESHOLD) {
-        gl_FragColor = vec4(fogColor, 1.0) * v_color;
-        return;
-    }
-    
-    // EDGE PIXELS ONLY: Run expensive noise calculations for fog edges
     
     // Calculate world coordinates from screen UV
     vec2 screenOffset = v_texCoords - 0.5;
@@ -137,11 +125,10 @@ void main() {
     vec2 distortedUV = v_texCoords + distortUV;
     float fogMask = texture2D(u_texture, distortedUV).r;
     
-    // Blend with original for smoother edges
-    float finalMask = mix(originalMask, fogMask, 0.99);
+    // Simple on/off: render fog if mask > 0.5, otherwise discard
+    if (fogMask < 0.5) {
+        discard;
+    }
     
-    // Apply edge softening
-    float softMask = smoothstep(0.3, 0.7, finalMask);
-    
-    gl_FragColor = vec4(fogColor, softMask) * v_color;
+    gl_FragColor = vec4(fogColor, 1.0) * v_color;
 }

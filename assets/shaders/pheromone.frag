@@ -10,11 +10,11 @@ uniform float u_time;
 // Decode pheromone type to actual color
 vec3 getTypeColor(float typeIndex) {
     if (typeIndex < 0.2) {
-        return vec3(0.3, 0.5, 1.0);  // GATHER - blue
+        return vec3(0.1, 0.3, 1.0);  // GATHER - blue
     } else if (typeIndex < 0.5) {
         return vec3(1.0, 0.3, 0.3);  // ATTACK - red
     } else {
-        return vec3(0.3, 0.9, 0.4);  // EXPLORE - green
+        return vec3(0.9, 0.9, 0.1);  // EXPLORE - yellow
     }
 }
 
