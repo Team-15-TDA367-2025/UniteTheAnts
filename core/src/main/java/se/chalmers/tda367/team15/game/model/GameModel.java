@@ -50,38 +50,12 @@ public class GameModel {
         this.antTypeRegistry = antTypeRegistry;
         this.structureManager = structureManager;
         this.entityQuery = entityQuery;
-        // Spawn structures based on terrain generation features
-        spawnTerrainStructures();
     }
 
     public Iterable<Drawable> getDrawables() {
         List<Drawable> allDrawables = new ArrayList<>(structureManager.getStructures());
         allDrawables.addAll(entityQuery.getEntitiesOfType(Entity.class));
         return Collections.unmodifiableList(allDrawables);
-    }
-
-    /**
-     * Spawns structures determined by terrain generation features.
-     */
-    private void spawnTerrainStructures() {
-        // This will be gone
-        List<StructureSpawn> spawns = new ArrayList<>();
-
-        for (StructureSpawn spawn : spawns) {
-            if ("resource_node".equals(spawn.getType())) {
-                Vector2 worldPos = mapProvider.tileToWorld(spawn.getPosition());
-                GridPoint2 worldGridPos = new GridPoint2((int) worldPos.x, (int) worldPos.y);
-
-                structureManager.addStructure(new ResourceNode(
-                        worldGridPos,
-                        "node",
-                        1,
-                        ResourceType.FOOD,
-                        10,
-                        20));
-            }
-            // Add other structure types here
-        }
     }
 
     public ColonyUsageProvider getColonyUsageProvider() {

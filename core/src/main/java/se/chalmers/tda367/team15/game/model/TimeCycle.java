@@ -18,7 +18,7 @@ public class TimeCycle implements Updatable, TimeCycleDataProvider {
     }
 
     public TimeCycle(float timePerMinute) {
-        this.minutes = 0;
+        this.minutes = 360;
         this.timePerMinute = timePerMinute;
     }
 

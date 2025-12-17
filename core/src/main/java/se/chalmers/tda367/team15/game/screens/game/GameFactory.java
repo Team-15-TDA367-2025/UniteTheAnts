@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 
+import com.badlogic.gdx.math.Vector2;
 import se.chalmers.tda367.team15.game.controller.CameraController;
 import se.chalmers.tda367.team15.game.controller.HudController;
 import se.chalmers.tda367.team15.game.controller.InputManager;
@@ -32,9 +33,14 @@ import se.chalmers.tda367.team15.game.model.managers.StructureManager;
 import se.chalmers.tda367.team15.game.model.managers.WaveManager;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
 import se.chalmers.tda367.team15.game.model.structure.Colony;
+import se.chalmers.tda367.team15.game.model.structure.resource.ResourceNode;
+import se.chalmers.tda367.team15.game.model.structure.resource.ResourceNodeFactory;
+import se.chalmers.tda367.team15.game.model.structure.resource.ResourceType;
+import se.chalmers.tda367.team15.game.model.world.MapProvider;
 import se.chalmers.tda367.team15.game.model.world.TerrainFactory;
 import se.chalmers.tda367.team15.game.model.world.TerrainGenerator;
 import se.chalmers.tda367.team15.game.model.world.WorldMap;
+import se.chalmers.tda367.team15.game.model.world.terrain.StructureSpawn;
 import se.chalmers.tda367.team15.game.view.TextureRegistry;
 import se.chalmers.tda367.team15.game.view.camera.CameraView;
 import se.chalmers.tda367.team15.game.view.camera.ViewportListener;
@@ -147,6 +153,8 @@ public class GameFactory {
         AntFactory antFactory = new AntFactory(pheromoneManager, worldMap, entityManager,
                 destructionListener);
 
+        ResourceNodeFactory resourceNodeFactory = new ResourceNodeFactory(structureManager);
+
         EggManager eggManager = new EggManager(antTypeRegistry, antFactory);
         timeCycle.addTimeObserver(eggManager);
 
@@ -154,6 +162,8 @@ public class GameFactory {
                 structureManager, destructionListener);
 
         spawnInitialAnts(entityManager, colony, antFactory, antTypeRegistry);
+
+        spawnTerrainStructures(resourceNodeFactory, worldMap);
 
         WaveManager waveManager = new WaveManager(enemyFactory, entityManager);
         timeCycle.addTimeObserver(waveManager);
@@ -165,8 +175,24 @@ public class GameFactory {
     public static void spawnInitialAnts(EntityManager entityManager, Home home, AntFactory antFactory,
             AntTypeRegistry antTypeRegistry) {
         AntType type = antTypeRegistry.get("worker");
-        Ant ant = antFactory.createAnt(home, type);
-        entityManager.addEntity(ant);
+        for (int i = 0; i < 10000; i++) {
+            Ant ant = antFactory.createAnt(home, type);
+            entityManager.addEntity(ant);
+        }
+    }
+
+    /**
+     * Spawns structures determined by terrain generation features.
+     */
+    private static void spawnTerrainStructures(ResourceNodeFactory resourceNodeFactory, MapProvider map) {
+        for (StructureSpawn spawn : map.getStructureSpawns()) {
+            if ("resource_node".equals(spawn.getType())) {
+                Vector2 structurePos = map.tileToWorld(spawn.getPosition());
+
+                resourceNodeFactory.createResourceNode(structurePos, spawn);
+            }
+            // Add other structure types here
+        }
     }
 
     private static Colony createColony(TimeCycle timeCycle,
@@ -198,41 +224,42 @@ public class GameFactory {
      */
     private static AntTypeRegistry createAntTypeRegistry() {
         AntTypeRegistry registry = new AntTypeRegistry();
+
         // Scout: High speed, low HP, 0 capacity, cheap/fast to hatch
-        registry.register(new AntType(
-                "scout",
-                "Scout",
-                5, // Food Cost
-                30, // 30 ticks (0.5 min)
-                4f, // Max Health
-                8f, // Speed
-                0, // Capacity
-                "scout" // Texture
-        ));
+        registry.register(AntType.with()
+                .id("scout")
+                .displayName("Scout")
+                .foodCost(5)
+                .developmentTicks(30)
+                .maxHealth(4f)
+                .moveSpeed(8f)
+                .carryCapacity(0)
+                .textureName("scout")
+                .build());
 
         // Soldier: Low speed, high HP, 0 capacity, expensive
-        registry.register(new AntType(
-                "soldier",
-                "Soldier",
-                40, // Food Cost
-                300, // 5 min
-                20f, // Max Health
-                2f, // Speed
-                0, // Capacity
-                "ant" // Texture
-        ));
+        registry.register(AntType.with()
+                .id("soldier")
+                .displayName("Soldier")
+                .foodCost(40)
+                .developmentTicks(300)
+                .maxHealth(20f)
+                .moveSpeed(2f)
+                .carryCapacity(0)
+                .textureName("ant")
+                .build());
 
         // Worker: Medium speed, medium HP, some capacity
-        registry.register(new AntType(
-                "worker",
-                "Worker",
-                10, // Food Cost
-                60, // 1 min
-                6f, // Max Health
-                5f, // Speed
-                10, // Capacity
-                "ant" // Texture
-        ));
+        registry.register(AntType.with()
+                .id("worker")
+                .displayName("Worker")
+                .foodCost(10)
+                .developmentTicks(60)
+                .maxHealth(6f)
+                .moveSpeed(5f)
+                .carryCapacity(10)
+                .textureName("ant")
+                .build());
 
         return registry;
     }
