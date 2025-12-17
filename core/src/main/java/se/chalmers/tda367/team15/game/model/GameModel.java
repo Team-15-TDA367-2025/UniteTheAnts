@@ -3,49 +3,42 @@ package se.chalmers.tda367.team15.game.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-
-import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.Vector2;
 
 import se.chalmers.tda367.team15.game.model.egg.EggManager;
 import se.chalmers.tda367.team15.game.model.entity.Entity;
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntTypeRegistry;
 import se.chalmers.tda367.team15.game.model.fog.FogProvider;
-import se.chalmers.tda367.team15.game.model.fog.FogManager;
 import se.chalmers.tda367.team15.game.model.interfaces.ColonyUsageProvider;
 import se.chalmers.tda367.team15.game.model.interfaces.Drawable;
 import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
+import se.chalmers.tda367.team15.game.model.interfaces.PheromoneUsageProvider;
 import se.chalmers.tda367.team15.game.model.interfaces.TimeCycleDataProvider;
-import se.chalmers.tda367.team15.game.model.managers.PheromoneManager;
 import se.chalmers.tda367.team15.game.model.managers.StructureManager;
-import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
-import se.chalmers.tda367.team15.game.model.structure.resource.ResourceNode;
-import se.chalmers.tda367.team15.game.model.structure.resource.ResourceType;
 import se.chalmers.tda367.team15.game.model.world.MapProvider;
-import se.chalmers.tda367.team15.game.model.world.terrain.StructureSpawn;
 
 public class GameModel {
     private final ColonyUsageProvider colonyUsageProvider;
     // TODO: Fix
     private final TimeCycleDataProvider timeProvider;
-    private final FogManager fogManager;
+    private final FogProvider fogProvider;
     private final SimulationProvider simulationProvider;
-    private final PheromoneManager pheromoneManager;
+    private final PheromoneUsageProvider pheromoneUsageProvider;
     private final MapProvider mapProvider;
     private final AntTypeRegistry antTypeRegistry;
     private final StructureManager structureManager;
     private final EntityQuery entityQuery;
 
     public GameModel(SimulationProvider simulationProvider, TimeCycleDataProvider timeProvider,
-            FogManager fogManager, ColonyUsageProvider colonyUsageProvider, PheromoneManager pheromoneManager,
-            MapProvider mapProvider, AntTypeRegistry antTypeRegistry, StructureManager structureManager, EntityQuery entityQuery) {
+            FogProvider fogProvider, ColonyUsageProvider colonyUsageProvider,
+            PheromoneUsageProvider pheromoneUsageProvider,
+            MapProvider mapProvider, AntTypeRegistry antTypeRegistry, StructureManager structureManager,
+            EntityQuery entityQuery) {
         this.simulationProvider = simulationProvider;
         this.colonyUsageProvider = colonyUsageProvider;
         this.timeProvider = timeProvider;
-        this.fogManager = fogManager;
-        this.pheromoneManager = pheromoneManager;
+        this.fogProvider = fogProvider;
+        this.pheromoneUsageProvider = pheromoneUsageProvider;
         this.mapProvider = mapProvider;
         this.antTypeRegistry = antTypeRegistry;
         this.structureManager = structureManager;
@@ -66,8 +59,8 @@ public class GameModel {
         return timeProvider;
     }
 
-    public PheromoneGridConverter getPheromoneGridConverter() {
-        return pheromoneManager.getConverter();
+    public PheromoneUsageProvider getPheromoneUsageProvider() {
+        return pheromoneUsageProvider;
     }
 
     // --- FACADE METHODS (Actions) ---
@@ -89,15 +82,11 @@ public class GameModel {
     }
 
     public FogProvider getFogProvider() {
-        return fogManager;
+        return fogProvider;
     }
 
     public AntTypeRegistry getAntTypeRegistry() {
         return antTypeRegistry;
-    }
-
-    public PheromoneManager getPheromoneManager() {
-        return pheromoneManager;
     }
 
     public MapProvider getMapProvider() {

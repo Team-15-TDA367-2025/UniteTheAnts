@@ -33,9 +33,7 @@ import se.chalmers.tda367.team15.game.model.managers.StructureManager;
 import se.chalmers.tda367.team15.game.model.managers.WaveManager;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
 import se.chalmers.tda367.team15.game.model.structure.Colony;
-import se.chalmers.tda367.team15.game.model.structure.resource.ResourceNode;
 import se.chalmers.tda367.team15.game.model.structure.resource.ResourceNodeFactory;
-import se.chalmers.tda367.team15.game.model.structure.resource.ResourceType;
 import se.chalmers.tda367.team15.game.model.world.MapProvider;
 import se.chalmers.tda367.team15.game.model.world.TerrainFactory;
 import se.chalmers.tda367.team15.game.model.world.TerrainGenerator;
@@ -75,14 +73,16 @@ public class GameFactory {
 
         // 3. Create Views
         CameraView cameraView = createCameraView(cameraModel);
-        WorldRenderer worldRenderer = new WorldRenderer(cameraView, textureRegistry, gameModel.getMapProvider(), gameModel.getTimeProvider(), gameModel.getFogProvider());
-        PheromoneRenderer pheromoneView = new PheromoneRenderer(cameraView, gameModel.getPheromoneManager());
+        WorldRenderer worldRenderer = new WorldRenderer(cameraView, textureRegistry, gameModel.getMapProvider(),
+                gameModel.getTimeProvider(), gameModel.getFogProvider());
+        PheromoneRenderer pheromoneView = new PheromoneRenderer(cameraView, gameModel.getPheromoneUsageProvider());
         HudView hudView = new HudView(hudBatch, uiFactory);
 
         // 4. Create Controllers
         InputManager inputManager = new InputManager(); // Used for wiring but not stored in screen
         CameraController cameraController = new CameraController(cameraModel, cameraView);
-        PheromoneController pheromoneController = new PheromoneController(gameModel, cameraView);
+        PheromoneController pheromoneController = new PheromoneController(gameModel.getPheromoneUsageProvider(),
+                cameraView);
         SpeedController speedController = new SpeedController(gameModel);
         HudController hudController = new HudController(hudView, gameModel.getAntTypeRegistry(),
                 gameModel.getEggManager(), pheromoneController, speedController,
