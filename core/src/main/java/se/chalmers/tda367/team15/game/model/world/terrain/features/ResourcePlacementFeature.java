@@ -40,7 +40,7 @@ public class ResourcePlacementFeature implements TerrainFeature {
 
         // 1. Colony Nucleation (Center area)
         GridPoint2 colonyPoint = placeInitialResource(context, nucRandom);
-        System.out.println(colonyPoint.x + " : " + colonyPoint.y);
+       
 
         if (colonyPoint != null) points.add(colonyPoint.add(new GridPoint2(width/2, height/2)));
         else points.add(new GridPoint2(width/2, height/2)); // Fallback
