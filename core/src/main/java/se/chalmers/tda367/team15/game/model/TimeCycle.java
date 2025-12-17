@@ -54,7 +54,7 @@ public class TimeCycle implements SimulationObserver, TimeCycleDataProvider {
         timeObservers.remove(observer);
     }
 
-    public int getTotalMinutes() {
+    public int getTotalMinutes() { // TODO: Unnecessary function? just take minutes?
         return minutes;
     }
 

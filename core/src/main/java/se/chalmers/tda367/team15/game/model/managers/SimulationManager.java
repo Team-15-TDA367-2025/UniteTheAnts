@@ -17,13 +17,13 @@ public class SimulationManager implements SimulationProvider {
     private long now = System.currentTimeMillis();
     private boolean paused = false;
 
-    private final List<SimulationObserver> updateObservers = new ArrayList<>();
+    private final List<SimulationObserver> simulationObservers = new ArrayList<>();
 
     public SimulationManager() {
     }
 
     public void addUpdateObserver(SimulationObserver u) {
-        updateObservers.add(u);
+        simulationObservers.add(u);
     }
 
     public void setTimeFast() {
@@ -64,7 +64,7 @@ public class SimulationManager implements SimulationProvider {
             accumulator += difference;
             while (accumulator >= mSPerTick) {
                 float inGameTimeDifference = (float) inGameTimePerTickMs / 1000f;
-                List<SimulationObserver> updateThese = new ArrayList<>(updateObservers);
+                List<SimulationObserver> updateThese = new ArrayList<>(simulationObservers);
                 for (SimulationObserver u : updateThese) {
                     u.update(inGameTimeDifference);
                 }
@@ -82,6 +82,6 @@ public class SimulationManager implements SimulationProvider {
     }
 
     public void removeUpdateObserver(SimulationObserver u) {
-        updateObservers.remove(u);
+        simulationObservers.remove(u);
     }
 }
