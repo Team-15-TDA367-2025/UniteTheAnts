@@ -12,7 +12,6 @@ import se.chalmers.tda367.team15.game.model.pheromones.PheromoneType;
 public class PheromoneController extends InputAdapter {
     private final PheromoneUsageProvider pheromoneUsageProvider;
     private final CoordinateConverter converter;
-    private final PheromoneGridConverter pheromoneGridConverter;
     private PheromoneType currentType = PheromoneType.GATHER; // null = delete mode
     private GridPoint2 lastGridPos; // Track last drawn position for line interpolation
     private boolean isDragging = false;
@@ -20,7 +19,6 @@ public class PheromoneController extends InputAdapter {
     public PheromoneController(PheromoneUsageProvider pheromoneUsageProvider, CoordinateConverter converter) {
         this.pheromoneUsageProvider = pheromoneUsageProvider;
         this.converter = converter;
-        this.pheromoneGridConverter = pheromoneUsageProvider.getConverter();
         this.lastGridPos = null;
     }
 
@@ -112,6 +110,6 @@ public class PheromoneController extends InputAdapter {
      * Uses the denser pheromone grid (multiple cells per tile).
      */
     private GridPoint2 worldToGrid(Vector2 worldPos) {
-        return pheromoneGridConverter.worldToPheromoneGrid(worldPos);
+        return pheromoneUsageProvider.getConverter().worldToPheromoneGrid(worldPos);
     }
 }
