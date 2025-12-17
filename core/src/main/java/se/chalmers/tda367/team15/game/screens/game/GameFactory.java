@@ -34,6 +34,7 @@ import se.chalmers.tda367.team15.game.model.managers.WaveManager;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
 import se.chalmers.tda367.team15.game.model.structure.Colony;
 import se.chalmers.tda367.team15.game.model.structure.resource.ResourceNode;
+import se.chalmers.tda367.team15.game.model.structure.resource.ResourceNodeFactory;
 import se.chalmers.tda367.team15.game.model.structure.resource.ResourceType;
 import se.chalmers.tda367.team15.game.model.world.MapProvider;
 import se.chalmers.tda367.team15.game.model.world.TerrainFactory;
@@ -152,6 +153,8 @@ public class GameFactory {
         AntFactory antFactory = new AntFactory(pheromoneManager, worldMap, entityManager,
                 destructionListener);
 
+        ResourceNodeFactory resourceNodeFactory = new ResourceNodeFactory(structureManager);
+
         EggManager eggManager = new EggManager(antTypeRegistry, antFactory);
         timeCycle.addTimeObserver(eggManager);
 
@@ -160,7 +163,7 @@ public class GameFactory {
 
         spawnInitialAnts(entityManager, colony, antFactory, antTypeRegistry);
 
-        spawnTerrainStructures(structureManager, worldMap);
+        spawnTerrainStructures(resourceNodeFactory, worldMap);
 
         WaveManager waveManager = new WaveManager(enemyFactory, entityManager);
         timeCycle.addTimeObserver(waveManager);
@@ -179,19 +182,12 @@ public class GameFactory {
     /**
      * Spawns structures determined by terrain generation features.
      */
-    private static void spawnTerrainStructures(StructureManager structureManager, MapProvider map) {
+    private static void spawnTerrainStructures(ResourceNodeFactory resourceNodeFactory, MapProvider map) {
         for (StructureSpawn spawn : map.getStructureSpawns()) {
             if ("resource_node".equals(spawn.getType())) {
                 Vector2 structurePos = map.tileToWorld(spawn.getPosition());
-                GridPoint2 worldGridPos = new GridPoint2((int) structurePos.x, (int) structurePos.y);
-                
-                structureManager.addStructure(new ResourceNode(
-                    worldGridPos,
-                    "node",
-                    1,
-                    ResourceType.FOOD,
-                    (Integer) spawn.getProperties().get("amount"),
-                    20));
+
+                resourceNodeFactory.createResourceNode(structurePos, spawn);
             }
             // Add other structure types here
         }
