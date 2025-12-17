@@ -13,6 +13,7 @@ import se.chalmers.tda367.team15.game.model.interfaces.TimeObserver;
  * Manages the collection of eggs and their development lifecycle.
  * Implements TimeObserver to tick eggs on game time updates.
  */
+// TODO: Should the egg manager be in /egg not in /managers?
 public class EggManager implements TimeObserver {
     private final List<Egg> eggs;
     private final List<EggHatchObserver> observers;
