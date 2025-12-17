@@ -19,7 +19,8 @@ import se.chalmers.tda367.team15.game.model.interfaces.TimeObserver;
 import se.chalmers.tda367.team15.game.model.managers.EntityManager;
 import se.chalmers.tda367.team15.game.model.structure.resource.ResourceType;
 
-public class Colony extends Structure implements CanBeAttacked, Home, EggHatchObserver, TimeObserver, ColonyUsageProvider {
+public class Colony extends Structure
+        implements CanBeAttacked, Home, EggHatchObserver, TimeObserver, ColonyUsageProvider {
     private Inventory inventory;
     private final EggManager eggManager;
     private float health;
@@ -29,8 +30,9 @@ public class Colony extends Structure implements CanBeAttacked, Home, EggHatchOb
     private final EntityManager entityManager;
     private final DestructionListener destructionListener;
 
-    public Colony(GridPoint2 position, EntityQuery entityQuery, EggManager eggManager, EntityManager entityManager, DestructionListener destructionListener) {
-        super(position, "colony", 4);
+    public Colony(GridPoint2 position, EntityQuery entityQuery, EggManager eggManager, EntityManager entityManager,
+            DestructionListener destructionListener) {
+        super(position, 4);
         this.health = MAX_HEALTH;
         this.faction = Faction.DEMOCRATIC_REPUBLIC_OF_ANTS;
         this.inventory = new Inventory(1000000); // test value for now
@@ -129,5 +131,10 @@ public class Colony extends Structure implements CanBeAttacked, Home, EggHatchOb
     public int getTotalAnts() {
         // TODO: fix this
         return entityQuery.getEntitiesOfType(Ant.class).size();
+    }
+
+    @Override
+    public String getTypeId() {
+        return "colony";
     }
 }

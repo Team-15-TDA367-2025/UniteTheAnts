@@ -2,15 +2,14 @@ package se.chalmers.tda367.team15.game.model.entity;
 
 import com.badlogic.gdx.math.Vector2;
 
-import se.chalmers.tda367.team15.game.model.interfaces.Drawable;
+import se.chalmers.tda367.team15.game.model.interfaces.GameObject;
 import se.chalmers.tda367.team15.game.model.interfaces.HasPosition;
 import se.chalmers.tda367.team15.game.model.interfaces.MovementStrategy;
 import se.chalmers.tda367.team15.game.model.interfaces.Updatable;
 
-public abstract class Entity implements Drawable, Updatable, HasPosition {
+public abstract class Entity implements GameObject, Updatable, HasPosition {
     protected Vector2 position;
     protected float rotation;
-    private String textureName;
     protected Vector2 velocity;
     private MovementStrategy movementStrategy;
 
@@ -19,9 +18,8 @@ public abstract class Entity implements Drawable, Updatable, HasPosition {
     // GameWorld is useful because it gives entities awareness of the world around
     // them- singleton???
 
-    public Entity(Vector2 position, String textureName) {
+    public Entity(Vector2 position) {
         this.position = position;
-        this.textureName = textureName;
         this.rotation = 0f;
         this.velocity = new Vector2(0f, 0f);
     }
@@ -32,7 +30,7 @@ public abstract class Entity implements Drawable, Updatable, HasPosition {
 
     protected void handleCollision() {
         velocity = new Vector2(0, 0);
-        }
+    }
 
     @Override
     public void update(float deltaTime) {
@@ -61,17 +59,8 @@ public abstract class Entity implements Drawable, Updatable, HasPosition {
 
     private void updateRotation() {
         if (getVelocity().len2() > 0.1f) {
-            rotation = getVelocity().angleRad(); //- MathUtils.PI / 2f;
+            rotation = getVelocity().angleRad(); // - MathUtils.PI / 2f;
         }
-    }
-
-    @Override
-    public String getTextureName() {
-        return textureName;
-    }
-
-    public void setTextureName(String textureName) {
-        this.textureName = textureName;
     }
 
     public Vector2 getVelocity() {

@@ -8,10 +8,15 @@ public class Resource extends Structure {
     private ResourceType type;
     private int amount;
 
-    public Resource(GridPoint2 position, String textureName, ResourceType type, int amount) {
-        super(position, textureName, 1);
+    public Resource(GridPoint2 position, ResourceType type, int amount) {
+        super(position, 1);
         this.type = type;
         this.amount = amount;
+    }
+
+    @Override
+    public String getTypeId() {
+        return "resource_" + type.name().toLowerCase();
     }
 
     public ResourceType getType() {

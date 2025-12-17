@@ -32,8 +32,9 @@ public class Termite extends Entity implements CanBeAttacked {
     private final StructureProvider structureProvider;
     private final DestructionListener destructionListener;
 
-    public Termite(Vector2 position, EntityQuery entityQuery, StructureProvider structureProvider, DestructionListener destructionListener) {
-        super(position, "termite");
+    public Termite(Vector2 position, EntityQuery entityQuery, StructureProvider structureProvider,
+            DestructionListener destructionListener) {
+        super(position);
         this.destructionListener = destructionListener;
         this.entityQuery = entityQuery;
         this.structureProvider = structureProvider;
@@ -96,5 +97,10 @@ public class Termite extends Entity implements CanBeAttacked {
     @Override
     public Vector2 getSize() {
         return new Vector2(1f, 1.5f);
+    }
+
+    @Override
+    public String getTypeId() {
+        return "termite";
     }
 }

@@ -27,7 +27,6 @@ public class Ant extends Entity implements VisionProvider, CanBeAttacked {
 
     // Stats from AntType
     private final float speed;
-    private final String baseTextureName;
     private final Inventory inventory;
     private final DestructionListener destructionListener;
     private final PheromoneManager system;
@@ -35,8 +34,9 @@ public class Ant extends Entity implements VisionProvider, CanBeAttacked {
     private AntBehavior behavior;
     private float health;
 
-    public Ant(Vector2 position, PheromoneManager system, AntType type, MapProvider map, Home home, EntityQuery entityQuery, DestructionListener destructionListener) {
-        super(position, type.textureName());
+    public Ant(Vector2 position, PheromoneManager system, AntType type, MapProvider map, Home home,
+            EntityQuery entityQuery, DestructionListener destructionListener) {
+        super(position);
         this.type = type;
         this.behavior = new WanderBehavior(this, home, entityQuery, system.getConverter());
         this.system = system;
@@ -46,7 +46,6 @@ public class Ant extends Entity implements VisionProvider, CanBeAttacked {
         this.speed = type.moveSpeed();
         this.health = type.maxHealth();
         this.inventory = new Inventory(type.carryCapacity());
-        this.baseTextureName = type.textureName();
 
         pickRandomDirection();
         this.faction = Faction.DEMOCRATIC_REPUBLIC_OF_ANTS;
@@ -68,20 +67,10 @@ public class Ant extends Entity implements VisionProvider, CanBeAttacked {
     public void update(float deltaTime) {
         updateBehavior();
         super.update(deltaTime);
-        updateTexture();
     }
 
     public void updateBehavior() {
         behavior.update(system);
-    }
-
-    private void updateTexture() {
-        if (inventory.isEmpty()) {
-            setTextureName(baseTextureName);
-        } else {
-            // TODO: This should be a more generic solution
-            setTextureName("resource");
-        }
     }
 
     public void setBehavior(AntBehavior behavior) {
@@ -116,7 +105,6 @@ public class Ant extends Entity implements VisionProvider, CanBeAttacked {
         boolean deposited = home.depositResources(inventory);
         if (deposited) {
             inventory.clear();
-            updateTexture();
         }
         return deposited;
     }
@@ -138,6 +126,11 @@ public class Ant extends Entity implements VisionProvider, CanBeAttacked {
     @Override
     public Faction getFaction() {
         return faction;
+    }
+
+    @Override
+    public String getTypeId() {
+        return type.id();
     }
 
     @Override

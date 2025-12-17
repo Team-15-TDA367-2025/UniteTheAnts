@@ -40,6 +40,7 @@ import se.chalmers.tda367.team15.game.model.world.TerrainGenerator;
 import se.chalmers.tda367.team15.game.model.world.WorldMap;
 import se.chalmers.tda367.team15.game.model.world.terrain.StructureSpawn;
 import se.chalmers.tda367.team15.game.view.TextureRegistry;
+import se.chalmers.tda367.team15.game.view.TextureResolver;
 import se.chalmers.tda367.team15.game.view.camera.CameraView;
 import se.chalmers.tda367.team15.game.view.camera.ViewportListener;
 import se.chalmers.tda367.team15.game.view.renderers.PheromoneRenderer;
@@ -57,6 +58,7 @@ public class GameFactory {
     public static final float MIN_ZOOM = 0.05f;
     public static final float MAX_ZOOM = 4.0f;
     public static final int TICKS_PER_MINUTE = 6;
+    public static final int GRASS_VARIANT_TYPES = 3;
 
     private GameFactory() {
     }
@@ -68,12 +70,13 @@ public class GameFactory {
 
         // 2. Create Resources
         TextureRegistry textureRegistry = new TextureRegistry();
-        UiFactory uiFactory = new UiFactory(textureRegistry);
+        TextureResolver textureResolver = new TextureResolver(textureRegistry);
+        UiFactory uiFactory = new UiFactory(textureResolver);
         SpriteBatch hudBatch = new SpriteBatch();
 
         // 3. Create Views
         CameraView cameraView = createCameraView(cameraModel);
-        WorldRenderer worldRenderer = new WorldRenderer(cameraView, textureRegistry, gameModel.getMapProvider(),
+        WorldRenderer worldRenderer = new WorldRenderer(cameraView, textureResolver, gameModel.getMapProvider(),
                 gameModel.getTimeProvider(), gameModel.getFogProvider());
         PheromoneRenderer pheromoneView = new PheromoneRenderer(cameraView, gameModel.getPheromoneUsageProvider());
         HudView hudView = new HudView(hudBatch, uiFactory);
@@ -86,7 +89,7 @@ public class GameFactory {
         SpeedController speedController = new SpeedController(gameModel);
         HudController hudController = new HudController(hudView, gameModel.getAntTypeRegistry(),
                 gameModel.getEggManager(), pheromoneController, speedController,
-                uiFactory, gameModel.getTimeProvider(), gameModel.getColonyUsageProvider());
+                uiFactory, gameModel.getTimeProvider(), gameModel.getColonyUsageProvider(), textureResolver);
 
         // 5. Wire Input
         inputManager.addProcessor(cameraController);
@@ -124,7 +127,7 @@ public class GameFactory {
         AntTypeRegistry antTypeRegistry = createAntTypeRegistry();
 
         TerrainGenerator terrainGenerator = TerrainFactory.createStandardPerlinGenerator(
-                System.currentTimeMillis());
+                System.currentTimeMillis(), GRASS_VARIANT_TYPES);
         // TODO: break this down
         SimulationManager simulationManager = new SimulationManager();
         TimeCycle timeCycle = new TimeCycle(1f / TICKS_PER_MINUTE);
@@ -175,8 +178,8 @@ public class GameFactory {
     public static void spawnInitialAnts(EntityManager entityManager, Home home, AntFactory antFactory,
             AntTypeRegistry antTypeRegistry) {
         AntType type = antTypeRegistry.get("worker");
-            Ant ant = antFactory.createAnt(home, type);
-            entityManager.addEntity(ant);
+        Ant ant = antFactory.createAnt(home, type);
+        entityManager.addEntity(ant);
     }
 
     /**
@@ -232,7 +235,6 @@ public class GameFactory {
                 .maxHealth(4f)
                 .moveSpeed(8f)
                 .carryCapacity(0)
-                .textureName("scout")
                 .build());
 
         // Soldier: Low speed, high HP, 0 capacity, expensive
@@ -243,8 +245,7 @@ public class GameFactory {
                 .developmentTicks(300)
                 .maxHealth(20f)
                 .moveSpeed(2f)
-                .carryCapacity(0)
-                .textureName("ant")
+                .carryCapacity(50)
                 .build());
 
         // Worker: Medium speed, medium HP, some capacity
@@ -256,7 +257,6 @@ public class GameFactory {
                 .maxHealth(6f)
                 .moveSpeed(5f)
                 .carryCapacity(10)
-                .textureName("ant")
                 .build());
 
         return registry;

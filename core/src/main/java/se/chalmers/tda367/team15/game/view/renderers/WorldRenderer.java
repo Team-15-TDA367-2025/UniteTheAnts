@@ -10,16 +10,16 @@ import com.badlogic.gdx.math.MathUtils;
 
 import se.chalmers.tda367.team15.game.GameLaunchConfiguration;
 import se.chalmers.tda367.team15.game.model.fog.FogProvider;
-import se.chalmers.tda367.team15.game.model.interfaces.Drawable;
+import se.chalmers.tda367.team15.game.model.interfaces.GameObject;
 import se.chalmers.tda367.team15.game.model.interfaces.TimeCycleDataProvider;
 import se.chalmers.tda367.team15.game.model.world.MapProvider;
-import se.chalmers.tda367.team15.game.view.TextureRegistry;
+import se.chalmers.tda367.team15.game.view.TextureResolver;
 import se.chalmers.tda367.team15.game.view.camera.CameraView;
 
 public class WorldRenderer {
     private final SpriteBatch batch;
     private final CameraView cameraView;
-    private final TextureRegistry textureRegistry;
+    private final TextureResolver textureResolver;
     private final TerrainRenderer terrainRenderer;
     private final FogRenderer fogRenderer;
     private final MapProvider mapProvider;
@@ -27,20 +27,20 @@ public class WorldRenderer {
     private final FogProvider fogProvider;
     private final TimeCycleDataProvider timeProvider;
 
-    public WorldRenderer(CameraView cameraView, TextureRegistry textureRegistry, MapProvider mapProvider,
+    public WorldRenderer(CameraView cameraView, TextureResolver textureResolver, MapProvider mapProvider,
             TimeCycleDataProvider timeProvider, FogProvider fogProvider) {
         this.cameraView = cameraView;
-        this.textureRegistry = textureRegistry;
+        this.textureResolver = textureResolver;
         this.batch = new SpriteBatch();
-        this.terrainRenderer = new TerrainRenderer(textureRegistry);
+        this.terrainRenderer = new TerrainRenderer(textureResolver);
         this.fogProvider = fogProvider;
-        this.fogRenderer = new FogRenderer(textureRegistry.get("pixel"));
+        this.fogRenderer = new FogRenderer(textureResolver.resolve("pixel"));
         this.mapProvider = mapProvider;
         this.shapeRenderer = new ShapeRenderer();
         this.timeProvider = timeProvider;
     }
 
-    public void render(Iterable<Drawable> drawables) {
+    public void render(Iterable<GameObject> drawables) {
         batch.setProjectionMatrix(cameraView.getCombinedMatrix());
         batch.begin();
 
@@ -68,8 +68,8 @@ public class WorldRenderer {
 
     }
 
-    private void draw(Drawable drawable) {
-        TextureRegion region = textureRegistry.get(drawable.getTextureName());
+    private void draw(GameObject drawable) {
+        TextureRegion region = textureResolver.resolve(drawable);
 
         float width = drawable.getSize().x;
         float height = drawable.getSize().y;
