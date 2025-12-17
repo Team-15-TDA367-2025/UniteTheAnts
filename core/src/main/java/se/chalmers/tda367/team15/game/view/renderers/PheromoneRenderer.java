@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 
+import se.chalmers.tda367.team15.game.model.interfaces.PheromoneUsageProvider;
 import se.chalmers.tda367.team15.game.model.managers.PheromoneManager;
 import se.chalmers.tda367.team15.game.model.pheromones.Pheromone;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
@@ -16,13 +17,13 @@ import se.chalmers.tda367.team15.game.view.camera.CameraView;
 public class PheromoneRenderer {
     private final ShapeRenderer shapeRenderer;
     private final CameraView cameraView;
-    private final PheromoneManager pheromoneManager;
+    private final PheromoneUsageProvider pheromoneUsageProvider;
     private final PheromoneGridConverter converter;
 
-    public PheromoneRenderer(CameraView cameraView, PheromoneManager pheromoneManager) {
+    public PheromoneRenderer(CameraView cameraView, PheromoneUsageProvider pheromoneUsageProvider) {
         this.cameraView = cameraView;
-        this.pheromoneManager = pheromoneManager;
-        this.converter = pheromoneManager.getConverter();
+        this.pheromoneUsageProvider = pheromoneUsageProvider;
+        this.converter = pheromoneUsageProvider.getConverter();
         this.shapeRenderer = new ShapeRenderer();
     }
 
@@ -33,11 +34,11 @@ public class PheromoneRenderer {
 
         // Find max distance for normalization
         int maxDistance = 0;
-        for (Pheromone pheromone : pheromoneManager.getPheromones()) {
+        for (Pheromone pheromone : pheromoneUsageProvider.getPheromones()) {
             maxDistance = Math.max(maxDistance, pheromone.getDistance());
         }
 
-        for (Pheromone pheromone : pheromoneManager.getPheromones()) {
+        for (Pheromone pheromone : pheromoneUsageProvider.getPheromones()) {
             Color baseColor = getColorForType(pheromone.getType());
             float fadeFactor = calculateFadeFactor(pheromone.getDistance(), maxDistance);
 
