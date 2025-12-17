@@ -5,22 +5,22 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 
-import se.chalmers.tda367.team15.game.model.GameModel;
+import se.chalmers.tda367.team15.game.model.interfaces.PheromoneUsageProvider;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneType;
 
 public class PheromoneController extends InputAdapter {
-    private final GameModel gameModel;
+    private final PheromoneUsageProvider pheromoneUsageProvider;
     private final CoordinateConverter converter;
     private final PheromoneGridConverter pheromoneGridConverter;
     private PheromoneType currentType = PheromoneType.GATHER; // null = delete mode
     private GridPoint2 lastGridPos; // Track last drawn position for line interpolation
     private boolean isDragging = false;
 
-    public PheromoneController(GameModel gameModel, CoordinateConverter converter) {
-        this.gameModel = gameModel;
+    public PheromoneController(PheromoneUsageProvider pheromoneUsageProvider, CoordinateConverter converter) {
+        this.pheromoneUsageProvider = pheromoneUsageProvider;
         this.converter = converter;
-        this.pheromoneGridConverter = gameModel.getPheromoneGridConverter();
+        this.pheromoneGridConverter = pheromoneUsageProvider.getConverter();
         this.lastGridPos = null;
     }
 
@@ -68,7 +68,7 @@ public class PheromoneController extends InputAdapter {
         GridPoint2 gridPos = worldToGrid(worldPos);
 
         if (currentType == null) {
-            gameModel.getPheromoneManager().removePheromone(gridPos);
+            pheromoneUsageProvider.removePheromone(gridPos);
             return;
         }
 
@@ -103,8 +103,8 @@ public class PheromoneController extends InputAdapter {
     }
 
     private boolean processPheromoneAction(GridPoint2 pos) {
-        return gameModel.getPheromoneManager().addPheromone(pos, currentType) ||
-                gameModel.getPheromoneManager().getPheromoneAt(pos) != null;
+        return pheromoneUsageProvider.addPheromone(pos, currentType) ||
+                pheromoneUsageProvider.getPheromoneAt(pos) != null;
     }
 
     /**
