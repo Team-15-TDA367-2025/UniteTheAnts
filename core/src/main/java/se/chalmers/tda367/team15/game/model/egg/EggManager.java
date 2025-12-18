@@ -3,24 +3,23 @@ package se.chalmers.tda367.team15.game.model.egg;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import se.chalmers.tda367.team15.game.model.AntFactory;
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntType;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntTypeRegistry;
-import se.chalmers.tda367.team15.game.model.interfaces.TimeObserver;
-import se.chalmers.tda367.team15.game.model.structure.resource.ResourceType;
 import se.chalmers.tda367.team15.game.model.interfaces.EggPurchaseProvider;
 import se.chalmers.tda367.team15.game.model.interfaces.EntityModificationProvider;
 import se.chalmers.tda367.team15.game.model.interfaces.Home;
+import se.chalmers.tda367.team15.game.model.interfaces.TimeObserver;
+import se.chalmers.tda367.team15.game.model.structure.resource.ResourceType;
 
 /**
  * Manages the collection of eggs and their development lifecycle.
  * Implements TimeObserver to tick eggs on game time updates.
  */
 public class EggManager implements TimeObserver, EggPurchaseProvider {
-    private final CopyOnWriteArrayList<Egg> eggs;
+    private final List<Egg> eggs;
     private final AntTypeRegistry antTypeRegistry;
     private final AntFactory antFactory;
     private final Home home;
@@ -31,7 +30,7 @@ public class EggManager implements TimeObserver, EggPurchaseProvider {
         this.antTypeRegistry = antTypeRegistry;
         this.antFactory = antFactory;
         this.home = home;
-        this.eggs = new CopyOnWriteArrayList<>();
+        this.eggs = new ArrayList<>();
         this.entityManager = entityManager;
     }
 
@@ -56,8 +55,8 @@ public class EggManager implements TimeObserver, EggPurchaseProvider {
 
             Ant ant = antFactory.createAnt(home, type);
             entityManager.addEntity(ant);
-            eggs.remove(egg);
         }
+        eggs.removeIf(Egg::isHatched);
     }
 
     public boolean purchaseEgg(AntType type) {
