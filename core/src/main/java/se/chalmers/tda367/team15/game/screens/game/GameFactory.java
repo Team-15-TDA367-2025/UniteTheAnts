@@ -11,11 +11,7 @@ import se.chalmers.tda367.team15.game.controller.HudController;
 import se.chalmers.tda367.team15.game.controller.InputManager;
 import se.chalmers.tda367.team15.game.controller.PheromoneController;
 import se.chalmers.tda367.team15.game.controller.SpeedController;
-import se.chalmers.tda367.team15.game.model.AntFactory;
-import se.chalmers.tda367.team15.game.model.DestructionListener;
-import se.chalmers.tda367.team15.game.model.EnemyFactory;
-import se.chalmers.tda367.team15.game.model.GameModel;
-import se.chalmers.tda367.team15.game.model.TimeCycle;
+import se.chalmers.tda367.team15.game.model.*;
 import se.chalmers.tda367.team15.game.model.camera.CameraConstraints;
 import se.chalmers.tda367.team15.game.model.camera.CameraModel;
 import se.chalmers.tda367.team15.game.model.egg.EggManager;
@@ -46,6 +42,8 @@ import se.chalmers.tda367.team15.game.view.renderers.PheromoneRenderer;
 import se.chalmers.tda367.team15.game.view.renderers.WorldRenderer;
 import se.chalmers.tda367.team15.game.view.ui.HudView;
 import se.chalmers.tda367.team15.game.view.ui.UiSkin;
+
+import java.util.HashMap;
 
 /**
  * Factory for creating and wiring the GameScreen.
@@ -137,24 +135,31 @@ public class GameFactory {
 
         StructureManager structureManager = new StructureManager();
         simulationManager.addUpdateObserver(structureManager);
-        destructionListener.addStructureDeathObserver(structureManager);
 
         ResourceManager resourceManager = new ResourceManager(entityManager, structureManager);
         simulationManager.addUpdateObserver(resourceManager);
 
         WorldMap worldMap = new WorldMap(MAP_WIDTH, MAP_HEIGHT, terrainGenerator);
 
-        EnemyFactory enemyFactory = new EnemyFactory(entityManager, structureManager, destructionListener);
+        // Termite target priority
+        HashMap<AttackCategory, Integer> termiteTargetPriority = new HashMap<>();
+        termiteTargetPriority.put(AttackCategory.WORKER_ANT, 2);
+
+        EnemyFactory enemyFactory = new EnemyFactory(entityManager, structureManager, destructionListener, termiteTargetPriority);
         FogManager fogManager = new FogManager(entityManager, worldMap);
         simulationManager.addUpdateObserver(fogManager);
         PheromoneGridConverter pheromoneGridConverter = new PheromoneGridConverter(4);
 
+        //Ant target priority
+        HashMap<AttackCategory, Integer> antTargetPriority = new HashMap<>();
+        antTargetPriority.put(AttackCategory.TERMITE, 2);
+
         PheromoneManager pheromoneManager = new PheromoneManager(new GridPoint2(0, 0), pheromoneGridConverter, 4);
         AntFactory antFactory = new AntFactory(pheromoneManager, worldMap, entityManager,
-                destructionListener);
+                destructionListener, structureManager, antTargetPriority);
 
         ResourceNodeFactory resourceNodeFactory = new ResourceNodeFactory(structureManager);
-        Colony colony = createColony(timeCycle, entityManager, structureManager, destructionListener,
+        Colony colony = createColony(timeCycle, entityManager, structureManager,
                 20);
 
         EggManager eggManager = new EggManager(antTypeRegistry, antFactory, colony, entityManager);
@@ -193,9 +198,9 @@ public class GameFactory {
 
     private static Colony createColony(TimeCycle timeCycle,
             EntityQuery entityQuery, StructureManager structureManager,
-            DestructionListener destructionListener, int initialFood) {
+            int initialFood) {
         Colony colony = new Colony(new GridPoint2(0, 0), entityQuery,
-                destructionListener, initialFood);
+                initialFood);
         structureManager.addStructure(colony);
         timeCycle.addTimeObserver(colony);
         return colony;
