@@ -179,7 +179,16 @@ public class Ant extends Entity implements VisionProvider, CanAttack {
     }
 
     public void setWanderBehaviour() {
-        behavior = new WanderBehavior(this, home, entityQuery);
+        setWanderBehaviour(false);
+    }
+
+    /**
+     * Switches to wander behavior.
+     * 
+     * @param leftTrail If true, applies a cooldown before re-entering any trail
+     */
+    public void setWanderBehaviour(boolean leftTrail) {
+        behavior = new WanderBehavior(this, home, entityQuery, leftTrail);
     }
 
     public void setFollowTrailBehaviour() {

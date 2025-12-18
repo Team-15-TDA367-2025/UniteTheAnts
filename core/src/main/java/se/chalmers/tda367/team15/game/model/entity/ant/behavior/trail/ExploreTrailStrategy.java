@@ -28,12 +28,12 @@ public class ExploreTrailStrategy extends TrailStrategy {
             return null;
         }
 
-        return getBestByDistance(outward, true);
+        return moveRandomlyOnTrail(outward, current);
     }
 
     @Override
     public void onTrailEnd(Ant ant, Pheromone current) {
-        ant.setWanderBehaviour();
+        ant.setWanderBehaviour(true);
     }
 
     @Override

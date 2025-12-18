@@ -183,7 +183,7 @@ public class GameFactory {
 
     public static void spawnInitialAnts(EntityManager entityManager, Home home, AntFactory antFactory,
             AntTypeRegistry antTypeRegistry) {
-        AntType type = antTypeRegistry.get("worker");
+        AntType type = antTypeRegistry.get("scout");
         for (int i = 0; i < 20000; i++) {
             Ant ant = antFactory.createAnt(home, type);
             entityManager.addEntity(ant);
@@ -244,7 +244,7 @@ public class GameFactory {
                 .carryCapacity(0)
                 .textureName("scout")
                 .allowedPheromones(Set.of(PheromoneType.EXPLORE))
-                .homeBias(0.01f) // Low home bias - scouts wander far
+                .homeBias(0.05f) // Low home bias - scouts wander far
                 .build());
 
         // Soldier: Low speed, high HP, 0 capacity, expensive
@@ -258,7 +258,7 @@ public class GameFactory {
                 .carryCapacity(0)
                 .textureName("ant")
                 .allowedPheromones(Set.of(PheromoneType.ATTACK))
-                .homeBias(0.5f)
+                .homeBias(0.3f)
                 .build());
 
         // Worker: Medium speed, medium HP, some capacity

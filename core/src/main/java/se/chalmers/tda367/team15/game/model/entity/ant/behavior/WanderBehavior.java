@@ -17,12 +17,29 @@ import se.chalmers.tda367.team15.game.model.pheromones.Pheromone;
  * pheromone trail.
  */
 public class WanderBehavior extends AntBehavior {
+    private static final int TRAIL_REENTRY_COOLDOWN = 30; // frames to wait before re-entering a trail
+
     private final Home home;
     private int accumulator = 0;
+    private int trailCooldown = 0;
 
     public WanderBehavior(Ant ant, Home home, EntityQuery entityQuery) {
+        this(ant, home, entityQuery, false);
+    }
+
+    /**
+     * Creates a wander behavior.
+     * 
+     * @param ant              The ant
+     * @param home             The home colony
+     * @param entityQuery      Entity query interface
+     * @param leftTrailOnStart If true, applies a cooldown before re-entering any
+     *                         trail
+     */
+    public WanderBehavior(Ant ant, Home home, EntityQuery entityQuery, boolean leftTrailOnStart) {
         super(ant, entityQuery);
         this.home = home;
+        this.trailCooldown = leftTrailOnStart ? TRAIL_REENTRY_COOLDOWN : 0;
     }
 
     private void changeTrajectory() {
@@ -74,6 +91,12 @@ public class WanderBehavior extends AntBehavior {
         if (accumulator >= 20) {
             changeTrajectory();
             accumulator = 0;
+        }
+
+        // Decrement trail cooldown
+        if (trailCooldown > 0) {
+            trailCooldown--;
+            return; // Don't check for pheromones while cooling down
         }
 
         GridPoint2 gridPos = ant.getGridPosition();

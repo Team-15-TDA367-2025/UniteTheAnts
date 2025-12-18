@@ -14,6 +14,8 @@ import se.chalmers.tda367.team15.game.model.pheromones.Pheromone;
 public abstract class TrailStrategy {
 
     protected boolean outwards = true;
+    // Protected because it's also used in the PatrolTrailStrategy
+    protected final Random random = new Random();
 
     /**
      * Selects the next pheromone to move toward from available neighbors.
@@ -88,7 +90,7 @@ public abstract class TrailStrategy {
      * @param random    Random instance for shuffling
      * @return Selected pheromone, or null if completely stuck
      */
-    protected Pheromone moveRandomlyOnTrail(List<Pheromone> neighbors, Pheromone current, Random random) {
+    protected Pheromone moveRandomlyOnTrail(List<Pheromone> neighbors, Pheromone current) {
         if (neighbors.isEmpty())
             return null;
 

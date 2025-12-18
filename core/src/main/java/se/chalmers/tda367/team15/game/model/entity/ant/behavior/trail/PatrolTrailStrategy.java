@@ -1,7 +1,6 @@
 package se.chalmers.tda367.team15.game.model.entity.ant.behavior.trail;
 
 import java.util.List;
-import java.util.Random;
 
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.pheromones.Pheromone;
@@ -18,8 +17,6 @@ public class PatrolTrailStrategy extends TrailStrategy {
     private static final float SPEED_MULTIPLIER = 1.0f;
     private static final float TURN_CHANCE_PER_SOLDIER = 0.05f; // 5% per soldier
     private static final float MAX_TURN_CHANCE = 0.20f; // Cap at 20%
-
-    private final Random random = new Random();
 
     @Override
     public Pheromone selectNextPheromone(Ant ant, List<Pheromone> neighbors, Pheromone current) {
@@ -39,13 +36,13 @@ public class PatrolTrailStrategy extends TrailStrategy {
             }
         }
 
-        return moveRandomlyOnTrail(neighbors, current, random);
+        return moveRandomlyOnTrail(neighbors, current);
     }
 
     @Override
     public void onTrailEnd(Ant ant, Pheromone current) {
         if (current == null) {
-            ant.setWanderBehaviour();
+            ant.setWanderBehaviour(true);
         }
         outwards = !outwards;
     }
