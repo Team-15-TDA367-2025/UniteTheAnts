@@ -1,7 +1,5 @@
 package se.chalmers.tda367.team15.game.view.renderers;
 
-import java.util.Map;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -26,6 +24,7 @@ public class WorldRenderer {
     private final FogRenderer fogRenderer;
     private final MapProvider mapProvider;
     private final ShapeRenderer shapeRenderer;
+    private final FogProvider fogProvider;
     private final TimeCycleDataProvider timeProvider;
 
     public WorldRenderer(CameraView cameraView, TextureRegistry textureRegistry, MapProvider mapProvider,
@@ -34,7 +33,8 @@ public class WorldRenderer {
         this.textureRegistry = textureRegistry;
         this.batch = new SpriteBatch();
         this.terrainRenderer = new TerrainRenderer(textureRegistry);
-        this.fogRenderer = new FogRenderer(textureRegistry.get("pixel"), fogProvider);
+        this.fogProvider = fogProvider;
+        this.fogRenderer = new FogRenderer(textureRegistry.get("pixel"));
         this.mapProvider = mapProvider;
         this.shapeRenderer = new ShapeRenderer();
         this.timeProvider = timeProvider;
@@ -46,11 +46,13 @@ public class WorldRenderer {
 
         terrainRenderer.render(batch, mapProvider, cameraView);
         drawables.forEach(this::draw);
-        if (!GameLaunchConfiguration.getCurrent().noFog()) {
-            fogRenderer.render(batch, cameraView);
-        }
 
         batch.end();
+
+        // Render fog after main batch to avoid z-fighting
+        if (!GameLaunchConfiguration.getCurrent().noFog()) {
+            fogRenderer.render(fogProvider, cameraView.getCombinedMatrix(), cameraView);
+        }
 
         if (!timeProvider.getIsDay()) {
             // at night, we draw a black rectangle over screen 50% opacity
@@ -90,6 +92,7 @@ public class WorldRenderer {
 
     public void dispose() {
         batch.dispose();
+        fogRenderer.dispose();
         shapeRenderer.dispose();
     }
 }
