@@ -1,7 +1,5 @@
 package se.chalmers.tda367.team15.game.model.entity.ant.behavior.trail;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
@@ -91,25 +89,30 @@ public abstract class TrailStrategy {
      * @return Selected pheromone, or null if completely stuck
      */
     protected Pheromone moveRandomlyOnTrail(List<Pheromone> neighbors, Pheromone current, Random random) {
-        List<Pheromone> forward = filterByDistance(neighbors, current, outwards);
+        if (neighbors.isEmpty())
+            return null;
 
+        // Try forward direction; if dead end flip once
+        List<Pheromone> forward = filterByDistance(neighbors, current, outwards);
         if (forward.isEmpty()) {
-            // Dead end - turn around
             outwards = !outwards;
             forward = filterByDistance(neighbors, current, outwards);
         }
 
-        if (forward.isEmpty()) {
-            // Still nothing - pick any neighbor that isn't current
-            return neighbors.stream()
-                    .filter(p -> current == null || !p.getPosition().equals(current.getPosition()))
-                    .findAny()
-                    .orElse(neighbors.isEmpty() ? null : neighbors.get(0));
+        if (!forward.isEmpty()) {
+            return forward.get(random.nextInt(forward.size()));
         }
 
-        // Pick randomly from forward options
-        List<Pheromone> shuffled = new ArrayList<>(forward);
-        Collections.shuffle(shuffled, random);
-        return shuffled.get(0);
+        // Still nothing: pick any neighbor not equal to current
+        if (current == null)
+            return neighbors.get(random.nextInt(neighbors.size()));
+        var curPos = current.getPosition();
+        for (int i = 0; i < neighbors.size(); i++) {
+            Pheromone p = neighbors.get(random.nextInt(neighbors.size()));
+            if (!p.getPosition().equals(curPos))
+                return p;
+        }
+        return neighbors.get(0);
     }
+
 }

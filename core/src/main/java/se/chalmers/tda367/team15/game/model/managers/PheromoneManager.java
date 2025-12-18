@@ -89,8 +89,7 @@ public class PheromoneManager implements PheromoneUsageProvider {
                 Pheromone neighbor = pheromoneGrid.getPheromoneAt(neighborPos);
 
                 if (neighbor != null && neighbor.getDistance() > currentDistance + 1) {
-                    Pheromone updated = new Pheromone(neighborPos, neighbor.getType(), currentDistance + 1);
-                    pheromoneGrid.addPheromone(updated);
+                    neighbor.setDistance(currentDistance + 1);
                     queue.add(neighborPos);
                 }
             }
@@ -138,8 +137,8 @@ public class PheromoneManager implements PheromoneUsageProvider {
 
             if (isInsideColony(neighborPos)) {
                 // Calculate Manhattan distance from colony center (0,0 in grid coordinates)
-                int distanceFromCenter = Math.abs(neighborPos.x - colonyPheromoneGridPosition.x) 
-                                       + Math.abs(neighborPos.y - colonyPheromoneGridPosition.y);
+                int distanceFromCenter = Math.abs(neighborPos.x - colonyPheromoneGridPosition.x)
+                        + Math.abs(neighborPos.y - colonyPheromoneGridPosition.y);
                 if (distanceFromCenter < minDistance) {
                     minDistance = distanceFromCenter;
                     foundValidParent = true;

@@ -11,6 +11,7 @@ import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
 import se.chalmers.tda367.team15.game.model.managers.PheromoneManager;
 import se.chalmers.tda367.team15.game.model.pheromones.Pheromone;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
+import se.chalmers.tda367.team15.game.model.pheromones.PheromoneType;
 
 /**
  * This behaviour is used when ants are trying to follow a pheromone trail
@@ -36,6 +37,7 @@ public class FollowTrailBehavior extends AntBehavior {
     @Override
     public void update(PheromoneManager system) {
         if (enemiesInSight()) {
+            exitTrail(); // Decrement soldier count when leaving trail
             ant.setAttackBehaviour();
             return;
         }
@@ -46,6 +48,7 @@ public class FollowTrailBehavior extends AntBehavior {
 
         // Safety check: if no pheromones nearby, trail was likely deleted
         if (neighbors.isEmpty()) {
+            exitTrail(); // Decrement soldier count when leaving trail
             lastPheromone = null;
             currentTarget = null;
             trailStrategy.onTrailEnd(ant, null);
@@ -54,14 +57,18 @@ public class FollowTrailBehavior extends AntBehavior {
 
         // 1. Initialization / Re-anchoring
         if (lastPheromone == null || !isPheromoneStillValid(lastPheromone, neighbors)) {
-            lastPheromone = neighbors.stream()
+            Pheromone newPheromone = neighbors.stream()
                     .min((a, b) -> Integer.compare(a.getDistance(), b.getDistance()))
                     .orElse(null);
 
-            if (lastPheromone == null) {
+            if (newPheromone == null) {
+                exitTrail();
                 trailStrategy.onTrailEnd(ant, null);
                 return;
             }
+
+            updateSoldierCount(lastPheromone, newPheromone);
+            lastPheromone = newPheromone;
             // Reset target since our anchor changed
             currentTarget = null;
         }
@@ -72,7 +79,8 @@ public class FollowTrailBehavior extends AntBehavior {
                 // Target was deleted, need new target
                 currentTarget = null;
             } else if (ant.getPosition().dst2(getCenterPos(currentTarget)) < reachedThresholdSq) {
-                // Reached target
+                // Reached target - update soldier count when moving to new cell
+                updateSoldierCount(lastPheromone, currentTarget);
                 lastPheromone = currentTarget;
                 currentTarget = null;
             }
@@ -123,5 +131,38 @@ public class FollowTrailBehavior extends AntBehavior {
     @Override
     public void handleCollision() {
         currentTarget = null;
+    }
+
+    /**
+     * Checks if this ant is a soldier (can follow ATTACK pheromones).
+     */
+    private boolean isSoldierAnt() {
+        return ant.getType().allowedPheromones().contains(PheromoneType.ATTACK);
+    }
+
+    /**
+     * Updates soldier count when moving from one pheromone cell to another.
+     * Only affects soldier ants.
+     */
+    private void updateSoldierCount(Pheromone oldPheromone, Pheromone newPheromone) {
+        if (!isSoldierAnt()) {
+            return;
+        }
+        if (oldPheromone != null && oldPheromone != newPheromone) {
+            oldPheromone.decrementSoldierCount();
+        }
+        if (newPheromone != null && newPheromone != oldPheromone) {
+            newPheromone.incrementSoldierCount();
+        }
+    }
+
+    /**
+     * Called when ant leaves the trail (switches behavior or trail ends).
+     * Decrements soldier count on current pheromone.
+     */
+    private void exitTrail() {
+        if (isSoldierAnt() && lastPheromone != null) {
+            lastPheromone.decrementSoldierCount();
+        }
     }
 }

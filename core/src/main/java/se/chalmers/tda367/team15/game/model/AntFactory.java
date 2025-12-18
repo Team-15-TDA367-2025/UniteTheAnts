@@ -45,7 +45,7 @@ public class AntFactory {
     private TrailStrategy createStrategy(AntType type) {
         return switch (type.id()) {
             case "worker" -> new GatherTrailStrategy();
-            case "soldier" -> new PatrolTrailStrategy(entityQuery, pheromoneManager.getConverter());
+            case "soldier" -> new PatrolTrailStrategy();
             case "scout" -> new ExploreTrailStrategy();
             default -> new GatherTrailStrategy();
         };
