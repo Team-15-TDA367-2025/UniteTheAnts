@@ -5,14 +5,15 @@ import java.util.Collections;
 import java.util.List;
 
 import se.chalmers.tda367.team15.game.model.interfaces.StructureDeathObserver;
-import se.chalmers.tda367.team15.game.model.interfaces.Updatable;
+import se.chalmers.tda367.team15.game.model.interfaces.StructureProvider;
+import se.chalmers.tda367.team15.game.model.interfaces.SimulationObserver;
 import se.chalmers.tda367.team15.game.model.structure.Structure;
 
 /**
  * Manages the lifecycle of entities in the simulation.
  * Owns all entities, handles updates, and cleans up on death.
  */
-public class StructureManager implements Updatable, StructureDeathObserver {
+public class StructureManager implements SimulationObserver, StructureDeathObserver, StructureProvider {
     private final List<Structure> structures = new ArrayList<>();
 
     public void addStructure(Structure structure) {

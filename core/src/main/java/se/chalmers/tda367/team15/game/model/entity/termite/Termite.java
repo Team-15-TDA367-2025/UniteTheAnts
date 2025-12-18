@@ -11,6 +11,8 @@ import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
 import se.chalmers.tda367.team15.game.model.managers.StructureManager;
 
 import java.util.HashMap;
+import se.chalmers.tda367.team15.game.model.interfaces.StructureProvider;
+import se.chalmers.tda367.team15.game.model.structure.Structure;
 
 /**
  * Termites are hostile to anything not in their {@link Faction}, termites
@@ -28,10 +30,10 @@ public class Termite extends Entity implements CanAttack {
     private final DestructionListener destructionListener;
     private TermiteAttackBehaviour termiteAttackBehaviour;
 
-    public Termite(Vector2 position, EntityQuery entityQuery, StructureManager structureManager, HashMap<AttackCategory, Integer> targetPriority ,DestructionListener destructionListener) {
+    public Termite(Vector2 position, EntityQuery entityQuery, StructureProvider structureProvider, HashMap<AttackCategory, Integer> targetPriority ,DestructionListener destructionListener) {
         super(position, "termite");
         this.destructionListener = destructionListener;
-        this.termiteAttackBehaviour=new TermiteAttackBehaviour(this,entityQuery,structureManager,targetPriority);
+        this.termiteAttackBehaviour=new TermiteAttackBehaviour(this,entityQuery,structureProvider,targetPriority);
     }
 
     /**

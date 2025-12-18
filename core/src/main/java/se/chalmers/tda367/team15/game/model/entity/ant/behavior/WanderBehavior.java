@@ -9,15 +9,20 @@ import com.badlogic.gdx.math.Vector2;
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
 import se.chalmers.tda367.team15.game.model.interfaces.Home;
+import se.chalmers.tda367.team15.game.model.managers.PheromoneManager;
 import se.chalmers.tda367.team15.game.model.pheromones.Pheromone;
-import se.chalmers.tda367.team15.game.model.pheromones.PheromoneSystem;
+import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
 
 public class WanderBehavior extends AntBehavior implements GeneralizedBehaviour{
     private final Home home;
+    private final PheromoneGridConverter converter;
+    private int accumulator = 0;
 
-    public WanderBehavior(Ant ant, Home home, EntityQuery entityQuery) {
+    // TODO: we should not need to pass along everything to all behaviors
+    public WanderBehavior(Ant ant, Home home, EntityQuery entityQuery, PheromoneGridConverter converter) {
         super(ant, entityQuery);
         this.home = home;
+        this.converter = converter;
     }
 
     private void changeTrajectory() {
@@ -61,13 +66,18 @@ public class WanderBehavior extends AntBehavior implements GeneralizedBehaviour{
 
 
     @Override
-    public void update(PheromoneSystem system) {
+    public void update(PheromoneManager system) {
 
         if (enemiesInSight()) {
            ant.setAttackBehaviour();
            return;
         }
-        changeTrajectory();
+
+        accumulator += 1;
+        if (accumulator >= 20) {
+            changeTrajectory();
+            accumulator = 0;
+        }
 
         GridPoint2 gridPos = ant.getGridPosition();
         List<Pheromone> neighbors = system.getPheromonesIn3x3(gridPos);
