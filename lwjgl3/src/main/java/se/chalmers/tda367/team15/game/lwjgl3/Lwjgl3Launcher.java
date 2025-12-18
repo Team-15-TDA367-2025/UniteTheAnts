@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.badlogic.gdx.math.GridPoint2;
 
 import se.chalmers.tda367.team15.game.GameLaunchConfiguration;
 import se.chalmers.tda367.team15.game.Main;
@@ -20,8 +21,27 @@ public class Lwjgl3Launcher {
         // Parse launch arguments
         unlimitedFps = Arrays.asList(args).contains("--unlimited-fps");
         noFog = Arrays.asList(args).contains("--no-fog");
+        int startWorkers = Integer.parseInt(Arrays.stream(args).filter(arg -> arg.startsWith("--start-workers="))
+                .findFirst().orElse("--start-workers=1").split("=")[1]);
+        int seed = Integer.parseInt(Arrays.stream(args).filter(arg -> arg.startsWith("--seed="))
+                .findFirst().orElse("--seed=-1").split("=")[1]);
 
-        GameLaunchConfiguration.setCurrent(new GameLaunchConfiguration(unlimitedFps, noFog));
+        if (seed == -1) {
+            seed = (int) System.currentTimeMillis();
+        }
+
+        int startResources = Integer.parseInt(Arrays.stream(args).filter(arg -> arg.startsWith("--start-resources="))
+                .findFirst().orElse("--start-resources=20").split("=")[1]);
+
+        int mapSizeX = Integer.parseInt(Arrays.stream(args).filter(arg -> arg.startsWith("--map-size-x="))
+                .findFirst().orElse("--map-size-x=400").split("=")[1]);
+        int mapSizeY = Integer.parseInt(Arrays.stream(args).filter(arg -> arg.startsWith("--map-size-y="))
+                .findFirst().orElse("--map-size-y=400").split("=")[1]);
+
+        GridPoint2 mapSize = new GridPoint2(mapSizeX, mapSizeY);
+
+        GameLaunchConfiguration.setCurrent(new GameLaunchConfiguration(unlimitedFps, noFog, startWorkers, seed,
+                startResources, mapSize));
 
         createApplication();
     }

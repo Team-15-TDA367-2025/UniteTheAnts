@@ -7,6 +7,8 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
 
 import com.badlogic.gdx.math.Vector2;
+
+import se.chalmers.tda367.team15.game.GameLaunchConfiguration;
 import se.chalmers.tda367.team15.game.controller.CameraController;
 import se.chalmers.tda367.team15.game.controller.HudController;
 import se.chalmers.tda367.team15.game.controller.InputManager;
@@ -51,8 +53,6 @@ import se.chalmers.tda367.team15.game.view.ui.UiSkin;
  * Factory for creating and wiring the GameScreen.
  */
 public class GameFactory {
-    public static final int MAP_WIDTH = 400;
-    public static final int MAP_HEIGHT = 400;
     public static final float WORLD_VIEWPORT_WIDTH = 15f;
     public static final float MIN_ZOOM = 0.05f;
     public static final float MAX_ZOOM = 4.0f;
@@ -62,9 +62,13 @@ public class GameFactory {
     }
 
     public static GameScreen createGameScreen(Game game) {
+
+        GridPoint2 mapSize = GameLaunchConfiguration.getCurrent().mapSize();
+        int startResources = GameLaunchConfiguration.getCurrent().startResources();
+
         // 1. Create Models
-        CameraModel cameraModel = createCameraModel();
-        GameModel gameModel = createGameModel();
+        CameraModel cameraModel = createCameraModel(mapSize);
+        GameModel gameModel = createGameModel(mapSize);
 
         // 2. Create Resources
         TextureRegistry textureRegistry = new TextureRegistry();
@@ -111,20 +115,21 @@ public class GameFactory {
                 hudController);
     }
 
-    private static CameraModel createCameraModel() {
+    private static CameraModel createCameraModel(GridPoint2 mapSize) {
+
         Rectangle worldBounds = new Rectangle(
-                -MAP_WIDTH / 2f, -MAP_HEIGHT / 2f,
-                MAP_WIDTH, MAP_HEIGHT);
+                -mapSize.x / 2f, -mapSize.y / 2f,
+                mapSize.x, mapSize.y);
         CameraConstraints constraints = new CameraConstraints(
                 worldBounds, MIN_ZOOM, MAX_ZOOM);
         return new CameraModel(constraints);
     }
 
-    private static GameModel createGameModel() {
+    private static GameModel createGameModel(GridPoint2 mapSize) {
         AntTypeRegistry antTypeRegistry = createAntTypeRegistry();
 
         TerrainGenerator terrainGenerator = TerrainFactory.createStandardPerlinGenerator(
-                System.currentTimeMillis());
+                GameLaunchConfiguration.getCurrent().seed());
         // TODO: break this down
         SimulationManager simulationManager = new SimulationManager();
         TimeCycle timeCycle = new TimeCycle(1f / TICKS_PER_MINUTE);
@@ -142,7 +147,7 @@ public class GameFactory {
         ResourceManager resourceManager = new ResourceManager(entityManager, structureManager);
         simulationManager.addUpdateObserver(resourceManager);
 
-        WorldMap worldMap = new WorldMap(MAP_WIDTH, MAP_HEIGHT, terrainGenerator);
+        WorldMap worldMap = new WorldMap(mapSize.x, mapSize.y, terrainGenerator);
 
         EnemyFactory enemyFactory = new EnemyFactory(entityManager, structureManager, destructionListener);
         FogManager fogManager = new FogManager(entityManager, worldMap);
@@ -175,8 +180,10 @@ public class GameFactory {
     public static void spawnInitialAnts(EntityManager entityManager, Home home, AntFactory antFactory,
             AntTypeRegistry antTypeRegistry) {
         AntType type = antTypeRegistry.get("worker");
-        Ant ant = antFactory.createAnt(home, type);
-        entityManager.addEntity(ant);
+        for (int i = 0; i < GameLaunchConfiguration.getCurrent().startWorkers(); i++) {
+            Ant ant = antFactory.createAnt(home, type);
+            entityManager.addEntity(ant);
+        }
     }
 
     /**

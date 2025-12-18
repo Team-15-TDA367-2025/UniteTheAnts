@@ -1,13 +1,11 @@
 package se.chalmers.tda367.team15.game;
 
-public record GameLaunchConfiguration(boolean unlimitedFps, boolean noFog) {
+import com.badlogic.gdx.math.GridPoint2;
+
+public record GameLaunchConfiguration(boolean unlimitedFps, boolean noFog, int startWorkers, int seed,
+        int startResources, GridPoint2 mapSize) {
 
     private static GameLaunchConfiguration current;
-
-    public GameLaunchConfiguration(boolean unlimitedFps, boolean noFog) {
-        this.unlimitedFps = unlimitedFps;
-        this.noFog = noFog;
-    }
 
     public static void setCurrent(GameLaunchConfiguration gameLaunchConfiguration) {
         current = gameLaunchConfiguration;

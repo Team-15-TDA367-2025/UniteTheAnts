@@ -38,34 +38,35 @@ public class TermiteBehavior {
      */
 
     public AttackTarget update(List<Entity> entities, List<Structure> structures) {
-
-        AttackTarget target = null;
-
         List<AttackTarget> potentialTargets = potentialTargets(entities, structures);
 
-        // determine target, entities first, then structures, then stand still.
-        if (!potentialTargets.isEmpty()) {
-            target = potentialTargets.getFirst();
-            for (AttackTarget t : potentialTargets) {
-                // Greater or equal target priority?
-                if (targetPriority.get(t.canBeAttacked.getAttackCategory()) >= targetPriority
-                        .get(target.canBeAttacked.getAttackCategory())) {
-                    // closest distance?
-                    if (t.hasPosition.getPosition().dst(termite.getPosition()) < target.hasPosition.getPosition()
-                            .dst(termite.getPosition())) {
-                        target = t;
-                    }
-                }
+        if (potentialTargets.isEmpty()) {
+            termite.setVelocity(new Vector2(0, 0));
+            return null;
+        }
+
+        AttackTarget target = potentialTargets.getFirst();
+        for (AttackTarget t : potentialTargets) {
+            int priorityT = targetPriority.get(t.canBeAttacked.getAttackCategory());
+            int priorityCurrent = targetPriority.get(target.canBeAttacked.getAttackCategory());
+
+            if (priorityT < priorityCurrent) {
+                continue;
             }
 
+            float distT = t.hasPosition.getPosition().dst(termite.getPosition());
+            float distCurrent = target.hasPosition.getPosition().dst(termite.getPosition());
+
+            if (distT >= distCurrent) {
+                continue;
+            }
+
+            target = t;
         }
 
-        if (target == null) {
-            termite.setVelocity(new Vector2(0, 0));
-        } else {
-            Vector2 targetV = target.hasPosition.getPosition().sub(termite.getPosition());
-            termite.setVelocity(targetV.nor().scl(termite.getSpeed()));
-        }
+        Vector2 targetV = target.hasPosition.getPosition().sub(termite.getPosition());
+        termite.setVelocity(targetV.nor().scl(termite.getSpeed()));
+
         return target;
     }
 

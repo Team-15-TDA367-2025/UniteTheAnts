@@ -22,7 +22,8 @@ public class AttackBehavior extends AntBehavior {
     private final AttackComponent attackComponent;
     private final PheromoneGridConverter converter;
 
-    public AttackBehavior(Home home, Ant ant, Vector2 lastPosBeforeAttack, EntityQuery entityQuery, PheromoneGridConverter converter) {
+    public AttackBehavior(Home home, Ant ant, Vector2 lastPosBeforeAttack, EntityQuery entityQuery,
+            PheromoneGridConverter converter) {
         super(ant, entityQuery);
         targetPriority.put(AttackCategory.TERMITE, 1);
         this.home = home;
@@ -45,24 +46,30 @@ public class AttackBehavior extends AntBehavior {
     }
 
     private AttackTarget findTarget() {
-        AttackTarget target = null;
         List<CanBeAttacked> entities = entityQuery.getEntitiesOfType(CanBeAttacked.class);
         List<AttackTarget> potentialTargets = potentialTargets(entities);
 
-        // determine target
-        if (!potentialTargets.isEmpty()) {
-            target = potentialTargets.getFirst();
-            for (AttackTarget t : potentialTargets) {
-                // Greater or equal target priority?
-                if (targetPriority.get(t.canBeAttacked.getAttackCategory()) >= targetPriority
-                        .get(target.canBeAttacked.getAttackCategory())) {
-                    // closest distance?
-                    if (t.hasPosition.getPosition().dst(ant.getPosition()) < target.hasPosition.getPosition()
-                            .dst(ant.getPosition())) {
-                        target = t;
-                    }
-                }
+        if (potentialTargets.isEmpty()) {
+            return null;
+        }
+
+        AttackTarget target = potentialTargets.getFirst();
+        for (AttackTarget t : potentialTargets) {
+            int priorityT = targetPriority.get(t.canBeAttacked.getAttackCategory());
+            int priorityCurrent = targetPriority.get(target.canBeAttacked.getAttackCategory());
+
+            if (priorityT < priorityCurrent) {
+                continue;
             }
+
+            float distT = t.hasPosition.getPosition().dst(ant.getPosition());
+            float distCurrent = target.hasPosition.getPosition().dst(ant.getPosition());
+
+            if (distT >= distCurrent) {
+                continue;
+            }
+
+            target = t;
         }
 
         return target;
