@@ -43,14 +43,14 @@ class GatherTrailStrategyTest {
     // ========== Core Behavior: Wander on Trail ==========
 
     @Test
-    @DisplayName("should pick randomly at intersections (not always the same one)")
-    void shouldPickRandomlyAtIntersections() {
+    @DisplayName("should pick randomly at forks (from all forward options)")
+    void shouldPickRandomlyAtForks() {
         when(inventory.isFull()).thenReturn(false);
 
         Pheromone current = new Pheromone(new GridPoint2(0, 0), PheromoneType.GATHER, 1);
-        // Two equally valid forward options
+        // Two forward options with DIFFERENT distances (like a real fork)
         Pheromone option1 = new Pheromone(new GridPoint2(1, 0), PheromoneType.GATHER, 2);
-        Pheromone option2 = new Pheromone(new GridPoint2(0, 1), PheromoneType.GATHER, 2);
+        Pheromone option2 = new Pheromone(new GridPoint2(0, 1), PheromoneType.GATHER, 3);
         List<Pheromone> neighbors = Arrays.asList(option1, option2);
 
         Set<Pheromone> results = new HashSet<>();
@@ -135,8 +135,8 @@ class GatherTrailStrategyTest {
     }
 
     @Test
-    @DisplayName("should prefer outward (higher distance) when inventory is not full")
-    void shouldPreferOutwardWhenNotFull() {
+    @DisplayName("should move forward (higher distance) when inventory is not full")
+    void shouldMoveForwardWhenNotFull() {
         when(inventory.isFull()).thenReturn(false);
 
         Pheromone current = new Pheromone(new GridPoint2(2, 0), PheromoneType.GATHER, 2);
@@ -146,8 +146,8 @@ class GatherTrailStrategyTest {
 
         Pheromone result = strategy.selectNextPheromone(ant, neighbors, current);
 
-        // Should pick outward (higher distance) when not full
-        assertEquals(outward, result, "Should go outward when not full");
+        // Should pick outward (higher distance), not homeward
+        assertEquals(outward, result, "Should go forward (outward) when not full");
     }
 
     // ========== Edge Cases ==========

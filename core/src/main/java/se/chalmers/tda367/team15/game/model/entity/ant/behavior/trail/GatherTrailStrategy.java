@@ -1,5 +1,7 @@
 package se.chalmers.tda367.team15.game.model.entity.ant.behavior.trail;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -8,8 +10,7 @@ import se.chalmers.tda367.team15.game.model.pheromones.Pheromone;
 
 /**
  * Trail strategy for worker ants following GATHER pheromones.
- * - Walk forward, pick randomly at intersections (multiple same-distance
- * options)
+ * - Walk forward (pick randomly from all higher-distance options)
  * - Turn around at dead ends (don't leave trail)
  * - Only return home when inventory is full
  */
@@ -38,7 +39,7 @@ public class GatherTrailStrategy extends TrailStrategy {
         }
 
         // Not full: wander on trail
-        // Try to move in current direction
+        // Get ALL forward options (strictly higher distance when outwards)
         List<Pheromone> forward = filterByDistance(neighbors, current, outwards);
 
         if (forward.isEmpty()) {
@@ -55,22 +56,10 @@ public class GatherTrailStrategy extends TrailStrategy {
             }
         }
 
-        // Check for intersection: multiple options with the same "best" distance
-        int bestDist = outwards
-                ? forward.stream().mapToInt(Pheromone::getDistance).max().orElse(0)
-                : forward.stream().mapToInt(Pheromone::getDistance).min().orElse(0);
-
-        List<Pheromone> atBestDist = forward.stream()
-                .filter(p -> p.getDistance() == bestDist)
-                .toList();
-
-        if (atBestDist.size() > 1) {
-            // Intersection - pick randomly
-            return atBestDist.get(random.nextInt(atBestDist.size()));
-        }
-
-        // Single best option
-        return atBestDist.get(0);
+        // Pick randomly from ALL forward options (not just best distance)
+        List<Pheromone> shuffled = new ArrayList<>(forward);
+        Collections.shuffle(shuffled, random);
+        return shuffled.get(0);
     }
 
     @Override
