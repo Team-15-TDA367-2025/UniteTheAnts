@@ -1,10 +1,18 @@
 package se.chalmers.tda367.team15.game.model.egg;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,8 +20,12 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import se.chalmers.tda367.team15.game.model.AntFactory;
+import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntType;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntTypeRegistry;
+import se.chalmers.tda367.team15.game.model.interfaces.EntityModificationProvider;
+import se.chalmers.tda367.team15.game.model.interfaces.Home;
+import se.chalmers.tda367.team15.game.model.structure.resource.ResourceType;
 
 /**
  * Tests for the {@link EggManager} class.
@@ -28,6 +40,8 @@ class EggManagerTest {
 
     private AntTypeRegistry antTypeRegistry;
     private AntFactory antFactory;
+    private Home home;
+    private EntityModificationProvider entityManager;
     private EggManager eggManager;
     private AntType workerType;
     private AntType soldierType;
@@ -35,9 +49,9 @@ class EggManagerTest {
     @BeforeEach
     void setUp() {
         antTypeRegistry = new AntTypeRegistry();
-        // AntFactory is only passed through to observers, not used by EggManager
-        // directly
-        antFactory = null;
+        antFactory = mock(AntFactory.class);
+        home = mock(Home.class);
+        entityManager = mock(EntityModificationProvider.class);
 
         // Register test ant types
         workerType = AntType.with()
@@ -63,7 +77,7 @@ class EggManagerTest {
         antTypeRegistry.register(workerType);
         antTypeRegistry.register(soldierType);
 
-        eggManager = new EggManager(antTypeRegistry, antFactory);
+        eggManager = new EggManager(antTypeRegistry, antFactory, home, entityManager);
     }
 
     @Nested
@@ -121,10 +135,11 @@ class EggManagerTest {
         }
 
         @Test
-        @DisplayName("should remove hatched eggs after onMinute")
+        @DisplayName("should remove hatched eggs and add to entity manager after onMinute")
         void shouldRemoveHatchedEggsAfterMinute() {
             eggManager.addEgg(workerType); // 3 ticks
-            eggManager.addEgg(soldierType); // 5 ticks
+            Ant ant = mock(Ant.class);
+            when(antFactory.createAnt(home, workerType)).thenReturn(ant);
 
             // Tick 3 times to hatch worker
             eggManager.onMinute();
@@ -132,8 +147,8 @@ class EggManagerTest {
             eggManager.onMinute();
 
             List<Egg> eggs = eggManager.getEggs();
-            assertEquals(1, eggs.size());
-            assertEquals("soldier", eggs.get(0).getTypeId());
+            assertEquals(0, eggs.size());
+            verify(entityManager).addEntity(ant);
         }
 
         @Test
@@ -142,12 +157,15 @@ class EggManagerTest {
             eggManager.addEgg(workerType); // 3 ticks
             eggManager.addEgg(soldierType); // 5 ticks
 
+            when(antFactory.createAnt(eq(home), any(AntType.class))).thenReturn(mock(Ant.class));
+
             // Tick 5 times to hatch all
             for (int i = 0; i < 5; i++) {
                 eggManager.onMinute();
             }
 
             assertTrue(eggManager.getEggs().isEmpty());
+            verify(entityManager, times(2)).addEntity(any(Ant.class));
         }
 
         @Test
@@ -160,111 +178,40 @@ class EggManagerTest {
     }
 
     @Nested
-    @DisplayName("Observer Pattern")
-    class ObserverTests {
+    @DisplayName("Purchasing Eggs")
+    class EggPurchaseTests {
 
         @Test
-        @DisplayName("should notify observer when egg hatches")
-        void shouldNotifyObserverWhenEggHatches() {
-            AtomicInteger hatchCount = new AtomicInteger(0);
-            AtomicReference<AntType> hatchedType = new AtomicReference<>();
+        @DisplayName("should add egg when purchase is successful")
+        void shouldAddEggWhenPurchaseSuccessful() {
+            when(home.spendResources(ResourceType.FOOD, workerType.foodCost())).thenReturn(true);
 
-            EggHatchObserver observer = (factory, type) -> {
-                hatchCount.incrementAndGet();
-                hatchedType.set(type);
-            };
+            boolean result = eggManager.purchaseEgg(workerType);
 
-            eggManager.addObserver(observer);
-            eggManager.addEgg(workerType); // 3 ticks
-
-            // Tick until hatched
-            eggManager.onMinute();
-            eggManager.onMinute();
-            eggManager.onMinute();
-
-            assertEquals(1, hatchCount.get());
-            assertEquals(workerType, hatchedType.get());
+            assertTrue(result);
+            assertEquals(1, eggManager.getEggs().size());
+            assertEquals("worker", eggManager.getEggs().get(0).getTypeId());
+            verify(home).spendResources(ResourceType.FOOD, workerType.foodCost());
         }
 
         @Test
-        @DisplayName("should notify multiple observers")
-        void shouldNotifyMultipleObservers() {
-            AtomicInteger observer1Count = new AtomicInteger(0);
-            AtomicInteger observer2Count = new AtomicInteger(0);
+        @DisplayName("should not add egg when resources are insufficient")
+        void shouldNotAddEggWhenResourcesInsufficient() {
+            when(home.spendResources(ResourceType.FOOD, workerType.foodCost())).thenReturn(false);
 
-            eggManager.addObserver((factory, type) -> observer1Count.incrementAndGet());
-            eggManager.addObserver((factory, type) -> observer2Count.incrementAndGet());
+            boolean result = eggManager.purchaseEgg(workerType);
 
-            eggManager.addEgg(workerType); // 3 ticks
-
-            for (int i = 0; i < 3; i++) {
-                eggManager.onMinute();
-            }
-
-            assertEquals(1, observer1Count.get());
-            assertEquals(1, observer2Count.get());
+            assertFalse(result);
+            assertTrue(eggManager.getEggs().isEmpty());
+            verify(home).spendResources(ResourceType.FOOD, workerType.foodCost());
         }
 
         @Test
-        @DisplayName("should not notify observer after removal")
-        void shouldNotNotifyObserverAfterRemoval() {
-            AtomicInteger hatchCount = new AtomicInteger(0);
-
-            EggHatchObserver observer = (factory, type) -> hatchCount.incrementAndGet();
-
-            eggManager.addObserver(observer);
-            eggManager.removeObserver(observer);
-            eggManager.addEgg(workerType);
-
-            for (int i = 0; i < 3; i++) {
-                eggManager.onMinute();
-            }
-
-            assertEquals(0, hatchCount.get());
-        }
-
-        @Test
-        @DisplayName("should pass correct ant factory to observer")
-        void shouldPassCorrectAntFactoryToObserver() {
-            AtomicReference<AntFactory> receivedFactory = new AtomicReference<>();
-
-            EggHatchObserver observer = (factory, type) -> receivedFactory.set(factory);
-
-            eggManager.addObserver(observer);
-            eggManager.addEgg(workerType);
-
-            for (int i = 0; i < 3; i++) {
-                eggManager.onMinute();
-            }
-
-            assertSame(antFactory, receivedFactory.get());
-        }
-
-        @Test
-        @DisplayName("should notify once per hatched egg even with multiple eggs")
-        void shouldNotifyOncePerHatchedEgg() {
-            AtomicInteger hatchCount = new AtomicInteger(0);
-
-            eggManager.addObserver((factory, type) -> hatchCount.incrementAndGet());
-
-            // Add two eggs with same development time
-            AntType quickType = AntType.with()
-                    .id("quick")
-                    .displayName("Quick")
-                    .foodCost(5)
-                    .developmentTicks(1)
-                    .maxHealth(50f)
-                    .moveSpeed(2.0f)
-                    .carryCapacity(1)
-                    .build();
-            antTypeRegistry.register(quickType);
-
-            eggManager.addEgg(quickType);
-            eggManager.addEgg(quickType);
-
-            eggManager.onMinute();
-
-            assertEquals(2, hatchCount.get());
+        @DisplayName("should return false for null type")
+        void shouldReturnFalseForNullType() {
+            boolean result = eggManager.purchaseEgg(null);
+            assertFalse(result);
+            assertTrue(eggManager.getEggs().isEmpty());
         }
     }
 
