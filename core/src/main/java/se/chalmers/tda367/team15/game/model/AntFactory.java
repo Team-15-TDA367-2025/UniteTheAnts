@@ -43,6 +43,7 @@ public class AntFactory {
     }
 
     private TrailStrategy createStrategy(AntType type) {
+        // TODO: This should be determined by the ant type instead.
         return switch (type.id()) {
             case "worker" -> new GatherTrailStrategy();
             case "soldier" -> new PatrolTrailStrategy();
