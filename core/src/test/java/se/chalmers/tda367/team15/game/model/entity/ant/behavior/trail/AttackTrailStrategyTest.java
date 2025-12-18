@@ -77,6 +77,8 @@ class AttackTrailStrategyTest {
 
         List<Pheromone> neighbors = Arrays.asList(towardOther, awayFromOther);
 
+        // Force cooldown to expire so soldier-spacing logic runs
+        strategy.forceCheckNextTick();
         Pheromone result = strategy.selectNextPheromone(ant, neighbors, current);
 
         // awayFromOther is further from otherSoldier (distance 15 vs 5)
@@ -114,6 +116,8 @@ class AttackTrailStrategyTest {
 
         Set<Pheromone> results = new HashSet<>();
         for (int i = 0; i < 50; i++) {
+            // Create fresh strategy each iteration to test randomness
+            strategy = new AttackTrailStrategy(entityQuery, converter);
             Pheromone result = strategy.selectNextPheromone(ant, neighbors, current);
             assertNotNull(result);
             results.add(result);
@@ -154,6 +158,8 @@ class AttackTrailStrategyTest {
 
         List<Pheromone> neighbors = Arrays.asList(perpendicular, towardSoldier1);
 
+        // Force cooldown to expire so soldier-spacing logic runs
+        strategy.forceCheckNextTick();
         Pheromone result = strategy.selectNextPheromone(ant, neighbors, current);
 
         // perpendicular has min distance ~10, towardSoldier1 has min distance ~5

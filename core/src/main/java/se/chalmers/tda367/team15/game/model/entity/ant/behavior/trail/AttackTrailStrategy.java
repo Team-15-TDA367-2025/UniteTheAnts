@@ -1,9 +1,9 @@
 package se.chalmers.tda367.team15.game.model.entity.ant.behavior.trail;
 
-import java.util.Comparator;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-
-import com.badlogic.gdx.math.Vector2;
+import java.util.Random;
 
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
@@ -12,20 +12,35 @@ import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
 
 /**
  * Trail strategy for soldier ants following ATTACK pheromones.
- * - Stay on the trail but maximize distance from other soldiers
- * - Prefer higher distance pheromones (outward) as tiebreaker
- * - At trail end, patrol back and forth
+ * Simple patrol behavior:
+ * - Walk along trail in current direction
+ * - Turn around when seeing another soldier (after random delay)
+ * - Turn around at trail ends
  */
 public class AttackTrailStrategy extends TrailStrategy {
 
     private static final float SPEED_MULTIPLIER = 1.0f;
+    private static final int MIN_DELAY_TICKS = 2;
+    private static final int MAX_DELAY_TICKS = 6;
 
     private final EntityQuery entityQuery;
     private final PheromoneGridConverter converter;
+    private final Random random = new Random();
+
+    private int turnAroundDelay = 0;
+    private boolean sawSoldier = false;
 
     public AttackTrailStrategy(EntityQuery entityQuery, PheromoneGridConverter converter) {
         this.entityQuery = entityQuery;
         this.converter = converter;
+    }
+
+    /**
+     * Force the turn-around to happen next tick (for testing).
+     */
+    void forceCheckNextTick() {
+        turnAroundDelay = 0;
+        sawSoldier = true;
     }
 
     @Override
@@ -36,57 +51,71 @@ public class AttackTrailStrategy extends TrailStrategy {
 
         int currentDistance = current != null ? current.getDistance() : 0;
 
-        // Get all soldiers on the same trail
-        List<Ant> otherSoldiers = entityQuery.getEntitiesOfType(Ant.class).stream()
-                .filter(a -> a != ant)
-                .filter(a -> a.getType().id().equals("soldier"))
-                .filter(a -> a.getPosition().dst(ant.getPosition()) <= ant.getVisionRadius())
-                .toList();
-
         // Filter out current position to force movement
         List<Pheromone> movableNeighbors = neighbors.stream()
                 .filter(p -> current == null || p.getDistance() != currentDistance)
                 .toList();
 
         if (movableNeighbors.isEmpty()) {
-            // Stuck at current position - pick any neighbor to oscillate
+            // Stuck at current position - try any neighbor
             return neighbors.stream()
                     .filter(p -> current == null || !p.getPosition().equals(current.getPosition()))
                     .findAny()
                     .orElse(null);
         }
 
-        if (otherSoldiers.isEmpty()) {
-            // No soldiers in sight - prefer higher distance (outward)
-            // But occasionally patrol back for entropy (20% chance)
-            if (Math.random() < 0.2) {
-                return getBestByDistance(movableNeighbors, false);
-            }
-            return getBestByDistance(movableNeighbors, true);
+        // Check for other soldiers in vision
+        boolean canSeeOtherSoldier = entityQuery.getEntitiesOfType(Ant.class).stream()
+                .filter(a -> a != ant)
+                .filter(a -> a.getType().id().equals("soldier"))
+                .anyMatch(a -> a.getPosition().dst(ant.getPosition()) <= ant.getVisionRadius());
+
+        if (canSeeOtherSoldier && !sawSoldier) {
+            // Just saw a soldier - start turn-around delay
+            sawSoldier = true;
+            turnAroundDelay = random.nextInt(MAX_DELAY_TICKS - MIN_DELAY_TICKS + 1) + MIN_DELAY_TICKS;
         }
 
-        // Pick pheromone that maximizes minimum distance to any soldier
-        // Break ties by preferring higher distance (outward)
-        return movableNeighbors.stream()
-                .max(Comparator.<Pheromone>comparingDouble(p -> minDistanceToSoldiers(p, otherSoldiers))
-                        .thenComparingInt(Pheromone::getDistance))
-                .orElse(movableNeighbors.get(0));
-    }
+        if (sawSoldier) {
+            turnAroundDelay--;
+            if (turnAroundDelay <= 0) {
+                // Turn around
+                outwards = !outwards;
+                sawSoldier = false;
+            }
+        }
 
-    private double minDistanceToSoldiers(Pheromone pheromone, List<Ant> soldiers) {
-        Vector2 pheromoneWorldPos = converter.pheromoneGridToWorld(pheromone.getPosition());
+        if (!canSeeOtherSoldier) {
+            sawSoldier = false;
+        }
 
-        return soldiers.stream()
-                .mapToDouble(soldier -> soldier.getPosition().dst(pheromoneWorldPos))
-                .min()
-                .orElse(Double.MAX_VALUE);
+        // Move in current direction
+        List<Pheromone> forward = filterByDistance(movableNeighbors, current, outwards);
+
+        if (forward.isEmpty()) {
+            // Trail end - turn around
+            outwards = !outwards;
+            forward = filterByDistance(movableNeighbors, current, outwards);
+        }
+
+        if (forward.isEmpty()) {
+            // Fallback to any movable neighbor
+            forward = movableNeighbors;
+        }
+
+        // Pick randomly from forward options (slight jitter)
+        List<Pheromone> shuffled = new ArrayList<>(forward);
+        Collections.shuffle(shuffled, random);
+        return shuffled.get(0);
     }
 
     @Override
     public void onTrailEnd(Ant ant, Pheromone current) {
-        ant.setWanderBehaviour();
+        // Turn around at trail end
+        outwards = !outwards;
     }
 
+    @Override
     public float getSpeedMultiplier() {
         return SPEED_MULTIPLIER;
     }

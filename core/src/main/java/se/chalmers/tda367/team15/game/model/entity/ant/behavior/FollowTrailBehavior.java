@@ -44,8 +44,16 @@ public class FollowTrailBehavior extends AntBehavior implements GeneralizedBehav
                 .filter(p -> ant.getType().allowedPheromones().contains(p.getType()))
                 .collect(Collectors.toList());
 
+        // Safety check: if no pheromones nearby, trail was likely deleted
+        if (neighbors.isEmpty()) {
+            lastPheromone = null;
+            currentTarget = null;
+            trailStrategy.onTrailEnd(ant, null);
+            return;
+        }
+
         // 1. Initialization / Re-anchoring
-        if (lastPheromone == null) {
+        if (lastPheromone == null || !isPheromoneStillValid(lastPheromone, neighbors)) {
             lastPheromone = neighbors.stream()
                     .min((a, b) -> Integer.compare(a.getDistance(), b.getDistance()))
                     .orElse(null);
@@ -54,12 +62,20 @@ public class FollowTrailBehavior extends AntBehavior implements GeneralizedBehav
                 trailStrategy.onTrailEnd(ant, null);
                 return;
             }
+            // Reset target since our anchor changed
+            currentTarget = null;
         }
 
-        // 2. Target Management - check if we reached current target
-        if (currentTarget != null && ant.getPosition().dst2(getCenterPos(currentTarget)) < reachedThresholdSq) {
-            lastPheromone = currentTarget;
-            currentTarget = null;
+        // 2. Target Management - check if current target is still valid
+        if (currentTarget != null) {
+            if (!isPheromoneStillValid(currentTarget, neighbors)) {
+                // Target was deleted, need new target
+                currentTarget = null;
+            } else if (ant.getPosition().dst2(getCenterPos(currentTarget)) < reachedThresholdSq) {
+                // Reached target
+                lastPheromone = currentTarget;
+                currentTarget = null;
+            }
         }
 
         // 3. Select next target using strategy
@@ -85,6 +101,15 @@ public class FollowTrailBehavior extends AntBehavior implements GeneralizedBehav
         } else {
             ant.setVelocity(new Vector2(0, 0));
         }
+    }
+
+    /**
+     * Check if a pheromone is still in the neighbors list (not deleted).
+     */
+    private boolean isPheromoneStillValid(Pheromone pheromone, List<Pheromone> neighbors) {
+        return neighbors.stream()
+                .anyMatch(p -> p.getPosition().equals(pheromone.getPosition())
+                        && p.getType() == pheromone.getType());
     }
 
     private Vector2 getCenterPos(Pheromone p) {

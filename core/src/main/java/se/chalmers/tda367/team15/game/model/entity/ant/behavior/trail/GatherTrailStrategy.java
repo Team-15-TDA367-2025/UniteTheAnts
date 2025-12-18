@@ -27,8 +27,8 @@ public class GatherTrailStrategy extends TrailStrategy {
 
         boolean isFull = ant.getInventory().isFull();
 
+        // If inventory is full, always go home (lower distance)
         if (isFull) {
-            // Return home: prefer lower distance
             outwards = false;
             List<Pheromone> homeward = filterByDistance(neighbors, current, false);
             if (homeward.isEmpty()) {
