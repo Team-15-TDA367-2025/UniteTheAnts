@@ -8,6 +8,7 @@ import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
 import se.chalmers.tda367.team15.game.model.interfaces.StructureProvider;
 import se.chalmers.tda367.team15.game.model.managers.StructureManager;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -17,28 +18,27 @@ import java.util.List;
 public abstract class MeleeAttackBehaviour {
     protected final CanAttack host;
 
-    protected final EntityQuery entityQuery;
-    protected final StructureProvider structureProvider;
-    protected final HashMap<AttackCategory, Integer> targetPriority;
+    private final EntityQuery entityQuery;
+    private final StructureProvider structureProvider;
+    private final HashMap<AttackCategory, Integer> targetPriority;
 
-    protected long lastAttackTimeMS = 0;
+    private long lastAttackTimeMS = 0;
 
     protected MeleeAttackBehaviour(CanAttack canAttack, EntityQuery entityQuery, StructureProvider structureProvider, HashMap<AttackCategory, Integer> targetPriority) {
         this.host = canAttack;
-        this.entityQuery=entityQuery;
-        this.structureProvider=structureProvider;
-        this.targetPriority=targetPriority;
+        this.entityQuery = entityQuery;
+        this.structureProvider = structureProvider;
+        this.targetPriority = targetPriority;
     }
 
     public void update() {
         CanBeAttacked target = findTarget();
-        if(target==null) {
-           noTargets();
-        }
-        else{
+        if (target == null) {
+            noTargets();
+        } else {
             Vector2 targetV = target.getPosition().sub(this.host.getPosition());
             host.setVelocity(targetV.nor().scl(this.host.getSpeed()));
-            attack(target); // Remember we attack before actually moving
+            attack(target); // Remember, we attack before actually moving
         }
     }
 
@@ -52,33 +52,39 @@ public abstract class MeleeAttackBehaviour {
         }
     }
 
-    public CanBeAttacked findTarget() {
+    private CanBeAttacked findTarget() {
 
         CanBeAttacked target = null;
 
         List<CanBeAttacked> potentialTargets = potentialTargets();
 
-        // determine target, entities first, then structures, then stand still.
+        // determine target, TargetPriority gives us: ants first, then structures, then stand still.
         if (!potentialTargets.isEmpty()) {
             target = potentialTargets.getFirst();
             for (CanBeAttacked t : potentialTargets) {
-                // Greater or equal target priority?
-                if (targetPriority.get(t.getAttackCategory()) >= targetPriority
-                    .get(target.getAttackCategory())) {
-                    // closest distance?
-                    if (t.getPosition().dst(host.getPosition()) < target.getPosition()
-                        .dst(host.getPosition())) {
-                        target = t;
-                    }
+                if (isHigherTargetPriority(t, target) && isCloserTarget(t, target)) {
+                    target = t;
                 }
             }
-
         }
         return target;
     }
 
+    private boolean isHigherTargetPriority(CanBeAttacked target, CanBeAttacked currentTarget) {
+        return
+            targetPriority.get(target.getAttackCategory())
+                >= targetPriority.get(currentTarget.getAttackCategory());
+
+    }
+
+    private boolean isCloserTarget(CanBeAttacked target, CanBeAttacked currentTarget) {
+        return
+            target.getPosition().dst(host.getPosition())
+                < currentTarget.getPosition().dst(host.getPosition());
+    }
+
     private List<CanBeAttacked> potentialTargets() {
-        List<CanBeAttacked> targets = entityQuery.getEntitiesOfType(CanBeAttacked.class);
+        List<CanBeAttacked> targets = new ArrayList<>(entityQuery.getEntitiesOfType(CanBeAttacked.class));
         targets.removeIf(t -> t.getFaction() == host.getFaction());
         targets.removeIf(t -> t.getPosition().dst(host.getPosition()) > host.getVisionRadius());
         return targets;

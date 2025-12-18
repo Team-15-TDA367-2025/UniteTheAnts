@@ -50,9 +50,9 @@ public class EntityManager implements SimulationObserver, EntityDeathObserver, E
             cacheEntities(type);
         }
         @SuppressWarnings("unchecked") // We know the type is correct
-        List<T> result = (List<T>)  new ArrayList<>(cachedEntities.getOrDefault(type, new ArrayList<>()));
+        List<T> result = (List<T>)  cachedEntities.getOrDefault(type, new ArrayList<>());
 
-        return result;
+        return Collections.unmodifiableList(result);
     }
     @Override
     public void update(float deltaTime) {

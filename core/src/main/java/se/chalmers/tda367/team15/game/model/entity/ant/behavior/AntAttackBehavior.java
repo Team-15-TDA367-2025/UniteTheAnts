@@ -25,7 +25,6 @@ public class AntAttackBehavior extends MeleeAttackBehaviour implements Generaliz
     @Override
     protected void noTargets() {
         ant.setWanderBehaviour();
-
     }
     @Override
     public void update(PheromoneManager system) {
