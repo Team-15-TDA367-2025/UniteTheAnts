@@ -2,6 +2,7 @@ package se.chalmers.tda367.team15.game.model.entity.ant.behavior;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.badlogic.gdx.math.Vector2;
 
@@ -25,13 +26,13 @@ public abstract class AntBehavior {
     }
 
     public boolean enemiesInSight() {
-        List<CanBeAttacked> entities = new ArrayList<>(entityQuery.getEntitiesOfType(CanBeAttacked.class));
-        entities.removeIf(e -> e.getFaction() == ant.getFaction());
+        List<CanBeAttacked> entities = entityQuery.getEntitiesOfType(CanBeAttacked.class);
+        List <CanBeAttacked> enemies = entities.stream().filter(e -> e.getFaction() != ant.getFaction()).toList();
 
         Vector2 antPosition = ant.getPosition();
         float visionRadiusSq = ant.getVisionRadius() * ant.getVisionRadius();
 
-        for (CanBeAttacked entity : entities) {
+        for (CanBeAttacked entity : enemies) {
             if (entity.getPosition().dst2(antPosition) <= visionRadiusSq) {
                 return true;
             }
