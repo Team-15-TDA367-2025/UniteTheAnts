@@ -15,7 +15,7 @@ import se.chalmers.tda367.team15.game.model.interfaces.SimulationObserver;
 /**
  * Manages the lifecycle of entities in the simulation.
  * Owns all entities, handles updates, and cleans up on death.
- * 
+ *
  * Has a cache of entities by type to avoid lagging when querying entities by
  * type.
  */
@@ -49,9 +49,8 @@ public class EntityManager implements SimulationObserver, EntityDeathObserver, E
         if (!cachedEntities.containsKey(type)) {
             cacheEntities(type);
         }
-
         @SuppressWarnings("unchecked") // We know the type is correct
-        List<T> result = (List<T>) cachedEntities.getOrDefault(type, new ArrayList<>());
+        List<T> result = (List<T>)  new ArrayList<>(cachedEntities.getOrDefault(type, new ArrayList<>()));
 
         return result;
     }
