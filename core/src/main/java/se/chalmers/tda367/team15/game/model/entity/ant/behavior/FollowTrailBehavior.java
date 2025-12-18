@@ -8,39 +8,35 @@ import com.badlogic.gdx.math.Vector2;
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.entity.ant.behavior.trail.TrailStrategy;
 import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
-import se.chalmers.tda367.team15.game.model.interfaces.Home;
 import se.chalmers.tda367.team15.game.model.managers.PheromoneManager;
 import se.chalmers.tda367.team15.game.model.pheromones.Pheromone;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
 
-public class FollowTrailBehavior extends AntBehavior {
+/**
+ * This behaviour is used when ants are trying to follow a pheromone trail
+ */
+public class FollowTrailBehavior extends AntBehavior implements GeneralizedBehaviour {
     private static final float REACHED_THRESHOLD_FRACTION = 0.3f;
-    private final Home home;
     private Pheromone lastPheromone = null;
     private Pheromone currentTarget = null;
     private final float reachedThresholdSq;
     private final PheromoneGridConverter converter;
     private final TrailStrategy trailStrategy;
-    private final PheromoneManager pheromoneManager;
 
-    public FollowTrailBehavior(Home home, EntityQuery entityQuery, Ant ant,
-            PheromoneGridConverter converter, TrailStrategy trailStrategy,
-            PheromoneManager pheromoneManager) {
+    public FollowTrailBehavior(EntityQuery entityQuery, Ant ant,
+            PheromoneGridConverter converter, TrailStrategy trailStrategy) {
         super(ant, entityQuery);
         float cellSize = converter.getPheromoneCellSize();
         float threshold = cellSize * REACHED_THRESHOLD_FRACTION;
-        this.home = home;
         this.reachedThresholdSq = threshold * threshold;
         this.converter = converter;
         this.trailStrategy = trailStrategy;
-        this.pheromoneManager = pheromoneManager;
     }
 
     @Override
     public void update(PheromoneManager system) {
         if (enemiesInSight()) {
-            ant.setBehavior(new AttackBehavior(home, ant, ant.getPosition(), entityQuery, converter, trailStrategy,
-                    pheromoneManager));
+            ant.setAttackBehaviour();
             return;
         }
 
@@ -55,7 +51,7 @@ public class FollowTrailBehavior extends AntBehavior {
                     .orElse(null);
 
             if (lastPheromone == null) {
-                ant.setBehavior(new WanderBehavior(ant, home, entityQuery, converter, trailStrategy, pheromoneManager));
+                ant.setWanderBehaviour();
                 return;
             }
         }
@@ -71,8 +67,7 @@ public class FollowTrailBehavior extends AntBehavior {
             currentTarget = trailStrategy.selectNextPheromone(ant, neighbors, lastPheromone);
 
             if (currentTarget == null) {
-                trailStrategy.onTrailEnd(ant, lastPheromone, pheromoneManager, home, entityQuery, converter,
-                        trailStrategy);
+                trailStrategy.onTrailEnd(ant, lastPheromone);
                 return;
             }
         }

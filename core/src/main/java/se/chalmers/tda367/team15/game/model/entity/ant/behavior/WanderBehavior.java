@@ -7,26 +7,21 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
-import se.chalmers.tda367.team15.game.model.entity.ant.behavior.trail.TrailStrategy;
 import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
 import se.chalmers.tda367.team15.game.model.interfaces.Home;
 import se.chalmers.tda367.team15.game.model.managers.PheromoneManager;
 import se.chalmers.tda367.team15.game.model.pheromones.Pheromone;
-import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
 
-public class WanderBehavior extends AntBehavior {
+/**
+ * This behaviour is used when ants are moving on their own, searching for a pheromone trail.
+ */
+public class WanderBehavior extends AntBehavior implements GeneralizedBehaviour {
     private final Home home;
-    private final PheromoneGridConverter converter;
-    private final TrailStrategy trailStrategy;
-    private final PheromoneManager pheromoneManager;
+    private int accumulator = 0;
 
-    public WanderBehavior(Ant ant, Home home, EntityQuery entityQuery, PheromoneGridConverter converter,
-            TrailStrategy trailStrategy, PheromoneManager pheromoneManager) {
+    public WanderBehavior(Ant ant, Home home, EntityQuery entityQuery) {
         super(ant, entityQuery);
         this.home = home;
-        this.converter = converter;
-        this.trailStrategy = trailStrategy;
-        this.pheromoneManager = pheromoneManager;
     }
 
     private void changeTrajectory() {
@@ -70,11 +65,15 @@ public class WanderBehavior extends AntBehavior {
     public void update(PheromoneManager system) {
 
         if (enemiesInSight()) {
-            ant.setBehavior(new AttackBehavior(home, ant, ant.getPosition(), entityQuery, converter, trailStrategy,
-                    pheromoneManager));
-            return;
+           ant.setAttackBehaviour();
+           return;
         }
-        changeTrajectory();
+
+        accumulator += 1;
+        if (accumulator >= 20) {
+            changeTrajectory();
+            accumulator = 0;
+        }
 
         GridPoint2 gridPos = ant.getGridPosition();
         List<Pheromone> neighbors = system.getPheromonesIn3x3(gridPos).stream()
@@ -82,10 +81,8 @@ public class WanderBehavior extends AntBehavior {
                 .toList();
 
         if (!neighbors.isEmpty()) {
-            ant.setBehavior(
-                    new FollowTrailBehavior(home, entityQuery, ant, converter, trailStrategy, pheromoneManager));
+            ant.setFollowTrailBehaviour();
         }
-
     }
 
     @Override

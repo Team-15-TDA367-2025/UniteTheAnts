@@ -2,48 +2,28 @@ package se.chalmers.tda367.team15.game.model.structure;
 
 import com.badlogic.gdx.math.GridPoint2;
 
-import se.chalmers.tda367.team15.game.model.AntFactory;
-import se.chalmers.tda367.team15.game.model.AttackCategory;
-import se.chalmers.tda367.team15.game.model.DestructionListener;
-import se.chalmers.tda367.team15.game.model.TimeCycle;
-import se.chalmers.tda367.team15.game.model.egg.EggHatchObserver;
-import se.chalmers.tda367.team15.game.model.egg.EggManager;
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
-import se.chalmers.tda367.team15.game.model.entity.ant.AntType;
 import se.chalmers.tda367.team15.game.model.entity.ant.Inventory;
 import se.chalmers.tda367.team15.game.model.faction.Faction;
-import se.chalmers.tda367.team15.game.model.interfaces.CanBeAttacked;
-import se.chalmers.tda367.team15.game.model.interfaces.ColonyUsageProvider;
+import se.chalmers.tda367.team15.game.model.interfaces.ColonyDataProvider;
 import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
 import se.chalmers.tda367.team15.game.model.interfaces.Home;
 import se.chalmers.tda367.team15.game.model.interfaces.TimeObserver;
-import se.chalmers.tda367.team15.game.model.managers.EntityManager;
 import se.chalmers.tda367.team15.game.model.structure.resource.ResourceType;
 
 // TODO - Antigravity: SRP violation - implements 5 interfaces, consider extracting ColonyResourceManager, ColonyEggHandler, ColonyCombat
 public class Colony extends Structure
-        implements CanBeAttacked, Home, EggHatchObserver, TimeObserver, ColonyUsageProvider {
+        implements Home, TimeObserver, ColonyDataProvider {
     private Inventory inventory;
-    private final EggManager eggManager;
-    private float health;
-    private float MAX_HEALTH = 600;
     private Faction faction;
     private final EntityQuery entityQuery;
-    private final EntityManager entityManager;
-    private final DestructionListener destructionListener;
 
-    public Colony(GridPoint2 position, TimeCycle timeCycle, EntityQuery entityQuery, EggManager eggManager,
-            EntityManager entityManager, DestructionListener destructionListener) {
+    public Colony(GridPoint2 position, EntityQuery entityQuery, int initialFood) {
         super(position, "colony", 4);
-        this.health = MAX_HEALTH;
-        this.faction = Faction.DEMOCRATIC_REPUBLIC_OF_ANTS;
-        // TODO - Antigravity: Magic number - extract to constant or config
         this.inventory = new Inventory(1000000); // test value for now
-        this.eggManager = eggManager;
+        this.inventory.addResource(ResourceType.FOOD, initialFood);
         this.entityQuery = entityQuery;
-        this.entityManager = entityManager;
-        timeCycle.addTimeObserver(this);
-        this.destructionListener = destructionListener;
+        this.faction = Faction.DEMOCRATIC_REPUBLIC_OF_ANTS;
     }
 
     @Override
@@ -77,31 +57,8 @@ public class Colony extends Structure
         return inventory.getAmount(type);
     }
 
-    // TODO: Eggs should not be handled here probably
-    public EggManager getEggManager() {
-        return eggManager;
-    }
-
-    public boolean purchaseEgg(AntType type) {
-        if (type == null) {
-            return false;
-        }
-
-        int foodCost = type.foodCost();
-        if (getTotalResources(ResourceType.FOOD) < foodCost) {
-            return false;
-        }
-
-        inventory.addResource(ResourceType.FOOD, -foodCost);
-        eggManager.addEgg(type);
-        return true;
-    }
-
-    @Override
-    public void onEggHatch(AntFactory factory, AntType type) {
-        // TODO: Kinda violates SRP
-        Ant ant = factory.createAnt(this, type);
-        this.entityManager.addEntity(ant);
+    public boolean spendResources(ResourceType type, int amount) {
+        return inventory.addResource(type, -amount);
     }
 
     public void onDayStart() {
@@ -111,24 +68,6 @@ public class Colony extends Structure
     @Override
     public Faction getFaction() {
         return faction;
-    }
-
-    @Override
-    public void takeDamage(float amount) {
-        health = Math.max(0f, health - amount);
-        if (health == 0f) {
-            die();
-        }
-    }
-
-    @Override
-    public void die() {
-        destructionListener.notifyStructureDeathObservers(this);
-    }
-
-    @Override
-    public AttackCategory getAttackCategory() {
-        return AttackCategory.ANT_COLONY;
     }
 
     @Override

@@ -4,52 +4,47 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.Vector2;
-
 import se.chalmers.tda367.team15.game.model.egg.EggManager;
 import se.chalmers.tda367.team15.game.model.entity.Entity;
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntTypeRegistry;
 import se.chalmers.tda367.team15.game.model.fog.FogProvider;
-import se.chalmers.tda367.team15.game.model.fog.FogManager;
-import se.chalmers.tda367.team15.game.model.interfaces.ColonyUsageProvider;
+import se.chalmers.tda367.team15.game.model.interfaces.ColonyDataProvider;
 import se.chalmers.tda367.team15.game.model.interfaces.Drawable;
 import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
-import se.chalmers.tda367.team15.game.model.managers.PheromoneManager;
+import se.chalmers.tda367.team15.game.model.interfaces.PheromoneUsageProvider;
+import se.chalmers.tda367.team15.game.model.interfaces.TimeCycleDataProvider;
 import se.chalmers.tda367.team15.game.model.managers.StructureManager;
-import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
-import se.chalmers.tda367.team15.game.model.structure.resource.ResourceNode;
-import se.chalmers.tda367.team15.game.model.structure.resource.ResourceType;
-import se.chalmers.tda367.team15.game.model.world.WorldMap;
-import se.chalmers.tda367.team15.game.model.world.terrain.StructureSpawn;
+import se.chalmers.tda367.team15.game.model.world.MapProvider;
 
 public class GameModel {
-    private final ColonyUsageProvider colonyUsageProvider;
+    private final ColonyDataProvider colonyDataProvider;
     // TODO: Fix
-    private final TimeCycle timeCycle;
-    private final FogManager fogManager;
+    private final TimeCycleDataProvider timeProvider;
+    private final FogProvider fogProvider;
     private final SimulationProvider simulationProvider;
-    private final PheromoneManager pheromoneManager;
-    private final WorldMap worldMap;
+    private final PheromoneUsageProvider pheromoneUsageProvider;
+    private final MapProvider mapProvider;
     private final AntTypeRegistry antTypeRegistry;
     private final StructureManager structureManager;
     private final EntityQuery entityQuery;
+    private final EggManager eggManager;
 
-    public GameModel(SimulationProvider simulationProvider, TimeCycle timeCycle,
-            FogManager fogManager, ColonyUsageProvider colonyUsageProvider, PheromoneManager pheromoneManager,
-            WorldMap worldMap, AntTypeRegistry antTypeRegistry, StructureManager structureManager, EntityQuery entityQuery) {
+    public GameModel(SimulationProvider simulationProvider, TimeCycleDataProvider timeProvider,
+            FogProvider fogProvider, ColonyDataProvider colonyDataProvider,
+            PheromoneUsageProvider pheromoneUsageProvider,
+            MapProvider mapProvider, AntTypeRegistry antTypeRegistry, StructureManager structureManager,
+            EntityQuery entityQuery, EggManager eggManager) {
         this.simulationProvider = simulationProvider;
-        this.colonyUsageProvider = colonyUsageProvider;
-        this.timeCycle = timeCycle;
-        this.fogManager = fogManager;
-        this.pheromoneManager = pheromoneManager;
-        this.worldMap = worldMap;
+        this.colonyDataProvider = colonyDataProvider;
+        this.timeProvider = timeProvider;
+        this.fogProvider = fogProvider;
+        this.pheromoneUsageProvider = pheromoneUsageProvider;
+        this.mapProvider = mapProvider;
         this.antTypeRegistry = antTypeRegistry;
         this.structureManager = structureManager;
         this.entityQuery = entityQuery;
-        // Spawn structures based on terrain generation features
-        spawnTerrainStructures();
+        this.eggManager = eggManager;
     }
 
     public Iterable<Drawable> getDrawables() {
@@ -58,35 +53,16 @@ public class GameModel {
         return Collections.unmodifiableList(allDrawables);
     }
 
-    /**
-     * Spawns structures determined by terrain generation features.
-     */
-    private void spawnTerrainStructures() {
-        List<StructureSpawn> spawns = worldMap.getStructureSpawns();
-
-        for (StructureSpawn spawn : spawns) {
-            if ("resource_node".equals(spawn.getType())) {
-                Vector2 worldPos = worldMap.tileToWorld(spawn.getPosition());
-                GridPoint2 worldGridPos = new GridPoint2((int) worldPos.x, (int) worldPos.y);
-
-                structureManager.addStructure(new ResourceNode(
-                        worldGridPos,
-                        "node",
-                        1,
-                        ResourceType.FOOD,
-                        10,
-                        20));
-            }
-            // Add other structure types here
-        }
+    public ColonyDataProvider getColonyDataProvider() {
+        return colonyDataProvider;
     }
 
-    public ColonyUsageProvider getColonyUsageProvider() {
-        return colonyUsageProvider;
+    public TimeCycleDataProvider getTimeProvider() {
+        return timeProvider;
     }
 
-    public PheromoneGridConverter getPheromoneGridConverter() {
-        return pheromoneManager.getConverter();
+    public PheromoneUsageProvider getPheromoneUsageProvider() {
+        return pheromoneUsageProvider;
     }
 
     // --- FACADE METHODS (Actions) ---
@@ -107,45 +83,20 @@ public class GameModel {
         simulationProvider.handleSimulation();
     }
 
-    public boolean isDay() {
-        return timeCycle.getIsDay();
-    }
-
-    public TimeCycle.GameTime getGameTime() {
-        return timeCycle.getGameTime();
-    }
-
     public FogProvider getFogProvider() {
-        return fogManager;
+        return fogProvider;
     }
 
     public AntTypeRegistry getAntTypeRegistry() {
         return antTypeRegistry;
     }
 
-    public PheromoneManager getPheromoneManager() {
-        return pheromoneManager;
-    }
-
-    public WorldMap getWorldMap() {
-        return worldMap;
-    }
-
-    public GridPoint2 getWorldSize() {
-        return getWorldMap().getSize();
-    }
-
-    public int getTotalDays() {
-        return timeCycle.getTotalDays();
+    public MapProvider getMapProvider() {
+        return mapProvider;
     }
 
     public EggManager getEggManager() {
-        return colonyUsageProvider.getEggManager();
-    }
-
-    // TODO: Fix this
-    public TimeCycle getTimeCycle() {
-        return timeCycle;
+        return eggManager;
     }
 
     public int getTotalAnts() {

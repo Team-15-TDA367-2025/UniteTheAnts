@@ -4,12 +4,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
-import se.chalmers.tda367.team15.game.model.entity.ant.behavior.WanderBehavior;
-import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
-import se.chalmers.tda367.team15.game.model.interfaces.Home;
-import se.chalmers.tda367.team15.game.model.managers.PheromoneManager;
 import se.chalmers.tda367.team15.game.model.pheromones.Pheromone;
-import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
 
 /**
  * Trail strategy for scout ants following EXPLORE pheromones.
@@ -71,28 +66,8 @@ public class ExploreTrailStrategy implements TrailStrategy {
     }
 
     @Override
-    public void onTrailEnd(Ant ant, Pheromone current, PheromoneManager pheromoneManagerParam,
-            Home homeParam, EntityQuery entityQueryParam, PheromoneGridConverter converterParam,
-            TrailStrategy strategy) {
-
-        if (returning) {
-            // Destroy the current pheromone when returning
-            if (current != null) {
-                pheromoneManagerParam.removePheromone(current.getPosition());
-            }
-            // Also destroy the last pheromone we came from
-            if (lastPheromone != null && lastPheromone != current) {
-                pheromoneManagerParam.removePheromone(lastPheromone.getPosition());
-            }
-        } else {
-            // Just reached the end for the first time - start returning
-            returning = true;
-            lastPheromone = current;
-        }
-
-        // Switch to wander behavior
-        ant.setBehavior(
-                new WanderBehavior(ant, homeParam, entityQueryParam, converterParam, strategy, pheromoneManagerParam));
+    public void onTrailEnd(Ant ant, Pheromone current) {
+        ant.setWanderBehaviour();
     }
 
     @Override

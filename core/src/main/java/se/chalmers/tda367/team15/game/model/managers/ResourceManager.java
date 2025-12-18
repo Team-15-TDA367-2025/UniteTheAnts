@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
 import se.chalmers.tda367.team15.game.model.interfaces.Home;
-import se.chalmers.tda367.team15.game.model.interfaces.Updatable;
+import se.chalmers.tda367.team15.game.model.interfaces.SimulationObserver;
 import se.chalmers.tda367.team15.game.model.structure.Structure;
 import se.chalmers.tda367.team15.game.model.structure.resource.Resource;
 import se.chalmers.tda367.team15.game.model.structure.resource.ResourceNode;
@@ -17,7 +17,7 @@ import se.chalmers.tda367.team15.game.model.structure.resource.ResourceNode;
  * Manages resource interactions using persistent spatial grid.
  * Grid is maintained internally and only modified when resources change.
  */
-public class ResourceManager implements Updatable {
+public class ResourceManager implements SimulationObserver {
     private static final int PICKUP_RADIUS = 2;
     private static final int DEPOSIT_RADIUS = 2;
     private EntityQuery entityQuery;
@@ -30,14 +30,10 @@ public class ResourceManager implements Updatable {
 
     @Override
     public void update(float deltaTime) {
-
-        List<Structure> structures = entityQuery.getEntitiesOfType(Structure.class);
-
         List<Ant> ants = entityQuery.getEntitiesOfType(Ant.class);
 
         handleResourcePickup(ants);
         handleResourceDeposit(ants);
-        structures.removeIf(structure -> structure instanceof Resource && ((Resource) structure).getAmount() <= 0);
     }
 
     public void addResource(Resource resource) {
@@ -121,10 +117,6 @@ public class ResourceManager implements Updatable {
     }
 
     private boolean tryHarvestNode(Ant ant, ResourceNode node) {
-        if (node.isDepleted()) {
-            return false;
-        }
-
         int amountToPickup = Math.min(
                 node.getCurrentAmount(),
                 ant.getInventory().getRemainingCapacity());

@@ -7,17 +7,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
-
+import com.badlogic.gdx.math.Vector2;
 import se.chalmers.tda367.team15.game.controller.CameraController;
 import se.chalmers.tda367.team15.game.controller.HudController;
 import se.chalmers.tda367.team15.game.controller.InputManager;
 import se.chalmers.tda367.team15.game.controller.PheromoneController;
 import se.chalmers.tda367.team15.game.controller.SpeedController;
-import se.chalmers.tda367.team15.game.model.AntFactory;
-import se.chalmers.tda367.team15.game.model.DestructionListener;
-import se.chalmers.tda367.team15.game.model.EnemyFactory;
-import se.chalmers.tda367.team15.game.model.GameModel;
-import se.chalmers.tda367.team15.game.model.TimeCycle;
+import se.chalmers.tda367.team15.game.model.*;
 import se.chalmers.tda367.team15.game.model.camera.CameraConstraints;
 import se.chalmers.tda367.team15.game.model.camera.CameraModel;
 import se.chalmers.tda367.team15.game.model.egg.EggManager;
@@ -25,6 +21,7 @@ import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntType;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntTypeRegistry;
 import se.chalmers.tda367.team15.game.model.fog.FogManager;
+import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
 import se.chalmers.tda367.team15.game.model.interfaces.Home;
 import se.chalmers.tda367.team15.game.model.managers.EntityManager;
 import se.chalmers.tda367.team15.game.model.managers.PheromoneManager;
@@ -35,16 +32,21 @@ import se.chalmers.tda367.team15.game.model.managers.WaveManager;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneType;
 import se.chalmers.tda367.team15.game.model.structure.Colony;
+import se.chalmers.tda367.team15.game.model.structure.resource.ResourceNodeFactory;
+import se.chalmers.tda367.team15.game.model.world.MapProvider;
 import se.chalmers.tda367.team15.game.model.world.TerrainFactory;
 import se.chalmers.tda367.team15.game.model.world.TerrainGenerator;
 import se.chalmers.tda367.team15.game.model.world.WorldMap;
+import se.chalmers.tda367.team15.game.model.world.terrain.StructureSpawn;
 import se.chalmers.tda367.team15.game.view.TextureRegistry;
 import se.chalmers.tda367.team15.game.view.camera.CameraView;
 import se.chalmers.tda367.team15.game.view.camera.ViewportListener;
 import se.chalmers.tda367.team15.game.view.renderers.PheromoneRenderer;
 import se.chalmers.tda367.team15.game.view.renderers.WorldRenderer;
 import se.chalmers.tda367.team15.game.view.ui.HudView;
-import se.chalmers.tda367.team15.game.view.ui.UiFactory;
+import se.chalmers.tda367.team15.game.view.ui.UiSkin;
+
+import java.util.HashMap;
 
 /**
  * Factory for creating and wiring the GameScreen.
@@ -67,23 +69,25 @@ public class GameFactory {
 
         // 2. Create Resources
         TextureRegistry textureRegistry = new TextureRegistry();
-        UiFactory uiFactory = new UiFactory(textureRegistry);
+        UiSkin uiFactory = new UiSkin(textureRegistry);
         SpriteBatch hudBatch = new SpriteBatch();
 
         // 3. Create Views
         CameraView cameraView = createCameraView(cameraModel);
-        WorldRenderer sceneView = new WorldRenderer(cameraView, textureRegistry, gameModel, gameModel.getFogProvider());
-        PheromoneRenderer pheromoneView = new PheromoneRenderer(cameraView, gameModel.getPheromoneManager());
+        WorldRenderer worldRenderer = new WorldRenderer(cameraView, textureRegistry, gameModel.getMapProvider(),
+                gameModel.getTimeProvider(), gameModel.getFogProvider());
+        PheromoneRenderer pheromoneView = new PheromoneRenderer(cameraView, gameModel.getPheromoneUsageProvider());
         HudView hudView = new HudView(hudBatch, uiFactory);
 
         // 4. Create Controllers
         InputManager inputManager = new InputManager(); // Used for wiring but not stored in screen
         CameraController cameraController = new CameraController(cameraModel, cameraView);
-        PheromoneController pheromoneController = new PheromoneController(gameModel, cameraView);
+        PheromoneController pheromoneController = new PheromoneController(gameModel.getPheromoneUsageProvider(),
+                cameraView);
         SpeedController speedController = new SpeedController(gameModel);
         HudController hudController = new HudController(hudView, gameModel.getAntTypeRegistry(),
                 gameModel.getEggManager(), pheromoneController, speedController,
-                uiFactory, gameModel.getTimeCycle(), gameModel.getColonyUsageProvider());
+                uiFactory, gameModel.getTimeProvider(), gameModel.getColonyDataProvider(), gameModel.getEggManager());
 
         // 5. Wire Input
         inputManager.addProcessor(cameraController);
@@ -98,7 +102,7 @@ public class GameFactory {
                 game,
                 gameModel,
                 cameraView,
-                sceneView,
+                worldRenderer,
                 pheromoneView,
                 hudView,
                 textureRegistry,
@@ -136,35 +140,44 @@ public class GameFactory {
 
         StructureManager structureManager = new StructureManager();
         simulationManager.addUpdateObserver(structureManager);
-        destructionListener.addStructureDeathObserver(structureManager);
 
         ResourceManager resourceManager = new ResourceManager(entityManager, structureManager);
         simulationManager.addUpdateObserver(resourceManager);
 
         WorldMap worldMap = new WorldMap(MAP_WIDTH, MAP_HEIGHT, terrainGenerator);
 
-        EnemyFactory enemyFactory = new EnemyFactory(entityManager, structureManager, destructionListener);
+        // Termite target priority
+        HashMap<AttackCategory, Integer> termiteTargetPriority = new HashMap<>();
+        termiteTargetPriority.put(AttackCategory.WORKER_ANT, 2);
+
+        EnemyFactory enemyFactory = new EnemyFactory(entityManager, structureManager, destructionListener, termiteTargetPriority);
         FogManager fogManager = new FogManager(entityManager, worldMap);
         simulationManager.addUpdateObserver(fogManager);
         PheromoneGridConverter pheromoneGridConverter = new PheromoneGridConverter(4);
 
+        //Ant target priority
+        HashMap<AttackCategory, Integer> antTargetPriority = new HashMap<>();
+        antTargetPriority.put(AttackCategory.TERMITE, 2);
+
         PheromoneManager pheromoneManager = new PheromoneManager(new GridPoint2(0, 0), pheromoneGridConverter, 4);
         AntFactory antFactory = new AntFactory(pheromoneManager, worldMap, entityManager,
-                destructionListener);
+                destructionListener, structureManager, antTargetPriority);
 
-        EggManager eggManager = new EggManager(antTypeRegistry, antFactory);
+        ResourceNodeFactory resourceNodeFactory = new ResourceNodeFactory(structureManager);
+        Colony colony = createColony(timeCycle, entityManager, structureManager,
+                20);
+
+        EggManager eggManager = new EggManager(antTypeRegistry, antFactory, colony, entityManager);
         timeCycle.addTimeObserver(eggManager);
 
-        Colony colony = createColony(timeCycle, entityManager, eggManager,
-                structureManager, destructionListener);
-
         spawnInitialAnts(entityManager, colony, antFactory, antTypeRegistry);
+        spawnTerrainStructures(resourceNodeFactory, worldMap);
 
         WaveManager waveManager = new WaveManager(enemyFactory, entityManager);
         timeCycle.addTimeObserver(waveManager);
 
         return new GameModel(simulationManager, timeCycle, fogManager, colony,
-                pheromoneManager, worldMap, antTypeRegistry, structureManager, entityManager);
+                pheromoneManager, worldMap, antTypeRegistry, structureManager, entityManager, eggManager);
     }
 
     public static void spawnInitialAnts(EntityManager entityManager, Home home, AntFactory antFactory,
@@ -174,13 +187,27 @@ public class GameFactory {
         entityManager.addEntity(ant);
     }
 
+    /**
+     * Spawns structures determined by terrain generation features.
+     */
+    private static void spawnTerrainStructures(ResourceNodeFactory resourceNodeFactory, MapProvider map) {
+        for (StructureSpawn spawn : map.getStructureSpawns()) {
+            if ("resource_node".equals(spawn.getType())) {
+                Vector2 structurePos = map.tileToWorld(spawn.getPosition());
+
+                resourceNodeFactory.createResourceNode(structurePos, spawn);
+            }
+            // Add other structure types here
+        }
+    }
+
     private static Colony createColony(TimeCycle timeCycle,
-            EntityManager entityManager, EggManager eggManager, StructureManager structureManager,
-            DestructionListener destructionListener) {
-        Colony colony = new Colony(new GridPoint2(0, 0), timeCycle, entityManager, eggManager,
-                entityManager, destructionListener);
+            EntityQuery entityQuery, StructureManager structureManager,
+            int initialFood) {
+        Colony colony = new Colony(new GridPoint2(0, 0), entityQuery,
+                initialFood);
         structureManager.addStructure(colony);
-        eggManager.addObserver(colony);
+        timeCycle.addTimeObserver(colony);
         return colony;
     }
 
@@ -202,47 +229,48 @@ public class GameFactory {
      */
     private static AntTypeRegistry createAntTypeRegistry() {
         AntTypeRegistry registry = new AntTypeRegistry();
+
         // Scout: High speed, low HP, 0 capacity, cheap/fast to hatch
-        registry.register(new AntType(
-                "scout",
-                "Scout",
-                5, // Food Cost
-                30, // 30 ticks (0.5 min)
-                4f, // Max Health
-                8f, // Speed
-                0, // Capacity
-                "scout", // Texture
-                Set.of(PheromoneType.EXPLORE), // Allowed pheromones
-                0.01f // Low home bias - scouts wander far
-        ));
+        registry.register(AntType.with()
+                .id("scout")
+                .displayName("Scout")
+                .foodCost(5)
+                .developmentTicks(30)
+                .maxHealth(4f)
+                .moveSpeed(8f)
+                .carryCapacity(0)
+                .textureName("scout")
+                .allowedPheromones(Set.of(PheromoneType.EXPLORE))
+                .homeBias(0.01f) // Low home bias - scouts wander far
+              .build());
 
         // Soldier: Low speed, high HP, 0 capacity, expensive
-        registry.register(new AntType(
-                "soldier",
-                "Soldier",
-                40, // Food Cost
-                300, // 5 min
-                20f, // Max Health
-                2f, // Speed
-                0, // Capacity
-                "ant", // Texture
-                Set.of(PheromoneType.ATTACK), // Allowed pheromones
-                0.05f // Medium home bias
-        ));
+        registry.register(AntType.with()
+                .id("soldier")
+                .displayName("Soldier")
+                .foodCost(40)
+                .developmentTicks(300)
+                .maxHealth(20f)
+                .moveSpeed(2f)
+                .carryCapacity(0)
+                .textureName("ant")
+                .allowedPheromones(Set.of(PheromoneType.ATTACK))
+                .homeBias(0.5f)
+              .build());
 
         // Worker: Medium speed, medium HP, some capacity
-        registry.register(new AntType(
-                "worker",
-                "Worker",
-                10, // Food Cost
-                60, // 1 min
-                6f, // Max Health
-                5f, // Speed
-                10, // Capacity
-                "ant", // Texture
-                Set.of(PheromoneType.GATHER), // Allowed pheromones
-                0.05f // Medium home bias
-        ));
+        registry.register(AntType.with()
+                .id("worker")
+                .displayName("Worker")
+                .foodCost(10)
+                .developmentTicks(60)
+                .maxHealth(6f)
+                .moveSpeed(5f)
+                .carryCapacity(10)
+                .textureName("ant")
+                .allowedPheromones(Set.of(PheromoneType.GATHER))
+                .homeBias(0.1f)
+              .build());
 
         return registry;
     }
