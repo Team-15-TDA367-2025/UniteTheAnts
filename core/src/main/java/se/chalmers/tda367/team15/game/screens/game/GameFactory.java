@@ -5,7 +5,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Rectangle;
-
 import com.badlogic.gdx.math.Vector2;
 import se.chalmers.tda367.team15.game.controller.CameraController;
 import se.chalmers.tda367.team15.game.controller.HudController;
@@ -24,6 +23,7 @@ import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntType;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntTypeRegistry;
 import se.chalmers.tda367.team15.game.model.fog.FogManager;
+import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
 import se.chalmers.tda367.team15.game.model.interfaces.Home;
 import se.chalmers.tda367.team15.game.model.managers.EntityManager;
 import se.chalmers.tda367.team15.game.model.managers.PheromoneManager;
@@ -86,7 +86,7 @@ public class GameFactory {
         SpeedController speedController = new SpeedController(gameModel);
         HudController hudController = new HudController(hudView, gameModel.getAntTypeRegistry(),
                 gameModel.getEggManager(), pheromoneController, speedController,
-                uiFactory, gameModel.getTimeProvider(), gameModel.getColonyUsageProvider());
+                uiFactory, gameModel.getTimeProvider(), gameModel.getColonyDataProvider(), gameModel.getEggManager());
 
         // 5. Wire Input
         inputManager.addProcessor(cameraController);
@@ -154,22 +154,20 @@ public class GameFactory {
                 destructionListener);
 
         ResourceNodeFactory resourceNodeFactory = new ResourceNodeFactory(structureManager);
+        Colony colony = createColony(timeCycle, entityManager, structureManager, destructionListener,
+                20);
 
-        EggManager eggManager = new EggManager(antTypeRegistry, antFactory);
+        EggManager eggManager = new EggManager(antTypeRegistry, antFactory, colony, entityManager);
         timeCycle.addTimeObserver(eggManager);
 
-        Colony colony = createColony(timeCycle, entityManager, eggManager,
-                structureManager, destructionListener);
-
         spawnInitialAnts(entityManager, colony, antFactory, antTypeRegistry);
-
         spawnTerrainStructures(resourceNodeFactory, worldMap);
 
         WaveManager waveManager = new WaveManager(enemyFactory, entityManager);
         timeCycle.addTimeObserver(waveManager);
 
         return new GameModel(simulationManager, timeCycle, fogManager, colony,
-                pheromoneManager, worldMap, antTypeRegistry, structureManager, entityManager);
+                pheromoneManager, worldMap, antTypeRegistry, structureManager, entityManager, eggManager);
     }
 
     public static void spawnInitialAnts(EntityManager entityManager, Home home, AntFactory antFactory,
@@ -194,12 +192,11 @@ public class GameFactory {
     }
 
     private static Colony createColony(TimeCycle timeCycle,
-            EntityManager entityManager, EggManager eggManager, StructureManager structureManager,
-            DestructionListener destructionListener) {
-        Colony colony = new Colony(new GridPoint2(0, 0), entityManager, eggManager,
-                entityManager, destructionListener);
+            EntityQuery entityQuery, StructureManager structureManager,
+            DestructionListener destructionListener, int initialFood) {
+        Colony colony = new Colony(new GridPoint2(0, 0), entityQuery,
+                destructionListener, initialFood);
         structureManager.addStructure(colony);
-        eggManager.addObserver(colony);
         timeCycle.addTimeObserver(colony);
         return colony;
     }
