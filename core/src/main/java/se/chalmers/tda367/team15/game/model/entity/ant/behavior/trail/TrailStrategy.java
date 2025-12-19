@@ -114,9 +114,6 @@ public abstract class TrailStrategy {
 
         // If no forward options, we're at a dead end - turn around
         if (forward.isEmpty()) {
-            System.out.println("Dead end - turning around. CurrentDist=" +
-                    (current != null ? current.getDistance() : "null") +
-                    ", outwards=" + behavior.isOutwards());
             behavior.flipDirection();
 
             // Find options in the new direction

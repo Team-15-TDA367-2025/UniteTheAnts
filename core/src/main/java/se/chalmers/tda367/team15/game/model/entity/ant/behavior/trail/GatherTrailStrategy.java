@@ -24,7 +24,6 @@ public class GatherTrailStrategy extends TrailStrategy {
         }
 
         if (ant.getInventory().isFull()) {
-            System.out.println("Ant is full");
             behavior.setOutwards(false);
             List<Pheromone> homeward = filterByDistance(neighbors, current, false);
             if (homeward.isEmpty()) {
