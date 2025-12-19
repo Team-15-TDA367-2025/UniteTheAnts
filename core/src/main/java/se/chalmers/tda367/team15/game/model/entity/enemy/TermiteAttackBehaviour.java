@@ -8,7 +8,6 @@ import se.chalmers.tda367.team15.game.model.AttackCategory;
 import se.chalmers.tda367.team15.game.model.entity.MeleeAttackBehaviour;
 import se.chalmers.tda367.team15.game.model.interfaces.CanAttack;
 import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
-import se.chalmers.tda367.team15.game.model.interfaces.StructureProvider;
 
 public class TermiteAttackBehaviour extends MeleeAttackBehaviour {
 
