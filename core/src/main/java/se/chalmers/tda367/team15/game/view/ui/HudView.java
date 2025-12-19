@@ -75,9 +75,7 @@ public class HudView {
         bottomBar.setPheromoneSelectionListener(listener);
     }
 
-    // TODO - Antigravity: Inconsistent naming - should be setSpeedControlsListener
-    // (camelCase)
-    public void SetSpeedControlsListener(SpeedControlsListener speedControlsListener)  {
+    public void setSpeedControlsListener(SpeedControlsListener speedControlsListener) {
         topBar.setSpeedControlsListener(speedControlsListener);
     }
 

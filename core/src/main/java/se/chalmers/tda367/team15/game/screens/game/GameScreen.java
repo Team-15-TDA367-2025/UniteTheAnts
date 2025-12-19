@@ -80,7 +80,7 @@ public class GameScreen extends ScreenAdapter {
         if (gameModel.getTotalAnts() == 0) {
             return GameEndReason.ALL_ANTS_DEAD;
         }
-        if (gameModel.getColonyDataProvider().getTotalResources(ResourceType.FOOD) < 0) {
+        if (gameModel.getColonyDataProvider().getIsDead()) {
             return GameEndReason.STARVATION;
         }
         return GameEndReason.STILL_PLAYING;
@@ -101,8 +101,9 @@ public class GameScreen extends ScreenAdapter {
 
         GameEndReason endReason = gameHasEnded();
         if (endReason != GameEndReason.STILL_PLAYING) {
-            GameStats gameStats = new GameStats(gameModel.getTimeProvider().getGameTime().totalDays()); // TODO long
-                                                                                                        // line
+            int totalDays = gameModel.getTimeProvider().getGameTime().totalDays();
+            GameStats gameStats = new GameStats(totalDays);
+            
             gameStats.saveIfNewHighScore();
             game.setScreen(new EndScreen(game, endReason, gameFactory));
         }
