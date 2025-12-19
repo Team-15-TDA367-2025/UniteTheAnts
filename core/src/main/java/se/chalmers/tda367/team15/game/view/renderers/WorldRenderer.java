@@ -8,13 +8,12 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 
-import se.chalmers.tda367.team15.game.GameLaunchConfiguration;
-import se.chalmers.tda367.team15.game.model.fog.FogProvider;
 import se.chalmers.tda367.team15.game.model.interfaces.GameObject;
 import se.chalmers.tda367.team15.game.model.interfaces.TimeCycleDataProvider;
 import se.chalmers.tda367.team15.game.model.world.MapProvider;
 import se.chalmers.tda367.team15.game.view.TextureResolver;
 import se.chalmers.tda367.team15.game.view.camera.CameraView;
+import se.chalmers.tda367.team15.game.view.camera.ViewportListener;
 
 public class WorldRenderer {
     private final SpriteBatch batch;
@@ -24,20 +23,22 @@ public class WorldRenderer {
     private final FogRenderer fogRenderer;
     private final MapProvider mapProvider;
     private final ShapeRenderer shapeRenderer;
-    private final FogProvider fogProvider;
     private final TimeCycleDataProvider timeProvider;
+    private final boolean disableFog;
 
     public WorldRenderer(CameraView cameraView, TextureResolver textureResolver, MapProvider mapProvider,
-            TimeCycleDataProvider timeProvider, FogProvider fogProvider) {
+            TimeCycleDataProvider timeProvider, FogRenderer fogRenderer, ViewportListener viewportListener,
+            boolean disableFog) {
         this.cameraView = cameraView;
         this.textureResolver = textureResolver;
         this.batch = new SpriteBatch();
         this.terrainRenderer = new TerrainRenderer(textureResolver);
-        this.fogProvider = fogProvider;
-        this.fogRenderer = new FogRenderer(textureResolver.resolve("pixel"));
+        this.fogRenderer = fogRenderer;
+        viewportListener.addObserver(fogRenderer);
         this.mapProvider = mapProvider;
         this.shapeRenderer = new ShapeRenderer();
         this.timeProvider = timeProvider;
+        this.disableFog = disableFog;
     }
 
     public void render(Iterable<GameObject> drawables) {
@@ -50,8 +51,8 @@ public class WorldRenderer {
         batch.end();
 
         // Render fog after main batch to avoid z-fighting
-        if (!GameLaunchConfiguration.getCurrent().noFog()) {
-            fogRenderer.render(fogProvider, cameraView.getCombinedMatrix(), cameraView);
+        if (!disableFog) {
+            fogRenderer.render(cameraView.getCombinedMatrix(), cameraView);
         }
 
         if (!timeProvider.getIsDay()) {

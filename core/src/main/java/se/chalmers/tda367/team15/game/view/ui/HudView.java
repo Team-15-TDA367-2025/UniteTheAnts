@@ -16,7 +16,7 @@ public class HudView {
     private final BottomBarView bottomBar;
     private final Label fpsLabel;
 
-    public HudView(SpriteBatch batch, UiFactory uiFactory) {
+    public HudView(SpriteBatch batch, UiSkin uiFactory) {
         stage = new Stage(new ScreenViewport(), batch);
         ((ScreenViewport) stage.getViewport()).setUnitsPerPixel(1f / UiTheme.UI_SCALE);
 
@@ -74,7 +74,9 @@ public class HudView {
         bottomBar.setPheromoneSelectionListener(listener);
     }
 
-    public void SetSpeedControlsListener(SpeedControlsListener speedControlsListener) {
+    // TODO - Antigravity: Inconsistent naming - should be setSpeedControlsListener
+    // (camelCase)
+    public void SetSpeedControlsListener(SpeedControlsListener speedControlsListener)  {
         topBar.setSpeedControlsListener(speedControlsListener);
     }
 

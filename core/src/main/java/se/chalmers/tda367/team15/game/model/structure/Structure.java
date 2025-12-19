@@ -1,19 +1,15 @@
 package se.chalmers.tda367.team15.game.model.structure;
 
-import java.util.Collection;
-import java.util.Collections;
-
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 
-import se.chalmers.tda367.team15.game.model.entity.Entity;
 import se.chalmers.tda367.team15.game.model.faction.Faction;
 import se.chalmers.tda367.team15.game.model.interfaces.GameObject;
 import se.chalmers.tda367.team15.game.model.interfaces.HasPosition;
-import se.chalmers.tda367.team15.game.model.interfaces.Updatable;
+import se.chalmers.tda367.team15.game.model.interfaces.SimulationObserver;
 
 // A structure is a static object in the game world, fixed to the grid.
-public abstract class Structure implements GameObject, Updatable, HasPosition {
+public abstract class Structure implements GameObject, SimulationObserver, HasPosition {
     private GridPoint2 position;
     private int size;
     Faction faction;
@@ -35,10 +31,6 @@ public abstract class Structure implements GameObject, Updatable, HasPosition {
     @Override
     public Vector2 getSize() {
         return new Vector2(size, size);
-    }
-
-    public Collection<Entity> getSubEntities() {
-        return Collections.emptyList();
     }
 
     public Faction getFaction() {

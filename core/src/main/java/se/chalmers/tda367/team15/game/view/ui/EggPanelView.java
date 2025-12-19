@@ -22,7 +22,7 @@ import se.chalmers.tda367.team15.game.view.TextureResolver;
  * Dynamically builds UI based on registered ant types in the registry.
  */
 public class EggPanelView {
-    private final UiFactory uiFactory;
+    private final UiSkin uiSkin;
     private final EggController eggController;
     private final EggManager eggManager;
     private final Table panelTable;
@@ -31,9 +31,9 @@ public class EggPanelView {
     private final AntTypeRegistry antTypeRegistry;
     private final TextureResolver textureResolver;
 
-    public EggPanelView(UiFactory uiFactory, EggController eggController, EggManager eggManager,
+    public EggPanelView(UiSkin uiFactory, EggController eggController, EggManager eggManager,
             ColonyDataProvider colonyDataProvider, AntTypeRegistry antTypeRegistry, TextureResolver textureResolver) {
-        this.uiFactory = uiFactory;
+        this.uiSkin = uiFactory;
         this.eggController = eggController;
         this.eggManager = eggManager;
         this.colonyDataProvider = colonyDataProvider;
@@ -69,20 +69,20 @@ public class EggPanelView {
      */
     private Table createEggTypeButton(AntType type) {
         // Create purchase button with the ant type's texture
-        ImageButton button = uiFactory.createImageButton(type.id(), () -> {
+        ImageButton button = uiSkin.createImageButton(type.id(), () -> {
             eggController.purchaseEgg(type.id());
         });
 
         // Name label below the button
         String labelText = type.displayName() + " (" + type.foodCost() + ")";
         Label nameLabel = new Label(labelText,
-                uiFactory.createLabelStyle(UiTheme.FONT_SCALE_DEFAULT, Color.WHITE));
+                uiSkin.createLabelStyle(UiTheme.FONT_SCALE_DEFAULT, Color.WHITE));
 
         // Progress bar for eggs of this type - using area background for consistent
         // styling
         ProgressBar.ProgressBarStyle progressStyle = new ProgressBar.ProgressBarStyle();
-        progressStyle.background = uiFactory.getAreaBackground();
-        progressStyle.knobBefore = uiFactory.getButtonBackgroundChecked();
+        progressStyle.background = uiSkin.getAreaBackground();
+        progressStyle.knobBefore = uiSkin.getButtonBackgroundChecked();
         ProgressBar progressBar = new ProgressBar(0f, 1f, 0.01f, false, progressStyle);
         progressBar.setValue(0f);
         progressBar.setVisible(false);
