@@ -178,7 +178,7 @@ public class GameFactory {
         AntFactory antFactory = new AntFactory(pheromoneManager, worldMap, entityManager,
                 destructionListener, structureManager, antTargetPriority);
 
-        ResourceNodeFactory resourceNodeFactory = new ResourceNodeFactory(structureManager);
+        ResourceNodeFactory resourceNodeFactory = new ResourceNodeFactory();
         Colony colony = createColony(timeCycle, entityManager, structureManager,
                 gameConfiguration.startResources());
 
@@ -186,7 +186,7 @@ public class GameFactory {
         timeCycle.addTimeObserver(eggManager);
 
         spawnInitialAnts(entityManager, colony, antFactory, antTypeRegistry);
-        spawnTerrainStructures(resourceNodeFactory, worldMap);
+        spawnTerrainStructures(resourceNodeFactory, worldMap, structureManager);
 
         WaveManager waveManager = new WaveManager(enemyFactory, entityManager);
         timeCycle.addTimeObserver(waveManager);
@@ -205,12 +205,12 @@ public class GameFactory {
     /**
      * Spawns structures determined by terrain generation features.
      */
-    private void spawnTerrainStructures(ResourceNodeFactory resourceNodeFactory, MapProvider map) {
+    private void spawnTerrainStructures(ResourceNodeFactory resourceNodeFactory, MapProvider map,
+            StructureManager structureManager) {
         for (StructureSpawn spawn : map.getStructureSpawns()) {
             if ("resource_node".equals(spawn.getType())) {
                 Vector2 structurePos = map.tileToWorld(spawn.getPosition());
-
-                resourceNodeFactory.createResourceNode(structurePos, spawn);
+                structureManager.addStructure(resourceNodeFactory.createResourceNode(structurePos, spawn));
             }
             // Add other structure types here
         }
