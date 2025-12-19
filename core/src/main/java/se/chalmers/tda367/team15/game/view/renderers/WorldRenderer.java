@@ -24,7 +24,6 @@ public class WorldRenderer {
     private final FogRenderer fogRenderer;
     private final MapProvider mapProvider;
     private final ShapeRenderer shapeRenderer;
-    private final FogProvider fogProvider;
     private final TimeCycleDataProvider timeProvider;
 
     public WorldRenderer(CameraView cameraView, TextureRegistry textureRegistry, MapProvider mapProvider,
@@ -33,8 +32,7 @@ public class WorldRenderer {
         this.textureRegistry = textureRegistry;
         this.batch = new SpriteBatch();
         this.terrainRenderer = new TerrainRenderer(textureRegistry);
-        this.fogProvider = fogProvider;
-        this.fogRenderer = new FogRenderer(textureRegistry.get("pixel"));
+        this.fogRenderer = new FogRenderer(fogProvider);
         this.mapProvider = mapProvider;
         this.shapeRenderer = new ShapeRenderer();
         this.timeProvider = timeProvider;
@@ -51,7 +49,7 @@ public class WorldRenderer {
 
         // Render fog after main batch to avoid z-fighting
         if (!GameLaunchConfiguration.getCurrent().noFog()) {
-            fogRenderer.render(fogProvider, cameraView.getCombinedMatrix(), cameraView);
+            fogRenderer.render(cameraView.getCombinedMatrix(), cameraView);
         }
 
         if (!timeProvider.getIsDay()) {

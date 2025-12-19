@@ -1,11 +1,12 @@
 package se.chalmers.tda367.team15.game.view.renderers;
 
+import java.nio.ByteBuffer;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.GridPoint2;
@@ -14,24 +15,23 @@ import com.badlogic.gdx.math.Matrix4;
 import se.chalmers.tda367.team15.game.model.fog.FogProvider;
 import se.chalmers.tda367.team15.game.view.camera.CameraView;
 
-import java.nio.ByteBuffer;
-
 public class FogRenderer {
     private final SpriteBatch maskBatch;
     private final SpriteBatch fogBatch;
     private final ShaderProgram fogShader;
     private FrameBuffer fogMaskBuffer;
     private float time = 0f;
+    private final FogProvider fogProvider;
 
-    // Pixmap-based fog mask texture (much faster than drawing sprites)
     private Pixmap fogPixmap;
     private Texture fogMaskTexture;
     private int fogWidth;
     private int fogHeight;
+    // This is used to set the fog mask texture to dirty when the window is resized
     private boolean textureNeedsUpdate = true;
 
-    public FogRenderer(TextureRegion pixelTexture) {
-        // pixelTexture no longer needed but keep parameter for API compatibility
+    public FogRenderer(FogProvider fogProvider) {
+        this.fogProvider = fogProvider;
         this.maskBatch = new SpriteBatch();
         this.fogBatch = new SpriteBatch();
 
@@ -89,7 +89,7 @@ public class FogRenderer {
         createFrameBuffer(width, height);
     }
 
-    public void render(FogProvider fogProvider, Matrix4 worldProjectionMatrix, CameraView cameraView) {
+    public void render(Matrix4 worldProjectionMatrix, CameraView cameraView) {
         time += Gdx.graphics.getDeltaTime();
 
         int screenWidth = Gdx.graphics.getWidth();
