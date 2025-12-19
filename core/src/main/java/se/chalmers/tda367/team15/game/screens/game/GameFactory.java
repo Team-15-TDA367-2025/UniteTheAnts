@@ -132,13 +132,8 @@ public class GameFactory {
         return new CameraModel(constraints);
     }
 
-    // TODO - Antigravity: Long method (47 lines) - break into createSimulation(),
-    // createWorldAndTerrain(), createEntitySystem()
     private GameModel createGameModel(GridPoint2 mapSize) {
         AntTypeRegistry antTypeRegistry = createAntTypeRegistry();
-
-        TerrainGenerator terrainGenerator = TerrainFactory.createStandardPerlinGenerator(
-                gameConfiguration.seed(), GameConfiguration.GRASS_VARIANT_TYPES);
         SimulationManager simulationManager = new SimulationManager();
         TimeCycle timeCycle = new TimeCycle(1f / GameConfiguration.TICKS_PER_MINUTE);
         simulationManager.addUpdateObserver(timeCycle);
@@ -154,27 +149,14 @@ public class GameFactory {
         ResourceManager resourceManager = new ResourceManager(entityManager, structureManager);
         simulationManager.addUpdateObserver(resourceManager);
 
-        WorldMap worldMap = new WorldMap(mapSize.x, mapSize.y, terrainGenerator);
+        WorldMap worldMap = createWorldMap(mapSize);
 
-        // Termite target priority
-        HashMap<AttackCategory, Integer> termiteTargetPriority = new HashMap<>();
-        termiteTargetPriority.put(AttackCategory.WORKER_ANT, 2);
-
-        EnemyFactory enemyFactory = new EnemyFactory(entityManager, destructionListener,
-                termiteTargetPriority);
         FogManager fogManager = new FogManager(entityManager, worldMap);
         simulationManager.addUpdateObserver(fogManager);
-        PheromoneGridConverter pheromoneGridConverter = new PheromoneGridConverter(4);
 
-        // Ant target priority
-        HashMap<AttackCategory, Integer> antTargetPriority = new HashMap<>();
-        antTargetPriority.put(AttackCategory.TERMITE, 2);
+        PheromoneManager pheromoneManager = createPheromoneManager();
+        AntFactory antFactory = createAntFactory(pheromoneManager, worldMap, entityManager, destructionListener);
 
-        PheromoneManager pheromoneManager = new PheromoneManager(new GridPoint2(0, 0), pheromoneGridConverter, 4);
-        AntFactory antFactory = new AntFactory(pheromoneManager, worldMap, entityManager,
-                destructionListener, antTargetPriority);
-
-        ResourceNodeFactory resourceNodeFactory = new ResourceNodeFactory();
         Colony colony = createColony(timeCycle, entityManager, structureManager,
                 gameConfiguration.startResources());
 
@@ -182,13 +164,40 @@ public class GameFactory {
         timeCycle.addTimeObserver(eggManager);
 
         spawnInitialAnts(entityManager, colony, antFactory, antTypeRegistry);
-        spawnTerrainStructures(resourceNodeFactory, worldMap, structureManager);
+        spawnTerrainStructures(new ResourceNodeFactory(), worldMap, structureManager);
 
-        WaveManager waveManager = new WaveManager(enemyFactory, entityManager);
-        timeCycle.addTimeObserver(waveManager);
+        createWaveManager(entityManager, destructionListener, timeCycle);
 
         return new GameModel(simulationManager, timeCycle, fogManager, colony,
                 pheromoneManager, worldMap, antTypeRegistry, structureManager, entityManager, eggManager);
+    }
+
+    private WorldMap createWorldMap(GridPoint2 mapSize) {
+        TerrainGenerator terrainGenerator = TerrainFactory.createStandardPerlinGenerator(
+                gameConfiguration.seed(), GameConfiguration.GRASS_VARIANT_TYPES);
+        return new WorldMap(mapSize.x, mapSize.y, terrainGenerator);
+    }
+
+    private PheromoneManager createPheromoneManager() {
+        PheromoneGridConverter pheromoneGridConverter = new PheromoneGridConverter(4);
+        return new PheromoneManager(new GridPoint2(0, 0), pheromoneGridConverter, 4);
+    }
+
+    private AntFactory createAntFactory(PheromoneManager pheromoneManager, WorldMap worldMap,
+            EntityManager entityManager, DestructionListener destructionListener) {
+        HashMap<AttackCategory, Integer> antTargetPriority = new HashMap<>();
+        antTargetPriority.put(AttackCategory.TERMITE, 2);
+        return new AntFactory(pheromoneManager, worldMap, entityManager, destructionListener, antTargetPriority);
+    }
+
+    private void createWaveManager(EntityManager entityManager, DestructionListener destructionListener,
+            TimeCycle timeCycle) {
+        HashMap<AttackCategory, Integer> termiteTargetPriority = new HashMap<>();
+        termiteTargetPriority.put(AttackCategory.WORKER_ANT, 2);
+
+        EnemyFactory enemyFactory = new EnemyFactory(entityManager, destructionListener, termiteTargetPriority);
+        WaveManager waveManager = new WaveManager(enemyFactory, entityManager);
+        timeCycle.addTimeObserver(waveManager);
     }
 
     public void spawnInitialAnts(EntityManager entityManager, Home home, AntFactory antFactory,
@@ -201,9 +210,6 @@ public class GameFactory {
         }
     }
 
-    /**
-     * Spawns structures determined by terrain generation features.
-     */
     private void spawnTerrainStructures(ResourceNodeFactory resourceNodeFactory, MapProvider map,
             StructureManager structureManager) {
         for (StructureSpawn spawn : map.getStructureSpawns()) {
