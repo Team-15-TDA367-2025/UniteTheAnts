@@ -29,8 +29,8 @@ public class HudController implements PheromoneSelectionListener {
         this.pheromoneController = pheromoneController;
         this.speedController = speedController;
         this.colonyDataProvider = colonyDataProvider;
-        this.eggController = eggController;
         this.eggPanelView = eggPanelView;
+        this.eggController = eggController;
 
         initializeListeners();
     }
