@@ -56,10 +56,6 @@ import se.chalmers.tda367.team15.game.view.ui.UiSkin;
  * Factory for creating and wiring the GameScreen.
  */
 public class GameFactory {
-    public final float WORLD_VIEWPORT_WIDTH = 15f;
-    public final float MIN_ZOOM = 0.05f;
-    public final float MAX_ZOOM = 4.0f;
-    public final int TICKS_PER_MINUTE = 6;
     public final GameConfiguration gameConfiguration;
 
     public GameFactory(GameConfiguration gameConfiguration) {
@@ -126,7 +122,7 @@ public class GameFactory {
                 -mapSize.x / 2f, -mapSize.y / 2f,
                 mapSize.x, mapSize.y);
         CameraConstraints constraints = new CameraConstraints(
-                worldBounds, MIN_ZOOM, MAX_ZOOM);
+                worldBounds, GameConfiguration.MIN_ZOOM, GameConfiguration.MAX_ZOOM);
         return new CameraModel(constraints);
     }
 
@@ -137,7 +133,7 @@ public class GameFactory {
                 gameConfiguration.seed());
         // TODO: break this down
         SimulationManager simulationManager = new SimulationManager();
-        TimeCycle timeCycle = new TimeCycle(1f / TICKS_PER_MINUTE);
+        TimeCycle timeCycle = new TimeCycle(1f / GameConfiguration.TICKS_PER_MINUTE);
         simulationManager.addUpdateObserver(timeCycle);
 
         DestructionListener destructionListener = new DestructionListener();
@@ -228,8 +224,8 @@ public class GameFactory {
 
         return new CameraView(
                 cameraModel,
-                WORLD_VIEWPORT_WIDTH,
-                WORLD_VIEWPORT_WIDTH * aspectRatio);
+                GameConfiguration.WORLD_VIEWPORT_WIDTH,
+                GameConfiguration.WORLD_VIEWPORT_WIDTH * aspectRatio);
     }
 
     /**

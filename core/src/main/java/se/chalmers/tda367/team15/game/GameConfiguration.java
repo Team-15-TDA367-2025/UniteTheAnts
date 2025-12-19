@@ -8,6 +8,11 @@ import picocli.CommandLine.Option;
 
 public record GameConfiguration(boolean unlimitedFps, boolean noFog, int startAnts, Long seed,
         int startResources, String antType, GridPoint2 mapSize) {
+    public static final float WORLD_VIEWPORT_WIDTH = 15f;
+    public static final float MIN_ZOOM = 0.05f;
+    public static final float MAX_ZOOM = 4.0f;
+    public static final int TICKS_PER_MINUTE = 6;
+
     @Command(name = "game", mixinStandardHelpOptions = true, description = "Game configuration")
     private static class CliArgs {
         @Option(names = "--unlimited-fps")
