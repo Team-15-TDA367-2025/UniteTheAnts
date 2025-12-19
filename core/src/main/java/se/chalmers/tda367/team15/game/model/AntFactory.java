@@ -35,18 +35,7 @@ public class AntFactory {
 
     public Ant createAnt(Home home, AntType type) {
         Vector2 position = home.getPosition();
-        TrailStrategy strategy = createStrategy(type);
         return new Ant(position, pheromoneManager, type, map, home, entityQuery, targetPriority,
-                destructionListener, strategy);
-    }
-
-    private TrailStrategy createStrategy(AntType type) {
-        // TODO: This should be determined by the ant type instead.
-        return switch (type.id()) {
-            case "worker" -> new GatherTrailStrategy();
-            case "soldier" -> new PatrolTrailStrategy();
-            case "scout" -> new ExploreTrailStrategy();
-            default -> new GatherTrailStrategy();
-        };
+                destructionListener);
     }
 }

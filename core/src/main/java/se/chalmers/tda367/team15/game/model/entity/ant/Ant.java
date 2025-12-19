@@ -24,16 +24,11 @@ import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
 import se.chalmers.tda367.team15.game.model.world.MapProvider;
 
 public class Ant extends Entity implements VisionProvider, CanAttack {
-    // TODO - Antigravity: Magic number - visionRadius should be in AntType or
-    // config
     AntType type;
-    private final int visionRadius = 8;
     protected final Faction faction;
     private final Home home;
-    private final int hunger;
-
+    private float health;
     // Stats from AntType
-    private final float speed;
     private final Inventory inventory;
     private final DestructionListener destructionListener;
     private final PheromoneManager system;
@@ -42,29 +37,20 @@ public class Ant extends Entity implements VisionProvider, CanAttack {
     HashMap<AttackCategory, Integer> targetPriority;
 
     private GeneralizedBehaviour behavior;
-    private float health;
-    private TrailStrategy trailStrategy;
 
     public Ant(Vector2 position, PheromoneManager system, AntType type, MapProvider map, Home home,
-
             EntityQuery entityQuery,
-            HashMap<AttackCategory, Integer> targetPriority, DestructionListener destructionListener,
-            TrailStrategy trailStrategy) {
+            HashMap<AttackCategory, Integer> targetPriority, DestructionListener destructionListener) {
         super(position);
         this.type = type;
         this.behavior = new WanderBehavior(this, home, entityQuery);
         this.system = system;
-        // TODO - Antigravity: Magic number - hunger should be in AntType
-        this.hunger = 2; // test value
         this.home = home;
         this.entityQuery = entityQuery;
         this.targetPriority = targetPriority;
-        this.trailStrategy = trailStrategy;
         // Initialize from AntType
-        this.speed = type.moveSpeed();
-        this.health = type.maxHealth();
         this.inventory = new Inventory(type.carryCapacity());
-
+        this.health = type.maxHealth();
         pickRandomDirection();
         this.faction = Faction.DEMOCRATIC_REPUBLIC_OF_ANTS;
         setMovementStrategy(new AntMovementStrategy(map));
@@ -73,7 +59,7 @@ public class Ant extends Entity implements VisionProvider, CanAttack {
 
     public void pickRandomDirection() {
         float angle = MathUtils.random.nextFloat() * 2 * MathUtils.PI;
-        velocity = new Vector2(MathUtils.cos(angle), MathUtils.sin(angle)).nor().scl(speed);
+        velocity = new Vector2(MathUtils.cos(angle), MathUtils.sin(angle)).nor().scl(type.moveSpeed());
     }
 
     @Override
@@ -101,7 +87,7 @@ public class Ant extends Entity implements VisionProvider, CanAttack {
     }
 
     public int getHunger() {
-        return hunger;
+        return type.hunger();
     }
 
     public AntType getType() {
@@ -121,7 +107,7 @@ public class Ant extends Entity implements VisionProvider, CanAttack {
 
     @Override
     public float getSpeed() {
-        return this.speed;
+        return type.moveSpeed();
     }
 
     @Override
@@ -136,7 +122,7 @@ public class Ant extends Entity implements VisionProvider, CanAttack {
 
     @Override
     public int getVisionRadius() {
-        return visionRadius;
+        return type.visionRadius();
     }
 
     @Override
@@ -177,7 +163,7 @@ public class Ant extends Entity implements VisionProvider, CanAttack {
     }
 
     public void setFollowTrailBehaviour() {
-        behavior = new FollowTrailBehavior(entityQuery, this, system.getConverter(), trailStrategy);
+        behavior = new FollowTrailBehavior(entityQuery, this, system.getConverter());
     }
 
     public void setAttackBehaviour() {

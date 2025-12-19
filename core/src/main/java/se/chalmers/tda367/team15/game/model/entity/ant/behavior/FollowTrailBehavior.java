@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import com.badlogic.gdx.math.Vector2;
 
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
-import se.chalmers.tda367.team15.game.model.entity.ant.behavior.trail.TrailStrategy;
 import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
 import se.chalmers.tda367.team15.game.model.managers.PheromoneManager;
 import se.chalmers.tda367.team15.game.model.pheromones.Pheromone;
@@ -22,16 +21,14 @@ public class FollowTrailBehavior extends AntBehavior {
     private Pheromone currentTarget = null;
     private final float reachedThresholdSq;
     private final PheromoneGridConverter converter;
-    private final TrailStrategy trailStrategy;
 
     public FollowTrailBehavior(EntityQuery entityQuery, Ant ant,
-            PheromoneGridConverter converter, TrailStrategy trailStrategy) {
+            PheromoneGridConverter converter) {
         super(ant, entityQuery);
         float cellSize = converter.getPheromoneCellSize();
         float threshold = cellSize * REACHED_THRESHOLD_FRACTION;
         this.reachedThresholdSq = threshold * threshold;
         this.converter = converter;
-        this.trailStrategy = trailStrategy;
     }
 
     @Override
@@ -51,7 +48,7 @@ public class FollowTrailBehavior extends AntBehavior {
             exitTrail(); // Decrement soldier count when leaving trail
             lastPheromone = null;
             currentTarget = null;
-            trailStrategy.onTrailEnd(ant, null);
+            ant.getType().trailStrategy().onTrailEnd(ant, null);
             return;
         }
 
@@ -63,7 +60,7 @@ public class FollowTrailBehavior extends AntBehavior {
 
             if (newPheromone == null) {
                 exitTrail();
-                trailStrategy.onTrailEnd(ant, null);
+                ant.getType().trailStrategy().onTrailEnd(ant, null);
                 return;
             }
 
@@ -88,10 +85,10 @@ public class FollowTrailBehavior extends AntBehavior {
 
         // 3. Select next target using strategy
         if (currentTarget == null) {
-            currentTarget = trailStrategy.selectNextPheromone(ant, neighbors, lastPheromone);
+            currentTarget = ant.getType().trailStrategy().selectNextPheromone(ant, neighbors, lastPheromone);
 
             if (currentTarget == null) {
-                trailStrategy.onTrailEnd(ant, lastPheromone);
+                ant.getType().trailStrategy().onTrailEnd(ant, lastPheromone);
                 return;
             }
         }
@@ -102,7 +99,7 @@ public class FollowTrailBehavior extends AntBehavior {
         float distSq = diff.len2();
 
         if (distSq > 0.001f) {
-            float maxSpeed = ant.getSpeed() * trailStrategy.getSpeedMultiplier();
+            float maxSpeed = ant.getSpeed() * ant.getType().trailStrategy().getSpeedMultiplier();
             float cellSize = converter.getPheromoneCellSize();
             float speed = Math.min(maxSpeed, Math.max(ant.getSpeed(), (float) Math.sqrt(distSq) / cellSize * maxSpeed));
             ant.setVelocity(diff.nor().scl(speed));
