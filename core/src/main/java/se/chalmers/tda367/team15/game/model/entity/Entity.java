@@ -1,5 +1,6 @@
 package se.chalmers.tda367.team15.game.model.entity;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 import se.chalmers.tda367.team15.game.model.interfaces.GameObject;
@@ -59,7 +60,7 @@ public abstract class Entity implements GameObject, SimulationObserver, HasPosit
 
     private void updateRotation() {
         if (getVelocity().len2() > 0.1f) {
-            rotation = getVelocity().angleRad(); // - MathUtils.PI / 2f;
+            rotation = getVelocity().angleRad() - MathUtils.PI / 2f;
         }
     }
 
