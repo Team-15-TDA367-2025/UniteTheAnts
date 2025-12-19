@@ -1,8 +1,8 @@
-package se.chalmers.tda367.team15.game.model.fog;
+package se.chalmers.tda367.team15.game.model.managers.fog;
 
 import com.badlogic.gdx.math.GridPoint2;
 
-import se.chalmers.tda367.team15.game.model.interfaces.FogObserver;
+import se.chalmers.tda367.team15.game.model.interfaces.observers.FogObserver;
 
 public interface FogProvider {
     GridPoint2 getSize();

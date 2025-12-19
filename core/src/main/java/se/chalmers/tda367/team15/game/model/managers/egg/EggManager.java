@@ -1,17 +1,18 @@
-package se.chalmers.tda367.team15.game.model.egg;
+package se.chalmers.tda367.team15.game.model.managers.egg;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import se.chalmers.tda367.team15.game.model.AntFactory;
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntType;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntTypeRegistry;
-import se.chalmers.tda367.team15.game.model.interfaces.EggPurchaseProvider;
-import se.chalmers.tda367.team15.game.model.interfaces.EntityModificationProvider;
 import se.chalmers.tda367.team15.game.model.interfaces.Home;
-import se.chalmers.tda367.team15.game.model.interfaces.TimeObserver;
+import se.chalmers.tda367.team15.game.model.interfaces.observers.TimeObserver;
+import se.chalmers.tda367.team15.game.model.interfaces.providers.EggPurchaseProvider;
+import se.chalmers.tda367.team15.game.model.interfaces.providers.EntityModificationProvider;
 import se.chalmers.tda367.team15.game.model.structure.resource.ResourceType;
 
 /**
@@ -47,13 +48,8 @@ public class EggManager implements TimeObserver, EggPurchaseProvider {
                 continue;
             }
 
-            AntType type = egg.getType();
-
-            if (type == null) {
-                throw new IllegalArgumentException("Egg type is null");
-            }
-
-            Ant ant = antFactory.createAnt(home, type);
+            Optional<AntType> type = egg.getType();
+            Ant ant = antFactory.createAnt(home, type.orElseThrow());
             entityManager.addEntity(ant);
         }
         eggs.removeIf(Egg::isHatched);

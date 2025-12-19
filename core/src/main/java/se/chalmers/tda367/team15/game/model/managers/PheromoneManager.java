@@ -8,7 +8,7 @@ import java.util.List;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 
-import se.chalmers.tda367.team15.game.model.interfaces.PheromoneUsageProvider;
+import se.chalmers.tda367.team15.game.model.interfaces.providers.PheromoneUsageProvider;
 import se.chalmers.tda367.team15.game.model.pheromones.Pheromone;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGrid;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
@@ -219,5 +219,37 @@ public class PheromoneManager implements PheromoneUsageProvider {
 
     public List<Pheromone> getPheromonesIn3x3(GridPoint2 centerGridPos) {
         return pheromoneGrid.getPheromonesIn3x3(centerGridPos);
+    }
+
+    /** Fills all lines using strictly adjacent (non-diagonal) steps. */
+    public GridPoint2 drawPheromonesBetween(GridPoint2 start, GridPoint2 end, PheromoneType type) {
+        if (start == null) {
+            processPheromoneAction(end, type);
+            return end;
+        }
+
+        GridPoint2 current = start;
+        while (!current.equals(end)) {
+            int dx = end.x - current.x;
+            int dy = end.y - current.y;
+
+            GridPoint2 next;
+            if (Math.abs(dx) > Math.abs(dy)) {
+                next = new GridPoint2(current.x + Integer.signum(dx), current.y);
+            } else {
+                next = new GridPoint2(current.x, current.y + Integer.signum(dy));
+            }
+
+            if (!processPheromoneAction(next, type)) {
+                return current;
+            }
+            current = next;
+        }
+        return current;
+    }
+
+    private boolean processPheromoneAction(GridPoint2 pos, PheromoneType type) {
+        return addPheromone(pos, type) ||
+                getPheromoneAt(pos, type) != null;
     }
 }

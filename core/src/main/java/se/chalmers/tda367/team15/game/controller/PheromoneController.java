@@ -5,7 +5,7 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 
-import se.chalmers.tda367.team15.game.model.interfaces.PheromoneUsageProvider;
+import se.chalmers.tda367.team15.game.model.interfaces.providers.PheromoneUsageProvider;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneType;
 
 public class PheromoneController extends InputAdapter {
@@ -69,40 +69,9 @@ public class PheromoneController extends InputAdapter {
             return;
         }
 
-        lastGridPos = fillLine(lastGridPos, gridPos);
+        lastGridPos = pheromoneUsageProvider.drawPheromonesBetween(lastGridPos, gridPos, currentType);
     }
 
-    /** Fills all lines using strictly adjacent (non-diagonal) steps. */
-    private GridPoint2 fillLine(GridPoint2 start, GridPoint2 end) {
-        if (start == null) {
-            processPheromoneAction(end);
-            return end;
-        }
-
-        GridPoint2 current = start;
-        while (!current.equals(end)) {
-            int dx = end.x - current.x;
-            int dy = end.y - current.y;
-
-            GridPoint2 next;
-            if (Math.abs(dx) > Math.abs(dy)) {
-                next = new GridPoint2(current.x + Integer.signum(dx), current.y);
-            } else {
-                next = new GridPoint2(current.x, current.y + Integer.signum(dy));
-            }
-
-            if (!processPheromoneAction(next)) {
-                return current;
-            }
-            current = next;
-        }
-        return current;
-    }
-
-    private boolean processPheromoneAction(GridPoint2 pos) {
-        return pheromoneUsageProvider.addPheromone(pos, currentType) ||
-                pheromoneUsageProvider.getPheromoneAt(pos, currentType) != null;
-    }
 
     /**
      * Converts world coordinates to pheromone grid coordinates.

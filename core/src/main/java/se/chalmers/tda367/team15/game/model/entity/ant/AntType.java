@@ -2,6 +2,7 @@ package se.chalmers.tda367.team15.game.model.entity.ant;
 
 import java.util.Set;
 
+import se.chalmers.tda367.team15.game.model.entity.ant.behavior.trail.TrailStrategy;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneType;
 
 /**
@@ -15,8 +16,9 @@ import se.chalmers.tda367.team15.game.model.pheromones.PheromoneType;
  * @param maxHealth         starting health of the ant
  * @param moveSpeed         movement speed of the ant
  * @param carryCapacity     resource carrying capacity
- * @param textureName       base name of the texture to use
  * @param allowedPheromones which pheromone types this ant can follow
+ * @param trailStrategy     strategy to follow when moving
+ * @param hunger            amount of hunger the ant has
  * @param homeBias          tendency to wander toward home (0.0 = none, 1.0 =
  *                          strong)
  */
@@ -24,22 +26,28 @@ public record AntType(
         String id,
         String displayName,
         int foodCost,
+        int visionRadius,
         int developmentTicks,
         float maxHealth,
         float moveSpeed,
         int carryCapacity,
         Set<PheromoneType> allowedPheromones,
+        TrailStrategy trailStrategy,
+        int hunger,
         float homeBias) {
 
     public static final class Builder {
         private String id;
         private String displayName;
         private int foodCost;
+        private int visionRadius;
         private int developmentTicks;
         private float maxHealth;
         private float moveSpeed;
         private int carryCapacity;
         private Set<PheromoneType> allowedPheromones;
+        private TrailStrategy trailStrategy;
+        private int hunger;
         private float homeBias;
 
         public Builder id(String id) {
@@ -82,14 +90,29 @@ public record AntType(
             return this;
         }
 
+        public Builder trailStrategy(TrailStrategy trailStrategy) {
+            this.trailStrategy = trailStrategy;
+            return this;
+        }
+
+        public Builder visionRadius(int visionRadius) {
+            this.visionRadius = visionRadius;
+            return this;
+        }
+
         public Builder homeBias(float homeBias) {
             this.homeBias = homeBias;
             return this;
         }
 
+        public Builder hunger(int hunger) {
+            this.hunger = hunger;
+            return this;
+        }
+
         public AntType build() {
-            return new AntType(id, displayName, foodCost, developmentTicks, maxHealth, moveSpeed, carryCapacity,
-                    allowedPheromones, homeBias);
+            return new AntType(id, displayName, foodCost, visionRadius, developmentTicks, maxHealth, moveSpeed, carryCapacity,
+                    allowedPheromones, trailStrategy, hunger, homeBias);
         }
     }
 

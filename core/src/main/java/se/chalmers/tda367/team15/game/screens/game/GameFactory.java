@@ -1,8 +1,7 @@
 package se.chalmers.tda367.team15.game.screens.game;
 
-import java.util.Set;
-
 import java.util.HashMap;
+import java.util.Set;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -25,11 +24,12 @@ import se.chalmers.tda367.team15.game.model.GameModel;
 import se.chalmers.tda367.team15.game.model.TimeCycle;
 import se.chalmers.tda367.team15.game.model.camera.CameraConstraints;
 import se.chalmers.tda367.team15.game.model.camera.CameraModel;
-import se.chalmers.tda367.team15.game.model.egg.EggManager;
 import se.chalmers.tda367.team15.game.model.entity.ant.Ant;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntType;
 import se.chalmers.tda367.team15.game.model.entity.ant.AntTypeRegistry;
-import se.chalmers.tda367.team15.game.model.fog.FogManager;
+import se.chalmers.tda367.team15.game.model.entity.ant.behavior.trail.ExploreTrailStrategy;
+import se.chalmers.tda367.team15.game.model.entity.ant.behavior.trail.GatherTrailStrategy;
+import se.chalmers.tda367.team15.game.model.entity.ant.behavior.trail.PatrolTrailStrategy;
 import se.chalmers.tda367.team15.game.model.interfaces.EntityQuery;
 import se.chalmers.tda367.team15.game.model.interfaces.Home;
 import se.chalmers.tda367.team15.game.model.managers.EntityManager;
@@ -38,6 +38,8 @@ import se.chalmers.tda367.team15.game.model.managers.ResourceManager;
 import se.chalmers.tda367.team15.game.model.managers.SimulationManager;
 import se.chalmers.tda367.team15.game.model.managers.StructureManager;
 import se.chalmers.tda367.team15.game.model.managers.WaveManager;
+import se.chalmers.tda367.team15.game.model.managers.egg.EggManager;
+import se.chalmers.tda367.team15.game.model.managers.fog.FogManager;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneGridConverter;
 import se.chalmers.tda367.team15.game.model.pheromones.PheromoneType;
 import se.chalmers.tda367.team15.game.model.structure.Colony;
@@ -197,7 +199,8 @@ public class GameFactory {
 
     public void spawnInitialAnts(EntityManager entityManager, Home home, AntFactory antFactory,
             AntTypeRegistry antTypeRegistry) {
-        AntType type = antTypeRegistry.get(gameConfiguration.antType());
+        AntType type = antTypeRegistry.get(gameConfiguration.antType()).orElseThrow();
+
         for (int i = 0; i < gameConfiguration.startAnts(); i++) {
             Ant ant = antFactory.createAnt(home, type);
             entityManager.addEntity(ant);
@@ -259,6 +262,9 @@ public class GameFactory {
                 .carryCapacity(0)
                 .allowedPheromones(Set.of(PheromoneType.EXPLORE))
                 .homeBias(0.05f) // Low home bias - scouts wander far
+                .visionRadius(8)
+                .hunger(2)
+                .trailStrategy(new ExploreTrailStrategy())
                 .build());
 
         // Soldier: Low speed, high HP, 0 capacity, expensive
@@ -272,6 +278,9 @@ public class GameFactory {
                 .carryCapacity(50)
                 .allowedPheromones(Set.of(PheromoneType.ATTACK))
                 .homeBias(0.3f)
+                .visionRadius(8)
+                .hunger(2)
+                .trailStrategy(new PatrolTrailStrategy())
                 .build());
 
         // Worker: Medium speed, medium HP, some capacity
@@ -285,6 +294,9 @@ public class GameFactory {
                 .carryCapacity(10)
                 .allowedPheromones(Set.of(PheromoneType.GATHER))
                 .homeBias(0.1f)
+                .visionRadius(8)
+                .hunger(2)
+                .trailStrategy(new GatherTrailStrategy())
                 .build());
 
         return registry;

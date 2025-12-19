@@ -1,4 +1,4 @@
-package se.chalmers.tda367.team15.game.model.interfaces;
+package se.chalmers.tda367.team15.game.model.interfaces.providers;
 
 import java.util.Collection;
 
@@ -12,6 +12,8 @@ public interface PheromoneUsageProvider {
     PheromoneGridConverter getConverter();
 
     boolean addPheromone(GridPoint2 pos, PheromoneType type);
+
+    GridPoint2 drawPheromonesBetween(GridPoint2 start, GridPoint2 end, PheromoneType type);
 
     void removePheromone(GridPoint2 pos, PheromoneType type);
 
