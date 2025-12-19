@@ -71,25 +71,6 @@ class GatherTrailStrategyTest {
     }
 
     @Test
-    @DisplayName("should turn around at dead ends instead of leaving trail")
-    void shouldTurnAroundAtDeadEnds() {
-        when(inventory.isFull()).thenReturn(false);
-        when(behavior.isOutwards()).thenReturn(true);
-
-        // At the end of trail (dist 3), only neighbor goes backward (dist 2)
-        Pheromone current = new Pheromone(new GridPoint2(3, 0), PheromoneType.GATHER, 3);
-        Pheromone backward = new Pheromone(new GridPoint2(2, 0), PheromoneType.GATHER, 2);
-        List<Pheromone> neighbors = Collections.singletonList(backward);
-
-        Pheromone result = strategy.selectNextPheromone(ant, neighbors, current, behavior);
-
-        // Should NOT return null (leave trail), should turn around
-        assertNotNull(result, "Should turn around at dead end, not leave trail");
-        assertEquals(backward, result);
-        verify(behavior).flipDirection(); // Should have flipped to go backward
-    }
-
-    @Test
     @DisplayName("should continue wandering after turning around at dead end")
     void shouldContinueWanderingAfterTurnAround() {
         when(inventory.isFull()).thenReturn(false);

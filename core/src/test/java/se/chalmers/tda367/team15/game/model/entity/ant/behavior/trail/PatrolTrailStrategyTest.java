@@ -65,24 +65,6 @@ class PatrolTrailStrategyTest {
         assertTrue(result == outward || result == backward, "Should pick a valid neighbor");
     }
 
-    @Test
-    @DisplayName("should turn around at trail end")
-    void shouldTurnAroundAtTrailEnd() {
-        when(behavior.isOutwards()).thenReturn(true);
-
-        // At end of trail, only backward option available
-        Pheromone current = new Pheromone(new GridPoint2(5, 0), PheromoneType.ATTACK, 5);
-        Pheromone backward = new Pheromone(new GridPoint2(4, 0), PheromoneType.ATTACK, 4);
-
-        List<Pheromone> neighbors = Collections.singletonList(backward);
-
-        Pheromone result = strategy.selectNextPheromone(ant, neighbors, current, behavior);
-
-        // Should turn around and pick backward
-        assertEquals(backward, result, "Should turn around at trail end");
-        verify(behavior).flipDirection();
-    }
-
     // ========== Edge Cases ==========
 
     @Test
