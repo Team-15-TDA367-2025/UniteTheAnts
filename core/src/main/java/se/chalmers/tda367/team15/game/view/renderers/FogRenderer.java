@@ -13,9 +13,21 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Matrix4;
 
 import se.chalmers.tda367.team15.game.model.fog.FogProvider;
+import se.chalmers.tda367.team15.game.model.interfaces.FogObserver;
 import se.chalmers.tda367.team15.game.view.camera.CameraView;
+import se.chalmers.tda367.team15.game.view.camera.ViewportObserver;
 
-public class FogRenderer {
+public class FogRenderer implements FogObserver, ViewportObserver {
+    @Override
+    public void onFogDirty() {
+        updateFogMaskTexture(fogProvider);
+    }
+
+    @Override
+    public void onViewportResize(int width, int height) {
+        createFrameBuffer(width, height);
+    }
+
     private final SpriteBatch maskBatch;
     private final SpriteBatch fogBatch;
     private final ShaderProgram fogShader;
@@ -25,30 +37,21 @@ public class FogRenderer {
 
     private Pixmap fogPixmap;
     private Texture fogMaskTexture;
-    private int fogWidth;
-    private int fogHeight;
-    // This is used to set the fog mask texture to dirty when the window is resized
-    private boolean textureNeedsUpdate = true;
 
     public FogRenderer(FogProvider fogProvider) {
         this.fogProvider = fogProvider;
         this.maskBatch = new SpriteBatch();
         this.fogBatch = new SpriteBatch();
 
-        // Load shader
         ShaderProgram.pedantic = false;
         fogShader = new ShaderProgram(
                 Gdx.files.internal("shaders/fog.vert"),
                 Gdx.files.internal("shaders/fog.frag"));
 
-        if (!fogShader.isCompiled()) {
-            Gdx.app.error("FogRenderer", "Shader compilation failed: " + fogShader.getLog());
-        }
-
         fogBatch.setShader(fogShader);
 
-        // Create initial framebuffer
         createFrameBuffer(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        updateFogMaskTexture(fogProvider);
     }
 
     private void createFrameBuffer(int width, int height) {
@@ -59,30 +62,24 @@ public class FogRenderer {
             fogMaskBuffer.dispose();
         }
         fogMaskBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, width, height, false);
-        // Use linear filtering for smoother fog edges
-        fogMaskBuffer.getColorBufferTexture().setFilter(
-                Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
     }
 
     private void ensureFogTextureSize(int width, int height) {
-        if (fogPixmap == null || fogWidth != width || fogHeight != height) {
-            if (fogPixmap != null) {
-                fogPixmap.dispose();
-            }
-            if (fogMaskTexture != null) {
-                fogMaskTexture.dispose();
-            }
-
-            fogPixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
-            fogMaskTexture = new Texture(fogPixmap);
-            // Use linear filtering for smoother fog edges when zoomed
-            fogMaskTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-
-            // Cache the size to prevent recreating every frame
-            fogWidth = width;
-            fogHeight = height;
-            textureNeedsUpdate = true;
+        if (fogPixmap != null && fogPixmap.getWidth() == width && fogPixmap.getHeight() == height) {
+            return;
         }
+
+        if (fogPixmap != null) {
+            fogPixmap.dispose();
+        }
+
+        if (fogMaskTexture != null) {
+            fogMaskTexture.dispose();
+        }
+
+        fogPixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
+        fogMaskTexture = new Texture(fogPixmap);
+        fogMaskTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
     }
 
     public void resize(int width, int height) {
@@ -102,17 +99,7 @@ public class FogRenderer {
             createFrameBuffer(screenWidth, screenHeight);
         }
 
-        // Step 1: Update fog mask texture from discovered array (only if changed)
-        if (fogProvider.isDirty() || textureNeedsUpdate) {
-            updateFogMaskTexture(fogProvider);
-            fogProvider.clearDirty();
-            textureNeedsUpdate = false;
-        }
-
-        // Step 2: Render fog mask to framebuffer using world projection
         renderFogMaskToFramebuffer(fogProvider, worldProjectionMatrix);
-
-        // Step 3: Render the fog overlay in SCREEN SPACE with shader
         renderFogOverlay(screenWidth, screenHeight, cameraView);
     }
 

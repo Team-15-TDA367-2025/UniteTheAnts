@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.GridPoint2;
 import se.chalmers.tda367.team15.game.model.world.MapProvider;
 
 // Data store for fog of war, only used by FogManager
-class FogOfWar implements FogProvider {
+class FogOfWar {
     private final boolean[][] discovered;
     private final MapProvider mapProvider;
     private boolean dirty = true;
@@ -27,7 +27,6 @@ class FogOfWar implements FogProvider {
         return discovered[pos.x][pos.y];
     }
 
-    @Override
     public boolean[][] getDiscoveredArray() {
         return discovered;
     }
@@ -37,6 +36,7 @@ class FogOfWar implements FogProvider {
             for (int dy = -radius; dy <= radius; dy++) {
                 GridPoint2 pos = new GridPoint2(center.x + dx, center.y + dy);
                 boolean insideCircle = dx * dx + dy * dy <= radius * radius;
+
                 if (mapProvider.isInBounds(pos) && insideCircle) {
                     if (!discovered[pos.x][pos.y]) {
                         discovered[pos.x][pos.y] = true;

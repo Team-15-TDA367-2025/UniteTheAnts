@@ -42,6 +42,7 @@ import se.chalmers.tda367.team15.game.model.world.terrain.StructureSpawn;
 import se.chalmers.tda367.team15.game.view.TextureRegistry;
 import se.chalmers.tda367.team15.game.view.camera.CameraView;
 import se.chalmers.tda367.team15.game.view.camera.ViewportListener;
+import se.chalmers.tda367.team15.game.view.renderers.FogRenderer;
 import se.chalmers.tda367.team15.game.view.renderers.PheromoneRenderer;
 import se.chalmers.tda367.team15.game.view.renderers.WorldRenderer;
 import se.chalmers.tda367.team15.game.view.ui.HudView;
@@ -65,6 +66,7 @@ public class GameFactory {
         // 1. Create Models
         CameraModel cameraModel = createCameraModel();
         GameModel gameModel = createGameModel();
+        ViewportListener viewportListener = new ViewportListener();
 
         // 2. Create Resources
         TextureRegistry textureRegistry = new TextureRegistry();
@@ -73,8 +75,9 @@ public class GameFactory {
 
         // 3. Create Views
         CameraView cameraView = createCameraView(cameraModel);
+        FogRenderer fogRenderer = new FogRenderer(gameModel.getFogProvider());
         WorldRenderer worldRenderer = new WorldRenderer(cameraView, textureRegistry, gameModel.getMapProvider(),
-                gameModel.getTimeProvider(), gameModel.getFogProvider());
+                gameModel.getTimeProvider(), fogRenderer, viewportListener);
         PheromoneRenderer pheromoneView = new PheromoneRenderer(cameraView, gameModel.getPheromoneUsageProvider());
         HudView hudView = new HudView(hudBatch, uiFactory);
 
@@ -94,8 +97,9 @@ public class GameFactory {
         inputManager.addProcessor(pheromoneController);
 
         // 6. Wire Listeners
-        ViewportListener viewportListener = new ViewportListener();
         viewportListener.addObserver(cameraView);
+        viewportListener.addObserver(fogRenderer);
+        gameModel.getFogProvider().addObserver(fogRenderer);
 
         return new GameScreen(
                 game,
@@ -175,8 +179,8 @@ public class GameFactory {
     public static void spawnInitialAnts(EntityManager entityManager, Home home, AntFactory antFactory,
             AntTypeRegistry antTypeRegistry) {
         AntType type = antTypeRegistry.get("worker");
-            Ant ant = antFactory.createAnt(home, type);
-            entityManager.addEntity(ant);
+        Ant ant = antFactory.createAnt(home, type);
+        entityManager.addEntity(ant);
     }
 
     /**

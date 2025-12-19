@@ -9,12 +9,12 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.MathUtils;
 
 import se.chalmers.tda367.team15.game.GameLaunchConfiguration;
-import se.chalmers.tda367.team15.game.model.fog.FogProvider;
 import se.chalmers.tda367.team15.game.model.interfaces.Drawable;
 import se.chalmers.tda367.team15.game.model.interfaces.TimeCycleDataProvider;
 import se.chalmers.tda367.team15.game.model.world.MapProvider;
 import se.chalmers.tda367.team15.game.view.TextureRegistry;
 import se.chalmers.tda367.team15.game.view.camera.CameraView;
+import se.chalmers.tda367.team15.game.view.camera.ViewportListener;
 
 public class WorldRenderer {
     private final SpriteBatch batch;
@@ -27,12 +27,13 @@ public class WorldRenderer {
     private final TimeCycleDataProvider timeProvider;
 
     public WorldRenderer(CameraView cameraView, TextureRegistry textureRegistry, MapProvider mapProvider,
-            TimeCycleDataProvider timeProvider, FogProvider fogProvider) {
+            TimeCycleDataProvider timeProvider, FogRenderer fogRenderer, ViewportListener viewportListener) {
         this.cameraView = cameraView;
         this.textureRegistry = textureRegistry;
         this.batch = new SpriteBatch();
         this.terrainRenderer = new TerrainRenderer(textureRegistry);
-        this.fogRenderer = new FogRenderer(fogProvider);
+        this.fogRenderer = fogRenderer;
+        viewportListener.addObserver(fogRenderer);
         this.mapProvider = mapProvider;
         this.shapeRenderer = new ShapeRenderer();
         this.timeProvider = timeProvider;
