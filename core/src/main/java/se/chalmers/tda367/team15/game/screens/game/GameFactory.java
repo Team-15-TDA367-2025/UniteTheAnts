@@ -234,6 +234,7 @@ public class GameFactory {
      * available.
      */
     private AntTypeRegistry createAntTypeRegistry() {
+        // TODO: move out somewhere that's not here
         AntTypeRegistry registry = new AntTypeRegistry();
 
         // Scout: High speed, low HP, 0 capacity, cheap/fast to hatch
